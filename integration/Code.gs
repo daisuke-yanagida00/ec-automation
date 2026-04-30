@@ -64,25 +64,39 @@ function integrateRakutenOrders() {
   Logger.log('楽天: ' + orderNumbers.length + '件の注文番号を取得');
 
   // getOrder は1回最大100件
-  var newRows  = [];
+  var newRows   = [];
   var fetchedAt = new Date();
-  var chunks   = chunkArray_(orderNumbers, 100);
+  var chunks    = chunkArray_(orderNumbers, 100);
+  var detailCount = 0;
+  var dupCount    = 0;
 
   chunks.forEach(function(chunk) {
     var details = getRakutenOrderDetails_(chunk);
+    Logger.log('楽天: getOrder ' + chunk.length + '件送信 → ' + details.length + '件取得');
+    detailCount += details.length;
+
     details.forEach(function(orderModel) {
-      var rows = buildRows_(orderModel, fetchedAt);
-      rows.forEach(function(row) {
-        if (!existsSet[row[COL.ORDER_ID]]) {
-          newRows.push(row);
-          existsSet[row[COL.ORDER_ID]] = true;
-        }
-      });
+      var rows    = buildRows_(orderModel, fetchedAt);
+      var orderId = rows.length > 0 ? rows[0][COL.ORDER_ID] : '';
+
+      // 重複チェックは注文単位で実施（行単位にすると同一注文の2品目以降が偽重複になる）
+      if (existsSet[orderId]) {
+        dupCount++;
+        return;
+      }
+      rows.forEach(function(row) { newRows.push(row); });
+      existsSet[orderId] = true;
     });
   });
 
+  Logger.log('楽天: 詳細取得 ' + detailCount + '件 / 重複スキップ ' + dupCount + '件 / 新規 ' + newRows.length + '行');
+
   if (newRows.length === 0) {
-    Logger.log('楽天: 新規注文なし（全件重複）');
+    if (detailCount === 0) {
+      Logger.log('楽天: 注文詳細が取得できませんでした（getOrder の応答を確認してください）');
+    } else {
+      Logger.log('楽天: 新規注文なし（全件重複）');
+    }
     return;
   }
 
