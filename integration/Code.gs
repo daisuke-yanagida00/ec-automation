@@ -429,7 +429,7 @@ function fetchAmazonOrderItems_(token, orderId) {
 // 注文 + 商品リスト → シート行（商品単位で1行）
 function buildAmazonRows_(order, items, fetchedAt) {
   var orderId    = order.AmazonOrderId;
-  var orderDate  = order.PurchaseDate  || '';
+  var orderDate  = order.PurchaseDate ? new Date(order.PurchaseDate) : '';
   var status     = AMAZON_ORDER_STATUS[order.OrderStatus] || order.OrderStatus || '';
   var orderTotal = (order.OrderTotal && order.OrderTotal.Amount)
                    ? parseFloat(order.OrderTotal.Amount) : 0;
