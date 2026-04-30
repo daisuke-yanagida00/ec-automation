@@ -226,6 +226,15 @@ function debugOrderDate() {
   Logger.log('buildRows result col0: ' + buildRows_(o, new Date())[0][0]);
 }
 
+function debugBuildRows() {
+  var details = getRakutenOrderDetails_(['260505-20260430-0026225288']);
+  var row = buildRows_(details[0], new Date())[0];
+  var labels = ['注文日時','モール','注文ID','顧客名','商品名','SKU','数量','売上金額','送料','ステータス','都道府県','取得日時'];
+  labels.forEach(function(label, i) {
+    Logger.log('[' + i + '] ' + label + ': ' + JSON.stringify(row[i]));
+  });
+}
+
 // ================================================================
 // スプレッドシート操作
 // ================================================================
