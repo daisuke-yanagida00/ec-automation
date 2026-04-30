@@ -131,6 +131,19 @@ function getRakutenOrderDetails_(orderNumbers) {
   });
 
   var res = rakutenPost_('getOrder', body);
+
+  // デバッグ：レスポンス生データのトップレベルキーと先頭1件を出力
+  if (res) {
+    Logger.log('getOrder レスポンス keys: ' + Object.keys(res).join(', '));
+    var firstEntry = res.MessageModelList && res.MessageModelList[0];
+    if (firstEntry) {
+      Logger.log('MessageModelList[0] keys: ' + Object.keys(firstEntry).join(', '));
+      Logger.log('MessageModelList[0] (先頭1件): ' + JSON.stringify(firstEntry).slice(0, 1000));
+    } else {
+      Logger.log('MessageModelList の中身: ' + JSON.stringify(res).slice(0, 1000));
+    }
+  }
+
   if (!res || !res.MessageModelList) return [];
 
   return res.MessageModelList
