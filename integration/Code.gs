@@ -384,8 +384,9 @@ function fetchAmazonOrderPage_(token, createdAfter, createdBefore, nextToken) {
   if (nextToken) {
     url += '&NextToken=' + encodeURIComponent(nextToken);
   } else {
-    url += '&CreatedAfter='  + encodeURIComponent(createdAfter)
-        +  '&CreatedBefore=' + encodeURIComponent(createdBefore)
+    url += '&CreatedAfter='    + encodeURIComponent(createdAfter)
+        +  '&CreatedBefore='   + encodeURIComponent(createdBefore)
+        +  '&OrderStatuses=Shipped,PartiallyShipped'  // 発送済みのみ（セラーセントラルの売上計上に合わせる）
         +  '&MaxResultsPerPage=100';
   }
 
