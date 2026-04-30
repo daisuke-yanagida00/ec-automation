@@ -212,6 +212,12 @@ function buildRows_(orderModel, fetchedAt) {
   return rows;
 }
 
+// デバッグ用：OrderModel の構造確認（確認後に削除）
+function debugOrderModel() {
+  var details = getRakutenOrderDetails_(['最新の注文番号1件']);
+  Logger.log(JSON.stringify(details[0]));
+}
+
 // ================================================================
 // スプレッドシート操作
 // ================================================================
