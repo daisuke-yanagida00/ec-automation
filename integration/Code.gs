@@ -425,6 +425,26 @@ function fetchAmazonOrderItems_(token, orderId) {
   return (json.payload && json.payload.OrderItems) ? json.payload.OrderItems : [];
 }
 
+// デバッグ用：Amazon注文の金額フィールド構造確認（確認後に削除）
+function debugAmazonPrice() {
+  var token  = getAmazonAccessToken_();
+  if (!token) return;
+  var range  = getYesterdayJstRange_();
+  var orders = fetchAllAmazonOrders_(token, range.from, range.to);
+  if (orders.length === 0) { Logger.log('注文なし'); return; }
+
+  orders.slice(0, 5).forEach(function(order) {
+    var items = fetchAmazonOrderItems_(token, order.AmazonOrderId);
+    Logger.log('--- ' + order.AmazonOrderId + ' ---');
+    Logger.log('OrderTotal: ' + JSON.stringify(order.OrderTotal));
+    Logger.log('OrderStatus: ' + order.OrderStatus);
+    if (items.length > 0) {
+      Logger.log('item[0].ItemPrice: '    + JSON.stringify(items[0].ItemPrice));
+      Logger.log('item[0].ShippingPrice: ' + JSON.stringify(items[0].ShippingPrice));
+    }
+  });
+}
+
 // 注文 + 商品リスト → シート行（商品単位で1行）
 function buildAmazonRows_(order, items, fetchedAt) {
   var orderId    = order.AmazonOrderId;
