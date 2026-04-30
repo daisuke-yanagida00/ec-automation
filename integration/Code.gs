@@ -218,6 +218,14 @@ function debugOrderModel() {
   Logger.log(JSON.stringify(details[0]));
 }
 
+function debugOrderDate() {
+  var details = getRakutenOrderDetails_(['260505-20260430-0026225288']);
+  var o = details[0];
+  Logger.log('orderDatetime: ' + o.orderDatetime);
+  Logger.log('typeof: ' + typeof o.orderDatetime);
+  Logger.log('buildRows result col0: ' + buildRows_(o, new Date())[0][0]);
+}
+
 // ================================================================
 // スプレッドシート操作
 // ================================================================
