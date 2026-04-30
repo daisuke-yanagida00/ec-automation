@@ -112,7 +112,7 @@ function integrateRakutenOrders() {
 function searchRakutenOrders_() {
   var body = JSON.stringify({
     dateType:          1,
-    startDatetime:     getIsoHoursAgo_(24 * 7),  // 動作確認用：過去7日間（確認後に24に戻す）
+    startDatetime:     getIsoHoursAgo_(24),
     endDatetime:       getIsoNow_(),
     orderProgressList: [100, 200, 300, 400, 500]
   });
@@ -214,28 +214,6 @@ function buildRows_(orderModel, fetchedAt) {
   return rows;
 }
 
-// デバッグ用：OrderModel の構造確認（確認後に削除）
-function debugOrderModel() {
-  var details = getRakutenOrderDetails_(['最新の注文番号1件']);
-  Logger.log(JSON.stringify(details[0]));
-}
-
-function debugOrderDate() {
-  var details = getRakutenOrderDetails_(['260505-20260430-0026225288']);
-  var o = details[0];
-  Logger.log('orderDatetime: ' + o.orderDatetime);
-  Logger.log('typeof: ' + typeof o.orderDatetime);
-  Logger.log('buildRows result col0: ' + buildRows_(o, new Date())[0][0]);
-}
-
-function debugBuildRows() {
-  var details = getRakutenOrderDetails_(['260505-20260430-0026225288']);
-  var row = buildRows_(details[0], new Date())[0];
-  var labels = ['注文日時','モール','注文ID','顧客名','商品名','SKU','数量','売上金額','送料','ステータス','都道府県','取得日時'];
-  labels.forEach(function(label, i) {
-    Logger.log('[' + i + '] ' + label + ': ' + JSON.stringify(row[i]));
-  });
-}
 
 // ================================================================
 // スプレッドシート操作
