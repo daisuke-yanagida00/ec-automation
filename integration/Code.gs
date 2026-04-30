@@ -475,6 +475,128 @@ function getYesterdayJstRange_() {
 }
 
 // ================================================================
+// 楽天 週次売上レポート
+// ================================================================
+function weeklyRakutenReport() {
+  var ss       = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var srcSheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  if (!srcSheet) {
+    Logger.log('週次レポート: 注文統合シートが存在しません');
+    return;
+  }
+
+  var lastRow = srcSheet.getLastRow();
+  if (lastRow <= 1) {
+    Logger.log('週次レポート: データがありません');
+    return;
+  }
+
+  var data = srcSheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
+
+  // 直近7日（今日を含む）の楽天データを抽出
+  var weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - 6);
+  weekStart.setHours(0, 0, 0, 0);
+
+  var rows = data.filter(function(row) {
+    if (row[COL.MALL] !== '楽天') return false;
+    var d = new Date(row[COL.ORDER_DATE]);
+    return !isNaN(d.getTime()) && d >= weekStart;
+  });
+
+  // 日別集計：売上金額は注文単位の値が商品行ごとに繰り返されるため ORDER_ID で重複排除
+  var dayMap      = {};  // dateStr → { sales: number, orderIds: {} }
+  var addedOrders = {};  // "dateStr\x00orderId" → true
+
+  rows.forEach(function(row) {
+    var d       = new Date(row[COL.ORDER_DATE]);
+    var dateStr = Utilities.formatDate(d, 'Asia/Tokyo', 'yyyy/MM/dd');
+    var orderId = String(row[COL.ORDER_ID]);
+    var key     = dateStr + '\x00' + orderId;
+
+    if (!dayMap[dateStr]) dayMap[dateStr] = { sales: 0, orderIds: {} };
+    if (!addedOrders[key]) {
+      dayMap[dateStr].sales += Number(row[COL.PRICE]) || 0;
+      dayMap[dateStr].orderIds[orderId] = true;
+      addedOrders[key] = true;
+    }
+  });
+
+  var sortedDates = Object.keys(dayMap).sort();
+
+  // 商品別集計：アイテム単価が存在しないため数量（QTY）で集計
+  var itemMap = {};
+  rows.forEach(function(row) {
+    var name = String(row[COL.ITEM_NAME]) || '（商品名なし）';
+    if (!itemMap[name]) itemMap[name] = 0;
+    itemMap[name] += Number(row[COL.QTY]) || 0;
+  });
+
+  var top10 = Object.keys(itemMap)
+    .map(function(n)    { return [n, itemMap[n]]; })
+    .sort(function(a, b) { return b[1] - a[1]; })
+    .slice(0, 10);
+
+  // レポートシート初期化
+  var report = ss.getSheetByName('週次レポート') || ss.insertSheet('週次レポート');
+  report.clearContents();
+  report.clearFormats();
+
+  var startLabel = Utilities.formatDate(weekStart, 'Asia/Tokyo', 'yyyy/MM/dd');
+  var endLabel   = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd');
+  var out = [];
+
+  // タイトル
+  out.push(['楽天市場 週次売上レポート', startLabel + ' 〜 ' + endLabel, '']);
+  out.push(['', '', '']);
+
+  // 日別集計セクション
+  var dailySectionRow = out.length + 1;
+  out.push(['【日別集計】', '', '']);
+  var dailyHeaderRow = out.length + 1;
+  out.push(['日付', '売上金額（円）', '注文件数']);
+
+  var sumSales = 0, sumOrders = 0;
+  sortedDates.forEach(function(d) {
+    var cnt = Object.keys(dayMap[d].orderIds).length;
+    out.push([d, dayMap[d].sales, cnt]);
+    sumSales  += dayMap[d].sales;
+    sumOrders += cnt;
+  });
+  var totalRow = out.length + 1;
+  out.push(['合計', sumSales, sumOrders]);
+  out.push(['', '', '']);
+
+  // 商品別ランキングセクション
+  var rankSectionRow = out.length + 1;
+  out.push(['【商品別販売数ランキング Top10】', '', '']);
+  var rankHeaderRow = out.length + 1;
+  out.push(['順位', '商品名', '販売数量（個）']);
+  top10.forEach(function(item, i) {
+    out.push([i + 1, item[0], item[1]]);
+  });
+
+  report.getRange(1, 1, out.length, 3).setValues(out);
+
+  // 書式設定
+  report.getRange(1, 1, 1, 2).setFontSize(14).setFontWeight('bold');
+  report.getRange(dailySectionRow, 1).setFontWeight('bold');
+  report.getRange(dailyHeaderRow, 1, 1, 3).setFontWeight('bold').setBackground('#d9ead3');
+  report.getRange(totalRow, 1, 1, 3).setFontWeight('bold').setBackground('#f3f3f3');
+  report.getRange(rankSectionRow, 1).setFontWeight('bold');
+  report.getRange(rankHeaderRow, 1, 1, 3).setFontWeight('bold').setBackground('#cfe2f3');
+  if (sortedDates.length > 0) {
+    report.getRange(dailyHeaderRow + 1, 2, sortedDates.length + 1, 1).setNumberFormat('#,##0');
+  }
+  report.autoResizeColumn(1);
+  report.autoResizeColumn(2);
+  report.autoResizeColumn(3);
+
+  Logger.log('週次レポート: 完了 (' + startLabel + ' 〜 ' + endLabel
+    + ') 売上合計 ' + sumSales + '円 / ' + sumOrders + '件');
+}
+
+// ================================================================
 // 日次トリガー設定（初回のみ手動実行）
 // ================================================================
 function setupDailyTrigger() {
