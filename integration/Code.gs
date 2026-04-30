@@ -98,7 +98,7 @@ function integrateRakutenOrders() {
 function searchRakutenOrders_() {
   var body = JSON.stringify({
     dateType:          1,
-    startDatetime:     getIsoHoursAgo_(24),
+    startDatetime:     getIsoHoursAgo_(24 * 7),  // 動作確認用：過去7日間（確認後に24に戻す）
     endDatetime:       getIsoNow_(),
     orderProgressList: [100, 200, 300, 400, 500]
   });
