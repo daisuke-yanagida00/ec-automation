@@ -163,7 +163,7 @@ function rakutenPost_(endpoint, jsonBody) {
 // OrderModel → シート行への変換（商品単位で1行）
 // ================================================================
 function buildRows_(orderModel, fetchedAt) {
-  var orderDate  = orderModel.orderDate  || '';
+  var orderDate  = orderModel.orderDatetime || '';
   var orderNo    = orderModel.orderNumber || '';
   var totalPrice = orderModel.totalPrice || 0;
   var postage    = orderModel.postagePrice || 0;
