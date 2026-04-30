@@ -425,64 +425,45 @@ function fetchAmazonOrderItems_(token, orderId) {
   return (json.payload && json.payload.OrderItems) ? json.payload.OrderItems : [];
 }
 
-// デバッグ用：Amazon注文の金額フィールド構造確認（確認後に削除）
-function debugAmazonPrice() {
-  var token  = getAmazonAccessToken_();
-  if (!token) return;
-  var range  = getYesterdayJstRange_();
-  var orders = fetchAllAmazonOrders_(token, range.from, range.to);
-  if (orders.length === 0) { Logger.log('注文なし'); return; }
-
-  orders.slice(0, 5).forEach(function(order) {
-    var items = fetchAmazonOrderItems_(token, order.AmazonOrderId);
-    Logger.log('--- ' + order.AmazonOrderId + ' ---');
-    Logger.log('OrderTotal: ' + JSON.stringify(order.OrderTotal));
-    Logger.log('OrderStatus: ' + order.OrderStatus);
-    if (items.length > 0) {
-      Logger.log('item[0].ItemPrice: '    + JSON.stringify(items[0].ItemPrice));
-      Logger.log('item[0].ShippingPrice: ' + JSON.stringify(items[0].ShippingPrice));
-    }
-  });
-}
-
 // 注文 + 商品リスト → シート行（商品単位で1行）
 function buildAmazonRows_(order, items, fetchedAt) {
   var orderId    = order.AmazonOrderId;
   var orderDate  = order.PurchaseDate  || '';
   var status     = AMAZON_ORDER_STATUS[order.OrderStatus] || order.OrderStatus || '';
-  var totalPrice = (order.OrderTotal && order.OrderTotal.Amount)
+  var orderTotal = (order.OrderTotal && order.OrderTotal.Amount)
                    ? parseFloat(order.OrderTotal.Amount) : 0;
 
-  // BuyerName・ShippingAddress は PII のため制限環境では空になる
-  var buyerName  = (order.BuyerInfo      && order.BuyerInfo.BuyerName)              || '';
-  var prefecture = (order.ShippingAddress && order.ShippingAddress.StateOrRegion)   || '';
+  var buyerName  = (order.BuyerInfo      && order.BuyerInfo.BuyerName)            || '';
+  var prefecture = (order.ShippingAddress && order.ShippingAddress.StateOrRegion) || '';
 
   var rows = [];
 
   if (items.length > 0) {
     items.forEach(function(item) {
+      // 商品単位の金額（ItemPrice）を優先、なければ注文合計を按分せず0
+      var itemPrice = (item.ItemPrice && item.ItemPrice.Amount)
+                      ? parseFloat(item.ItemPrice.Amount) : 0;
       var shipPrice = (item.ShippingPrice && item.ShippingPrice.Amount)
-                     ? parseFloat(item.ShippingPrice.Amount) : 0;
+                      ? parseFloat(item.ShippingPrice.Amount) : 0;
       rows.push([
-        orderDate,                    // 注文日時
-        'Amazon',                     // モール
-        orderId,                      // 注文ID
-        buyerName,                    // 顧客名
-        item.Title           || '',   // 商品名
-        item.SellerSKU       || '',   // SKU
-        item.QuantityOrdered || 0,    // 数量
-        totalPrice,                   // 売上金額（注文単位）
-        shipPrice,                    // 送料
-        status,                       // 注文ステータス
-        prefecture,                   // 配送先都道府県
-        fetchedAt                     // 取得日時
+        orderDate,
+        'Amazon',
+        orderId,
+        buyerName,
+        item.Title           || '',
+        item.SellerSKU       || '',
+        item.QuantityOrdered || 0,
+        itemPrice,   // 商品単位の売上金額
+        shipPrice,
+        status,
+        prefecture,
+        fetchedAt
       ]);
     });
   } else {
-    // 商品明細が取得できない場合は注文単位で1行
     rows.push([
       orderDate, 'Amazon', orderId, buyerName,
-      '', '', 0, totalPrice, 0, status, prefecture, fetchedAt
+      '', '', 0, orderTotal, 0, status, prefecture, fetchedAt
     ]);
   }
 
