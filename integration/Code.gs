@@ -112,7 +112,7 @@ function integrateRakutenOrders() {
 function searchRakutenOrders_() {
   var body = JSON.stringify({
     dateType:          1,
-    startDatetime:     getIsoHoursAgo_(24),
+    startDatetime:     getIsoHoursAgo_(24 * 7),  // 再取得用：確認後に24に戻す
     endDatetime:       getIsoNow_(),
     orderProgressList: [100, 200, 300, 400, 500]
   });
@@ -214,6 +214,20 @@ function buildRows_(orderModel, fetchedAt) {
   return rows;
 }
 
+// 一時：注文統合シートの楽天行を全削除（再取得前に実行・確認後に削除）
+function clearRakutenRows() {
+  var sheet   = getOrCreateSheet_();
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) { Logger.log('データなし'); return; }
+
+  var data = sheet.getRange(2, COL.MALL + 1, lastRow - 1, 1).getValues();
+  var toDelete = [];
+  for (var i = data.length - 1; i >= 0; i--) {
+    if (data[i][0] === '楽天') toDelete.push(i + 2);
+  }
+  toDelete.forEach(function(r) { sheet.deleteRow(r); });
+  Logger.log('楽天行を ' + toDelete.length + '件削除しました');
+}
 
 // ================================================================
 // スプレッドシート操作
