@@ -272,6 +272,15 @@ function chunkArray_(arr, size) {
   return chunks;
 }
 
+function filterByDateRange_(data, start, end) {
+  return data.filter(function(row) {
+    var d  = row[COL.ORDER_DATE];
+    if (!d) return false;
+    var dt = (d instanceof Date) ? d : new Date(d);
+    return !isNaN(dt.getTime()) && dt >= start && dt <= end;
+  });
+}
+
 // ================================================================
 // Amazon SP-API 注文統合
 // ================================================================
@@ -611,6 +620,176 @@ function weeklyRakutenReport() {
 
   Logger.log('週次レポート: 完了 (' + startLabel + ' 〜 ' + endLabel
     + ') 売上合計 ' + sumSales + '円 / ' + sumOrders + '件');
+}
+
+// ================================================================
+// 月次横断レポート
+// ================================================================
+function monthlyReport() {
+  var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var srcSheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  if (!srcSheet) {
+    Logger.log('月次レポート: 注文統合シートが存在しません');
+    return;
+  }
+
+  var lastRow = srcSheet.getLastRow();
+  if (lastRow <= 1) {
+    Logger.log('月次レポート: データがありません');
+    return;
+  }
+
+  var allData = srcSheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
+
+  // 前月・前々月の期間
+  var now      = new Date();
+  var pmStart  = new Date(now.getFullYear(), now.getMonth() - 1, 1,  0,  0,  0);
+  var pmEnd    = new Date(now.getFullYear(), now.getMonth(),     0, 23, 59, 59);
+  var pm2Start = new Date(now.getFullYear(), now.getMonth() - 2, 1,  0,  0,  0);
+  var pm2End   = new Date(now.getFullYear(), now.getMonth() - 1, 0, 23, 59, 59);
+
+  var pmRows  = filterByDateRange_(allData, pmStart, pmEnd);
+  var pm2Rows = filterByDateRange_(allData, pm2Start, pm2End);
+
+  var pmLabel  = Utilities.formatDate(pmStart,  'Asia/Tokyo', 'yyyy年M月');
+  var pm2Label = Utilities.formatDate(pm2Start, 'Asia/Tokyo', 'yyyy年M月');
+  var hasPrev2 = pm2Rows.length > 0;
+
+  // ORDER_ID 重複排除で集計するヘルパー
+  function mallStats(rows, mall) {
+    var mallRows = rows.filter(function(r) { return r[COL.MALL] === mall; });
+    var orderSet = {};
+    var sales = 0;
+    mallRows.forEach(function(row) {
+      var id = String(row[COL.ORDER_ID]);
+      if (!orderSet[id]) {
+        orderSet[id] = true;
+        sales += Number(row[COL.PRICE]) || 0;
+      }
+    });
+    var orders = Object.keys(orderSet).length;
+    return { sales: sales, orders: orders, avg: orders > 0 ? Math.round(sales / orders) : 0 };
+  }
+
+  function momStr(cur, prev) {
+    return prev > 0 ? ((cur - prev) / prev * 100).toFixed(1) + '%' : 'N/A';
+  }
+
+  // 商品別売上ランキング Top10（全モール横断）
+  var itemSales = {};
+  pmRows.forEach(function(row) {
+    var name = String(row[COL.ITEM_NAME]).trim() || '（商品名なし）';
+    itemSales[name] = (itemSales[name] || 0) + (Number(row[COL.PRICE]) || 0);
+  });
+  var top10 = Object.keys(itemSales)
+    .map(function(n) { return [n, itemSales[n]]; })
+    .sort(function(a, b) { return b[1] - a[1]; })
+    .slice(0, 10);
+
+  // 都道府県別売上 Top5（ORDER_ID 重複排除）
+  var prefMap    = {};
+  var prefOrders = {};
+  pmRows.forEach(function(row) {
+    var pref = String(row[COL.PREFECTURE]).trim() || '不明';
+    var key  = pref + '\x00' + String(row[COL.ORDER_ID]);
+    if (!prefOrders[key]) {
+      prefOrders[key] = true;
+      prefMap[pref]   = (prefMap[pref] || 0) + (Number(row[COL.PRICE]) || 0);
+    }
+  });
+  var top5pref = Object.keys(prefMap)
+    .map(function(p) { return [p, prefMap[p]]; })
+    .sort(function(a, b) { return b[1] - a[1]; })
+    .slice(0, 5);
+
+  // レポートシート出力
+  var report = ss.getSheetByName('月次レポート') || ss.insertSheet('月次レポート');
+  report.clearContents();
+  report.clearFormats();
+
+  var dateRange = Utilities.formatDate(pmStart, 'Asia/Tokyo', 'yyyy/MM/dd')
+                + ' 〜 ' + Utilities.formatDate(pmEnd, 'Asia/Tokyo', 'yyyy/MM/dd');
+  var out = [];
+
+  out.push(['月次売上レポート', pmLabel + '（' + dateRange + '）', '', '']);
+  out.push(['', '', '', '']);
+
+  var mallSectionRow = out.length + 1;
+  out.push(['【モール別集計】', '', '', '']);
+  var mallHeaderRow = out.length + 1;
+  out.push(['モール', '売上合計（円）', '注文件数', '客単価（円）']);
+
+  var malls = ['楽天', 'Amazon'];
+  var mallDataStartRow = out.length + 1;
+  malls.forEach(function(mall) {
+    var cur = mallStats(pmRows, mall);
+    out.push([mall, cur.sales, cur.orders, cur.avg]);
+    if (hasPrev2) {
+      var prev = mallStats(pm2Rows, mall);
+      out.push([
+        '  └ 前月比（' + pm2Label + '比）',
+        momStr(cur.sales,  prev.sales),
+        momStr(cur.orders, prev.orders),
+        ''
+      ]);
+    }
+  });
+
+  var allOrderSet = {};
+  var allSales = 0;
+  pmRows.forEach(function(row) {
+    var id = String(row[COL.ORDER_ID]);
+    if (!allOrderSet[id]) {
+      allOrderSet[id] = true;
+      allSales += Number(row[COL.PRICE]) || 0;
+    }
+  });
+  var allOrders = Object.keys(allOrderSet).length;
+  var totalRow  = out.length + 1;
+  out.push(['合計', allSales, allOrders, allOrders > 0 ? Math.round(allSales / allOrders) : 0]);
+  out.push(['', '', '', '']);
+
+  var rankSectionRow = out.length + 1;
+  out.push(['【商品別売上金額ランキング Top10（全モール）】', '', '', '']);
+  var rankHeaderRow = out.length + 1;
+  out.push(['順位', '商品名', '売上金額（円）', '']);
+  top10.forEach(function(item, i) { out.push([i + 1, item[0], item[1], '']); });
+  out.push(['', '', '', '']);
+
+  var prefSectionRow = out.length + 1;
+  out.push(['【都道府県別売上 Top5】', '', '', '']);
+  var prefHeaderRow = out.length + 1;
+  out.push(['順位', '都道府県', '売上金額（円）', '']);
+  top5pref.forEach(function(p, i) { out.push([i + 1, p[0], p[1], '']); });
+
+  report.getRange(1, 1, out.length, 4).setValues(out);
+
+  report.getRange(1, 1, 1, 2).setFontSize(14).setFontWeight('bold');
+  report.getRange(mallSectionRow, 1).setFontWeight('bold');
+  report.getRange(mallHeaderRow,  1, 1, 4).setFontWeight('bold').setBackground('#fce5cd');
+  report.getRange(totalRow,       1, 1, 4).setFontWeight('bold').setBackground('#f3f3f3');
+  report.getRange(rankSectionRow, 1).setFontWeight('bold');
+  report.getRange(rankHeaderRow,  1, 1, 3).setFontWeight('bold').setBackground('#cfe2f3');
+  report.getRange(prefSectionRow, 1).setFontWeight('bold');
+  report.getRange(prefHeaderRow,  1, 1, 3).setFontWeight('bold').setBackground('#d9ead3');
+
+  var step = hasPrev2 ? 2 : 1;
+  for (var i = 0; i < malls.length; i++) {
+    var r = mallDataStartRow + i * step;
+    report.getRange(r, 2, 1, 1).setNumberFormat('#,##0');
+    report.getRange(r, 4, 1, 1).setNumberFormat('#,##0');
+  }
+  report.getRange(totalRow, 2, 1, 1).setNumberFormat('#,##0');
+  report.getRange(totalRow, 4, 1, 1).setNumberFormat('#,##0');
+  if (top10.length    > 0) report.getRange(rankHeaderRow + 1, 3, top10.length,    1).setNumberFormat('#,##0');
+  if (top5pref.length > 0) report.getRange(prefHeaderRow + 1, 3, top5pref.length, 1).setNumberFormat('#,##0');
+
+  report.autoResizeColumn(1);
+  report.autoResizeColumn(2);
+  report.autoResizeColumn(3);
+
+  Logger.log('月次レポート: 完了 ' + pmLabel
+    + ' 売上合計 ' + allSales + '円 / ' + allOrders + '件');
 }
 
 // ================================================================
