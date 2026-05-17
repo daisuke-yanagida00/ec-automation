@@ -1,4 +1,4 @@
-# EC自動化プロジェクト（株式会社ネオ・ゲート）
+﻿# EC自動化プロジェクト（株式会社ネオ・ゲート）
 
 ## 目的
 
@@ -57,3 +57,29 @@ ec-automation/
 - Google Apps Script (GAS)
 - clasp
 - Claude Code
+
+## 2026-05-02 作業記録
+
+### 完了
+- 楽天 getOrder APIレスポンス構造修正（OrderModelList対応）
+- 楽天 orderDatetime キー名修正（A列に注文日表示）
+- Amazon 売上金額0円バグ修正
+- Amazon セッション数：SP-API値（重複カウントあり）をそのまま使用と決定
+  - Seller Centralとの差分約215セッション（約15%）は仕様差として許容
+  - CVRもSP-API基準で統一（Seller Centralより約0.7pt低く出る）
+- childAsin優先・parentAsinフォールバックのフィルター修正
+
+### 決定事項
+- EC注文統合GAS（integration）：全モール共通DBとして毎朝自動更新
+- 楽天API連携GAS（rakuten）：週次レポートはCSV運用で継続
+- 月次レポートは手動運用のまま継続
+- 次タスク：integration/Code.gs に月次横断レポート関数を追加
+
+### システム構成
+- 楽天取得期間：24*7（デバッグ中）→ 完了後に24へ戻す
+
+## 運用ルール
+**このプロジェクトのセッション終了時は必ずCLAUDE.mdを更新すること。**
+- セッション終了前に「今日の作業内容をCLAUDE.mdに追記してgit pushして」を実行
+- 記録内容：完了タスク・決定事項・システム構成の変更点
+
