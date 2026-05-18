@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自動化プロジェクト ダッシュボード</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: sans-serif; background: #f5f5f0; color: #2c2c2a; margin: 0; padding: 20px; font-size: 13px; }
+  h1 { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 11px; color: #888; margin-bottom: 20px; }
+  .section-title { font-size: 13px; font-weight: 600; color: #2c2c2a; margin: 20px 0 8px; border-left: 3px solid #1D9E75; padding-left: 8px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .card { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; }
+  .card h2 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
+  .item { font-size: 11px; padding: 3px 7px; border-radius: 5px; margin-bottom: 3px; }
+  .done { background: #e1f5ee; color: #085041; }
+  .wait { background: #faeeda; color: #633806; }
+  .now  { background: #fde8e8; color: #7a1f1f; }
+  .none { background: #f1efe8; color: #5f5e5a; }
+  .teal { border-left: 3px solid #1D9E75; }
+  .blue { border-left: 3px solid #378ADD; }
+  .amber { border-left: 3px solid #EF9F27; }
+  .coral { border-left: 3px solid #D85A30; }
+  .purple { border-left: 3px solid #7F77DD; }
+  .pink { border-left: 3px solid #D85A8C; }
+  .gray { border-left: 3px solid #aaa; }
+  .flow { background: #fff; border-radius: 10px; padding: 10px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
+  .flow h2 { font-size: 11px; font-weight: 600; color: #5f5e5a; margin: 0 0 6px; }
+  .flow-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .flow-box { background: #eeedfe; color: #3c3489; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 500; }
+  .flow-box.green { background: #e1f5ee; color: #085041; }
+  .flow-arrow { color: #bbb; font-size: 13px; }
+  .claude-md { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
+  .claude-md h2 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
+  .md-row { display: flex; gap: 8px; align-items: center; font-size: 11px; padding: 4px 0; border-bottom: 1px solid #f1efe8; }
+  .md-row:last-child { border-bottom: none; }
+  .md-name { min-width: 200px; font-weight: 500; }
+  .md-loc { font-size: 10px; color: #888; min-width: 80px; }
+  .md-git { font-size: 10px; padding: 1px 6px; border-radius: 8px; }
+  .git-yes { background: #e1f5ee; color: #085041; }
+  .git-no { background: #f1efe8; color: #888; }
+  .md-status { font-size: 10px; padding: 1px 6px; border-radius: 8px; }
+  .st-done { background: #e1f5ee; color: #085041; }
+  .st-new { background: #eeedfe; color: #3c3489; }
+  .md-date { color: #aaa; font-size: 10px; margin-left: auto; }
+  .rule-box { background: #eeedfe; border-radius: 8px; padding: 10px 14px; border: 1px solid #c5c2f5; margin-bottom: 10px; font-size: 11px; color: #3c3489; }
+  .rule-box strong { font-size: 12px; display: block; margin-bottom: 3px; }
+  .todo { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
+  .todo h2 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
+  .todo-item { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; padding: 4px 0; border-bottom: 1px solid #f1efe8; }
+  .todo-item:last-child { border-bottom: none; }
+  .badge { font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: 500; white-space: nowrap; margin-top: 1px; }
+  .b-now { background: #f7c1c1; color: #791f1f; }
+  .b-next { background: #fac775; color: #633806; }
+  .b-wait { background: #d3d1c7; color: #444; }
+  .progress-wrap { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
+  .progress-wrap h2 { font-size: 12px; font-weight: 600; margin: 0 0 10px; }
+  .prog-row { margin-bottom: 8px; }
+  .prog-label { font-size: 11px; color: #5f5e5a; margin-bottom: 2px; display: flex; justify-content: space-between; }
+  .bar-bg { background: #f1efe8; border-radius: 5px; height: 9px; overflow: hidden; }
+  .bar-fg { height: 9px; border-radius: 5px; }
+  .updated { font-size: 10px; color: #aaa; text-align: center; margin-top: 8px; }
+  .tag { font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 500; display: inline-block; margin-right: 3px; }
+  .tag-gas { background: #e1f5ee; color: #085041; }
+  .tag-py { background: #e6f1fb; color: #0C447C; }
+  .tag-js { background: #faeeda; color: #633806; }
+  .tag-auto { background: #eeedfe; color: #3c3489; }
+  .tag-manual { background: #f1efe8; color: #5f5e5a; }
+  .audio-flow { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+  .af-box { background: #f1efe8; border-radius: 6px; padding: 4px 9px; font-size: 11px; color: #444; border: 1px solid #d3d1c7; }
+  .af-arrow { color: #bbb; font-size: 12px; }
+  .improve { background: #faeeda; border-radius: 8px; padding: 10px 14px; border: 1px solid #FAC775; margin-bottom: 10px; }
+  .improve h3 { font-size: 12px; font-weight: 600; color: #633806; margin: 0 0 5px; }
+  .improve-item { font-size: 11px; color: #854F0B; padding: 2px 0; }
+  .schedule { background: #fff; border-radius: 10px; padding: 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
+  .schedule h2 { font-size: 13px; font-weight: 600; margin: 0 0 8px; }
+  .sch-row { display: flex; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid #f1efe8; font-size: 11px; }
+  .sch-row:last-child { border-bottom: none; }
+  .sch-tag { min-width: 56px; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 500; text-align: center; }
+  .t-mon { background: #e1f5ee; color: #085041; }
+  .t-wed { background: #e6f1fb; color: #0C447C; }
+  .t-fri { background: #faeeda; color: #633806; }
+  .t-mon1 { background: #eeedfe; color: #3c3489; }
+  .sch-time { color: #888; min-width: 76px; }
+  .next-run { font-size: 11px; color: #D85A30; font-weight: 500; margin-top: 8px; }
+</style>
+</head>
+<body>
+<h1>自動化プロジェクト ダッシュボード</h1>
+<p class="subtitle">2026年5月18日更新 | 株式会社ネオ・ゲート 全9プロジェクト</p>
+<div class="section-title">EC受注統合（ec-automation）<span class="tag tag-gas">GAS</span><span class="tag tag-auto">全自動</span></div>
+<div class="grid3">
+  <div class="card teal"><h2>楽天</h2>
+    <div class="item done">✓ 注文取得（毎朝8時）</div>
+    <div class="item done">✓ OrderModelList・orderDatetime修正</div>
+    <div class="item done">✓ 取得期間 24h確認済み</div>
+    <div class="item done">✓ 週次レポート（CSV運用）</div>
+    <div class="item none">△ 月次（手動運用中）</div>
+  </div>
+  <div class="card blue"><h2>Amazon</h2>
+    <div class="item done">✓ 注文取得（毎朝8時）</div>
+    <div class="item done">✓ 売上金額・childAsinフィルター修正</div>
+    <div class="item done">✓ セッション仕様差を許容決定</div>
+    <div class="item now">▶ 週次レポート（amazon-weekly）追加中</div>
+  </div>
+  <div class="card amber"><h2>Yahoo</h2>
+    <div class="item done">✓ 週次レポート（CSV運用）</div>
+    <div class="item wait">⏳ API承認待ち</div>
+    <div class="item none">— 注文自動取得（未着手）</div>
+  </div>
+</div>
+<div class="flow"><h2>データフロー</h2>
+  <div class="flow-row">
+    <div class="flow-box">楽天RMS API</div><div class="flow-arrow">+</div>
+    <div class="flow-box">Amazon SP-API</div><div class="flow-arrow">→</div>
+    <div class="flow-box">EC注文統合GAS（毎朝8時）</div><div class="flow-arrow">→</div>
+    <div class="flow-box green">注文統合シート（全モールDB）</div><div class="flow-arrow">→</div>
+    <div class="flow-box green">週次・月次レポート ✓<br><span style="font-weight:400;font-size:10px">4月実績: 535,026円/61件</span></div>
+  </div>
+</div>
+<div class="section-title">楽天自動化（rakuten-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
+<div class="card teal" style="margin-bottom:10px"><h2>楽天週次レポート自動集計</h2>
+  <div class="item done">✓ weekly.js：週次レポート生成</div>
+  <div class="item done">✓ run_weekly.bat / ps1：自動実行設定済み</div>
+  <div class="item done">✓ Google Sheets連携</div>
+</div>
+<div class="section-title">楽天RPP広告自動化（rakuten-rpp-auto）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">デイリー自動</span></div>
+<div class="card pink" style="margin-bottom:10px"><h2>楽天RPP広告デイリー運用</h2>
+  <div class="item done">✓ src/：メインロジック実装済み</div>
+  <div class="item done">✓ scripts/：実行スクリプト設定済み</div>
+  <div class="item none">— 詳細動作・進捗（CLAUDE.md未記録）</div>
+</div>
+<div class="section-title">Amazon月次レポート（amazon-monthly）<span class="tag tag-py">Python</span><span class="tag tag-auto">月次自動</span></div>
+<div class="card blue" style="margin-bottom:10px"><h2>Amazon広告月次自動集計</h2>
+  <div class="item done">✓ SP全レポート取得（KW・ASIN・検索語句）</div>
+  <div class="item done">✓ CTR/CPC/ACOS/ROAS自動計算</div>
+  <div class="item done">✓ Google Sheets自動出力</div>
+</div>
+<div class="section-title">Yahoo自動化（yahoo-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
+<div class="card amber" style="margin-bottom:10px"><h2>Yahoo!週次レポート自動集計</h2>
+  <div class="item done">✓ 毎週月曜9時：Google DriveのCSVを自動読み込み</div>
+  <div class="item done">✓ スプレッドシートに売上・広告データ書き込み</div>
+  <div class="item done">✓ SEO順位取得・記録</div>
+  <div class="item wait">△ 手動作業：月曜5分（CSV DL → Drive保存）</div>
+</div>
+<div class="section-title">ブログ自動化（blog-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週3回自動</span></div>
+<div class="schedule"><h2>Goosely ブログ自動投稿スケジュール</h2>
+  <div class="sch-row"><span class="sch-tag t-mon1">月初</span><span class="sch-time">毎月1日 9:00</span><span>翌月の記事カレンダー生成 → Sheets更新</span></div>
+  <div class="sch-row"><span class="sch-tag t-mon">月曜</span><span class="sch-time">毎週 7:00</span><span>記事生成・監査・投稿（教育コンテンツ）</span></div>
+  <div class="sch-row"><span class="sch-tag t-wed">水曜</span><span class="sch-time">毎週 7:00</span><span>記事生成・監査・投稿（比較・レビュー）</span></div>
+  <div class="sch-row"><span class="sch-tag t-fri">金曜</span><span class="sch-time">毎週 7:00</span><span>記事生成・監査・投稿（ライフスタイル）</span></div>
+</div>
+<div class="improve"><h3>継続改善ポイント</h3>
+  <div class="improve-item">① E-E-ATスコア：現在14/20が課題</div>
+  <div class="improve-item">② GA4・Search Console連携（未着手）</div>
+  <div class="improve-item">③ 投稿パフォーマンス分析（未着手）</div>
+</div>
+<div class="section-title">音声情報の教育化（writing-concepts）<span class="tag tag-js">Node.js</span><span class="tag tag-manual">手動実行</span></div>
+<div class="card coral" style="margin-bottom:10px"><h2>Vimeo動画 → ライティング概念ナレッジベース化</h2>
+  <div class="audio-flow">
+    <div class="af-box">① Vimeo音声DL</div><div class="af-arrow">→</div>
+    <div class="af-box">② Whisper文字起こし</div><div class="af-arrow">→</div>
+    <div class="af-box">③ Claude API概念抽出</div><div class="af-arrow">→</div>
+    <div class="af-box" style="background:#e1f5ee;border-color:#9FE1CB;color:#085041">④ knowledge_base.md</div>
+  </div>
+  <div class="item done">✓ パイプライン構築完了</div>
+  <div class="item done">✓ Whisperローカル環境構築済み</div>
+  <div class="item none">— Vimeo動画未投入（実行待ち）</div>
+</div>
+<div class="claude-md"><h2>CLAUDE.md管理状況</h2>
+  <div class="md-row"><span class="md-name">ec-automation</span><span class="md-loc">C:\Users\柳田大輔\</span><span class="md-git git-yes">Git ✓</span><span class="md-status st-done">✓ 更新済み</span><span class="md-date">2026-05-17</span></div>
+  <div class="md-row"><span class="md-name">amazon-gas-automation</span><span class="md-loc">C:\Users\柳田大輔\</span><span class="md-git git-yes">Git ✓</span><span class="md-status st-done">✓ 更新済み</span><span class="md-date">2026-05-17</span></div>
+  <div class="md-row"><span class="md-name">amazon-monthly</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-done">✓ 既存あり</span><span class="md-date">2026-05-14</span></div>
+  <div class="md-row"><span class="md-name">blog-automation</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-18</span></div>
+  <div class="md-row"><span class="md-name">rakuten-automation</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-18</span></div>
+  <div class="md-row"><span class="md-name">rakuten-rpp-auto</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-18</span></div>
+  <div class="md-row"><span class="md-name">yahoo-automation</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-18</span></div>
+  <div class="md-row"><span class="md-name">writing-automation</span><span class="md-loc">Documents/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-17</span></div>
+  <div class="md-row"><span class="md-name">writing-concepts</span><span class="md-loc">Documents/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-17</span></div>
+</div>
+<div class="rule-box"><strong>📋 運用ルール（全プロジェクト共通）</strong>各Claude Codeセッション終了前に必ず実行：「今日の作業内容をCLAUDE.mdに追記して」</div>
+<div class="todo"><h2>次のアクション</h2>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>weeklyAmazonReport() 動作確認</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>yahoo-gas CLAUDE.md作成</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>楽天API連携GAS（旧）トリガー削除</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>writing-concepts Vimeo動画投入</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>自社ショップ・グースリーCSV連携設計</div>
+  <div class="todo-item"><span class="badge b-wait">承認後</span>Yahoo API連携</div>
+</div>
+<div class="progress-wrap"><h2>全体進捗</h2>
+  <div class="prog-row"><div class="prog-label"><span>EC受注統合</span><span>70%</span></div><div class="bar-bg"><div class="bar-fg" style="width:70%;background:#1D9E75"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>楽天自動化</span><span>90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#1D9E75"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>楽天RPP広告</span><span>60%</span></div><div class="bar-bg"><div class="bar-fg" style="width:60%;background:#D85A8C"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>Amazon月次</span><span>85%</span></div><div class="bar-bg"><div class="bar-fg" style="width:85%;background:#378ADD"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>Yahoo自動化</span><span>85%</span></div><div class="bar-bg"><div class="bar-fg" style="width:85%;background:#EF9F27"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>ブログ自動化</span><span>80%</span></div><div class="bar-bg"><div class="bar-fg" style="width:80%;background:#7F77DD"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>音声教育化</span><span>40%</span></div><div class="bar-bg"><div class="bar-fg" style="width:40%;background:#D85A30"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>CLAUDE.md整備</span><span>90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#378ADD"></div></div></div>
+</div>
+<p class="updated">最終更新: 2026-05-18 | 全9プロジェクト管理中</p>
+</body>
+</html>
