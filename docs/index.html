@@ -88,12 +88,12 @@
 <h1>自動化プロジェクト ダッシュボード</h1>
 <p class="subtitle">2026年05月25週（2026-05-25）更新 | 株式会社エフェクト 全9プロジェクト</p>
 
-<div class="alert-box info"><strong>ℹ️ Yahoo 注文取得</strong>API連携申請を取り下げ。手動CSVダウンロード運用に方針変更済み（Playwright月次DLで代替）。</div>
-<div class="alert-box warning"><strong>⚠️ アラート</strong>Google Search Console 所有権確認が未完了。ユーザー側での「確認」ボタン操作が必要。</div>
-<div class="alert-box warning"><strong>⚠️ アラート</strong>音声教育化：Vimeo動画・lessons.json が未投入のため、パイプラインが実行待ち状態。</div>
-<div class="alert-box info"><strong>ℹ️ アラート</strong>楽天RPP広告：headless: false 変更により自動ログイン成功。ジョブ実行中（1日3回）にChromeウィンドウが一時表示される仕様。</div>
-<div class="alert-box info"><strong>ℹ️ アラート</strong>EC受注統合：自社ショップ・グースリー公式のCSVメール転送設定が未完了。楽天・Amazonのみ稼働中。</div>
-<div class="alert-box info"><strong>ℹ️ アラート</strong>amazon-gas-automation：今週のgitコミットなし。SP-APIデバッグはClaudeセッションで対応済みだが、コードの最終push状態を要確認。</div>
+<div class="alert-box warning"><strong>⚠️ アラート</strong>Yahoo注文API申請を取り下げ・手動CSVダウンロード運用に変更（2026-05-25）。Yahoo自動化の完全自動化は中断中。</div>
+<div class="alert-box warning"><strong>⚠️ アラート</strong>楽天週次レポート：受注取得漏れ未解決（goosely-mattress-s CSV8件 vs API4件など）。次回実行ログで要確認。</div>
+<div class="alert-box warning"><strong>⚠️ アラート</strong>楽天RPP広告：headless:falseでChromeウィンドウが1日3回（各10〜15分）画面に表示される副作用あり。</div>
+<div class="alert-box info"><strong>ℹ️ アラート</strong>amazon-gas-automationは今週コミットなし。SP-APIデバッグセッションはあったが、amazon-gas-automationリポジトリへの反映を確認すること。</div>
+<div class="alert-box info"><strong>ℹ️ アラート</strong>音声教育化：パイプライン構築済みだがVimeo動画・lessons.json未投入のため実質未稼働。早期の初回実行を推奨。</div>
+<div class="alert-box info"><strong>ℹ️ アラート</strong>補助金リサーチ（Jgrants）Webアプリ構築完了。活用方針・運用ルールの策定が次のステップ。</div>
 
 <div class="section-title">EC受注統合（ec-automation）<span class="tag tag-gas">GAS</span><span class="tag tag-auto">全自動</span></div>
 <div class="grid3">
@@ -112,8 +112,8 @@
   </div>
   <div class="card amber"><h2>Yahoo</h2>
     <div class="item done">✓ 週次レポート（CSV運用）</div>
-    <div class="item done">✓ 注文取得：手動CSVダウンロード運用に変更</div>
-    <div class="item none">— API連携（申請取り下げ・当面不要）</div>
+    <div class="item wait">⏳ API承認待ち</div>
+    <div class="item none">— 注文自動取得（未着手）</div>
   </div>
 </div>
 <div class="flow"><h2>データフロー</h2>
@@ -127,7 +127,7 @@
 </div>
 
 <div class="section-title">今週の完了タスク</div>
-<div class="completed-task"><h2>今週の完了タスク</h2><div class="ct-project">ブログ自動化（blog-automation）</div><div class="ct-item">執筆者一覧ページ SEO設定変更（タイトル・description更新、WordPress保存済み）</div><div class="ct-item">Google Search Console 所有権確認タグ追加（TCDテーマ &lt;head&gt; に meta タグ出力確認済み）</div><div class="ct-item">phase3_publish.js 改修：WAF 403時のSyntaxErrorクラッシュ修正</div><div class="ct-item">phase3_publish.js 改修：重複投稿防止（カレンダー逐次保存・WordPress既存タイトル照合）</div><div class="ct-item">phase3_publish.js 改修：アイキャッチ画像必須ルール実装（未取得時は投稿スキップ）</div><div class="ct-item">phase3_publish.js 改修：JSON-LD（BlogPosting schema）自動挿入・投稿後URL更新</div><div class="ct-project">楽天RPP広告自動化（rakuten-rpp-auto）</div><div class="ct-item">Playwrightブラウザを headless: false に変更（楽天RMS自動ログイン成功率改善）</div><div class="ct-item">セッション有効期限を36時間→約20時間に修正（実測値ベース）</div><div class="ct-item">ログファイルをDropbox外ローカルパスへ移動（ファイルロック問題対策）</div><div class="ct-item">自動ログイン改善：期限切れCookie除去後に再ログイン（clearCookies実装）</div><div class="ct-item">スケジューラー改善：lastRunKeyを永続化してPM2再起動後の二重実行防止</div><div class="ct-item">毎時セッション有効期限チェック・残り6時間以内でChatwork警告通知</div><div class="ct-project">Amazon自動化（amazon-gas-automation）</div><div class="ct-item">SP-API広告レポート取得エラーのデバッグ対応</div><div class="ct-item">amazon-weekly/ フォルダ追加（Amazon週次レポート用GASプロジェクト）</div><div class="ct-item">Amazon月次データ自動同期の実装継続</div><div class="ct-project">Yahoo自動化（yahoo-automation）</div><div class="ct-item">Yahoo Shopping API と GAS 連携実装</div><div class="ct-item">Yahoo月次自動化システム構築（Playwright CSV自動ダウンロード含む）</div><div class="ct-project">楽天自動化（rakuten-automation）</div><div class="ct-item">楽天週次オペレーション自動化ワークフロー実装</div><div class="ct-item">楽天月次運用レポート自動化</div><div class="ct-project">音声教育化（writing-concepts）</div><div class="ct-item">Vimeo動画の教育コンテンツ整理・分類作業</div><div class="ct-item">パイプライン構築完了（スクリプト①〜⑥）・Whisperローカル実行環境構築済み</div><div class="ct-project">週次ダッシュボード（ec-automation）</div><div class="ct-item">週次ダッシュボード自動更新システム構築・2026-05-25付コミット</div><div class="ct-project">経営・マーケティング（Claude.aiウェブチャットで実施）</div><div class="ct-item">補助金・助成金リサーチ：該当する公的支援制度を調査・整理</div><div class="ct-item">メルマガ配信改善：配信内容・運用フローの見直し・改善実施</div><div class="ct-item">楽天 新商品リサーチ：新規取り扱い商品候補のリサーチ実施</div></div>
+<div class="completed-task"><h2>今週の完了タスク</h2><div class="ct-project">EC受注統合</div><div class="ct-item">Yahoo注文API申請を取り下げ・手動CSVダウンロード運用に方針変更（2026-05-25）</div><div class="ct-item">Yahoo Shopping API integration with GAS automation</div><div class="ct-item">ダッシュボード週次自動更新（2026-05-25 ×2回）</div><div class="ct-item">ダッシュボード手動補正（Yahoo方針変更・補助金リサーチ・メルマガ・新商品リサーチ追加）</div><div class="ct-project">楽天RPP広告</div><div class="ct-item">楽天RPP広告の自動運用システム構築</div><div class="ct-item">headless: false への変更でglogin.rms自動ログイン問題を解消（2026-05-24）</div><div class="ct-item">ログファイルをDropbox外ローカルパスへ移動（ファイルロック対策）</div><div class="ct-item">セッション有効期限を約20時間に修正・Chatwork警告通知実装</div><div class="ct-item">lastRunKeyをJSONファイルに永続化（PM2再起動後の二重実行防止）</div><div class="ct-project">楽天自動化（週次）</div><div class="ct-item">Automate Rakuten weekly operations workflow</div><div class="ct-item">Automate Rakuten monthly operations reporting</div><div class="ct-item">SEO削除バグ修正：skipSeo時にnullを設定し既存SEOデータを上書きしない仕組みに変更</div><div class="ct-item">AF列（5/8〜）SEOデータ復元：recover-af-seo.jsでリビジョン621から正常復元</div><div class="ct-item">AG列（5/15〜）計算式をハードコード値からGoogle Sheets数式に変更</div><div class="ct-item">売上金額計算バグ修正：aggregateByProduct()で複数個購入時に単価×数量の乗算を追加</div><div class="ct-item">Build Rakuten marketplace competitive research pipeline</div><div class="ct-project">Amazon自動化</div><div class="ct-item">Debug SP-API advertising report fetch errors</div><div class="ct-item">Continue Amazon data auto-sync implementation</div><div class="ct-item">amazon-weekly/フォルダ追加（Amazon週次レポート用GASプロジェクト）</div><div class="ct-project">Yahoo自動化</div><div class="ct-item">Yahoo注文API申請取り下げ・手動CSVダウンロード運用への方針変更対応</div><div class="ct-item">Build Yahoo Shopping monthly automation system</div><div class="ct-project">ブログ自動化</div><div class="ct-item">Organize Goosely SNS automation project handover</div><div class="ct-item">執筆者一覧ページSEO設定変更（タイトル・description更新・WordPress保存済み）</div><div class="ct-item">Google Search Console所有権確認タグをTCDテーマhead内に追加</div><div class="ct-item">phase3_publish.js主要改修：WAF 403 SyntaxErrorクラッシュ修正・重複投稿防止・アイキャッチ必須ルール・JSON-LD自動挿入</div><div class="ct-item">Write content using knowledge base</div><div class="ct-project">音声教育化</div><div class="ct-item">Organize Vimeo videos into educational content</div><div class="ct-item">音声教育化パイプライン構築完了（スクリプト①〜⑥）確認</div><div class="ct-item">Whisperローカル実行環境構築済み確認</div><div class="ct-project">その他・経営支援</div><div class="ct-item">Build weekly dashboard automation system</div><div class="ct-item">Build Jgrants subsidy search web application（補助金リサーチWebアプリ構築）</div><div class="ct-item">Free up PC storage and identify large folders（PCストレージ整理・大容量フォルダ特定）</div><div class="ct-item">This session is being continued from a previous conversation that ran out of context（コンテキスト継続セッション）</div></div>
 
 <div class="section-title">楽天自動化（rakuten-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
 <div class="card teal" style="margin-bottom:10px"><h2>楽天週次レポート自動集計</h2>
@@ -187,12 +187,12 @@
 <div class="rule-box"><strong>📋 運用ルール（全プロジェクト共通）</strong>各Claude Codeセッション終了前に必ず実行：「今日の作業内容をCLAUDE.mdに追記して」</div>
 
 <div class="todo"><h2>次のアクション</h2>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>Google Search Console で「確認」ボタンをクリックし、所有権確認を完了させる</div>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>Search Console URL検査ツールで以下URLのインデックス登録リクエストを実行：representative_message / author-list / 5/24・5/21公開記事</div>
-  <div class="todo-item"><span class="badge b-wait">承認後</span>Yahoo IP制限解除申請の承認確認後、Yahoo注文自動取得を本番稼働させる（申請から1〜2週間待ち）</div>
-  <div class="todo-item"><span class="badge b-next">次回</span>自社ショップ・グースリー公式の CSVメール転送設定を実施してEC受注統合を完成させる</div>
-  <div class="todo-item"><span class="badge b-next">次回</span>integration/Code.gs に月次横断レポート関数を追加（楽天・Amazon・Yahoo横断集計）</div>
-  <div class="todo-item"><span class="badge b-next">次回</span>writing-concepts：Vimeo動画・lessons.json を投入してWhisper文字起こし→Claude API概念抽出パイプラインを初回実行する</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>Google Search Consoleで「確認」ボタンをクリックし所有権確認を完了させる</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>Search Console URLインデックス登録リクエスト：representative_message・author-list・5/24・5/21公開記事</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>楽天週次レポート：受注取得漏れ問題（goosely-mattress-s: CSV8件 vs API4件等）を次回実行ログで確認・調査</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>EC受注統合：自社ショップ・グースリーのCSVメール転送設定を完了させる</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>integration/Code.gsに月次横断レポート関数を追加（楽天週次レポートをec-automationへ統合）</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>音声教育化：Vimeo動画・lessons.jsonを投入してパイプライン初回実行を行う</div>
 </div>
 
 <div class="progress-wrap"><h2>全体進捗</h2>
@@ -200,12 +200,12 @@
   <div class="prog-row"><div class="prog-label"><span>楽天RPP広告</span><span>78%</span></div><div class="bar-bg"><div class="bar-fg" style="width:78%;background:#D85A8C"></div></div></div>
   <div class="prog-row"><div class="prog-label"><span>楽天自動化</span><span>91%</span></div><div class="bar-bg"><div class="bar-fg" style="width:91%;background:#1D9E75"></div></div></div>
   <div class="prog-row"><div class="prog-label"><span>Amazon月次</span><span>90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#378ADD"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>Yahoo自動化</span><span>91%</span></div><div class="bar-bg"><div class="bar-fg" style="width:91%;background:#EF9F27"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>ブログ自動化</span><span>83%</span></div><div class="bar-bg"><div class="bar-fg" style="width:83%;background:#7F77DD"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>音声教育化</span><span>47%</span></div><div class="bar-bg"><div class="bar-fg" style="width:47%;background:#D85A30"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>Yahoo自動化</span><span>88%</span></div><div class="bar-bg"><div class="bar-fg" style="width:88%;background:#EF9F27"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>ブログ自動化</span><span>82%</span></div><div class="bar-bg"><div class="bar-fg" style="width:82%;background:#7F77DD"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>音声教育化</span><span>46%</span></div><div class="bar-bg"><div class="bar-fg" style="width:46%;background:#D85A30"></div></div></div>
   <div class="prog-row"><div class="prog-label"><span>CLAUDE.md整備</span><span>91%</span></div><div class="bar-bg"><div class="bar-fg" style="width:91%;background:#378ADD"></div></div></div>
 </div>
 
-<p class="updated">最終更新: 2026-05-25 05:24 | 全9プロジェクト管理中 | 自動生成by Claude API</p>
+<p class="updated">最終更新: 2026-05-25 12:00 | 全9プロジェクト管理中 | 自動生成by Claude API</p>
 </body>
 </html>
