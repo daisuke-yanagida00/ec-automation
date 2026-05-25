@@ -5,12 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>自動化プロジェクト ダッシュボード</title>
 <style>
-  * { box-sizing: border-box; }
-  body { font-family: sans-serif; background: #f5f5f0; color: #2c2c2a; margin: 0; padding: 20px; font-size: 13px; }
+  * { box-sizing: border-box; max-width: 100%; }
+  html { overflow-x: hidden; }
+  body { font-family: sans-serif; background: #f5f5f0; color: #2c2c2a; margin: 0; padding: 16px; font-size: 13px; overflow-x: hidden; }
   h1 { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 4px; }
   .subtitle { text-align: center; font-size: 11px; color: #888; margin-bottom: 20px; }
-  .section-title { font-size: 13px; font-weight: 600; color: #2c2c2a; margin: 20px 0 8px; border-left: 3px solid #1D9E75; padding-left: 8px; }
-  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .section-title { font-size: 13px; font-weight: 600; color: #2c2c2a; margin: 20px 0 8px; border-left: 3px solid #1D9E75; padding-left: 8px; word-break: break-word; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 700px) { .grid3 { grid-template-columns: 1fr; } }
+  @media (min-width: 701px) and (max-width: 900px) { .grid3 { grid-template-columns: 1fr 1fr; } }
   .card { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; }
   .card h2 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
   .item { font-size: 11px; padding: 3px 7px; border-radius: 5px; margin-bottom: 3px; }
@@ -58,12 +61,12 @@
   .schedule h2 { font-size: 13px; font-weight: 600; margin: 0 0 8px; }
   .sch-row { display: flex; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid #f1efe8; font-size: 11px; }
   .sch-row:last-child { border-bottom: none; }
-  .sch-tag { min-width: 56px; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 500; text-align: center; }
+  .sch-tag { min-width: 44px; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 500; text-align: center; white-space: nowrap; }
   .t-mon { background: #e1f5ee; color: #085041; }
   .t-wed { background: #e6f1fb; color: #0C447C; }
   .t-fri { background: #faeeda; color: #633806; }
   .t-mon1 { background: #eeedfe; color: #3c3489; }
-  .sch-time { color: #888; min-width: 76px; }
+  .sch-time { color: #888; min-width: 60px; white-space: nowrap; }
   .improve { background: #faeeda; border-radius: 8px; padding: 10px 14px; border: 1px solid #FAC775; margin-bottom: 10px; }
   .improve h3 { font-size: 12px; font-weight: 600; color: #633806; margin: 0 0 5px; }
   .improve-item { font-size: 11px; color: #854F0B; padding: 2px 0; }
@@ -85,7 +88,7 @@
 <h1>自動化プロジェクト ダッシュボード</h1>
 <p class="subtitle">2026年05月25週（2026-05-25）更新 | 株式会社エフェクト 全9プロジェクト</p>
 
-<div class="alert-box warning"><strong>⚠️ アラート</strong>Yahoo IP制限解除申請が承認待ち中（1〜2週間）。承認まで Yahoo 注文自動取得は停止中。</div>
+<div class="alert-box info"><strong>ℹ️ Yahoo 注文取得</strong>API連携申請を取り下げ。手動CSVダウンロード運用に方針変更済み（Playwright月次DLで代替）。</div>
 <div class="alert-box warning"><strong>⚠️ アラート</strong>Google Search Console 所有権確認が未完了。ユーザー側での「確認」ボタン操作が必要。</div>
 <div class="alert-box warning"><strong>⚠️ アラート</strong>音声教育化：Vimeo動画・lessons.json が未投入のため、パイプラインが実行待ち状態。</div>
 <div class="alert-box info"><strong>ℹ️ アラート</strong>楽天RPP広告：headless: false 変更により自動ログイン成功。ジョブ実行中（1日3回）にChromeウィンドウが一時表示される仕様。</div>
@@ -109,8 +112,8 @@
   </div>
   <div class="card amber"><h2>Yahoo</h2>
     <div class="item done">✓ 週次レポート（CSV運用）</div>
-    <div class="item wait">⏳ API承認待ち</div>
-    <div class="item none">— 注文自動取得（未着手）</div>
+    <div class="item done">✓ 注文取得：手動CSVダウンロード運用に変更</div>
+    <div class="item none">— API連携（申請取り下げ・当面不要）</div>
   </div>
 </div>
 <div class="flow"><h2>データフロー</h2>
@@ -124,7 +127,7 @@
 </div>
 
 <div class="section-title">今週の完了タスク</div>
-<div class="completed-task"><h2>今週の完了タスク</h2><div class="ct-project">ブログ自動化（blog-automation）</div><div class="ct-item">執筆者一覧ページ SEO設定変更（タイトル・description更新、WordPress保存済み）</div><div class="ct-item">Google Search Console 所有権確認タグ追加（TCDテーマ &lt;head&gt; に meta タグ出力確認済み）</div><div class="ct-item">phase3_publish.js 改修：WAF 403時のSyntaxErrorクラッシュ修正</div><div class="ct-item">phase3_publish.js 改修：重複投稿防止（カレンダー逐次保存・WordPress既存タイトル照合）</div><div class="ct-item">phase3_publish.js 改修：アイキャッチ画像必須ルール実装（未取得時は投稿スキップ）</div><div class="ct-item">phase3_publish.js 改修：JSON-LD（BlogPosting schema）自動挿入・投稿後URL更新</div><div class="ct-project">楽天RPP広告自動化（rakuten-rpp-auto）</div><div class="ct-item">Playwrightブラウザを headless: false に変更（楽天RMS自動ログイン成功率改善）</div><div class="ct-item">セッション有効期限を36時間→約20時間に修正（実測値ベース）</div><div class="ct-item">ログファイルをDropbox外ローカルパスへ移動（ファイルロック問題対策）</div><div class="ct-item">自動ログイン改善：期限切れCookie除去後に再ログイン（clearCookies実装）</div><div class="ct-item">スケジューラー改善：lastRunKeyを永続化してPM2再起動後の二重実行防止</div><div class="ct-item">毎時セッション有効期限チェック・残り6時間以内でChatwork警告通知</div><div class="ct-project">Amazon自動化（amazon-gas-automation）</div><div class="ct-item">SP-API広告レポート取得エラーのデバッグ対応</div><div class="ct-item">amazon-weekly/ フォルダ追加（Amazon週次レポート用GASプロジェクト）</div><div class="ct-item">Amazon月次データ自動同期の実装継続</div><div class="ct-project">Yahoo自動化（yahoo-automation）</div><div class="ct-item">Yahoo Shopping API と GAS 連携実装</div><div class="ct-item">Yahoo月次自動化システム構築（Playwright CSV自動ダウンロード含む）</div><div class="ct-project">楽天自動化（rakuten-automation）</div><div class="ct-item">楽天週次オペレーション自動化ワークフロー実装</div><div class="ct-item">楽天月次運用レポート自動化</div><div class="ct-project">音声教育化（writing-concepts）</div><div class="ct-item">Vimeo動画の教育コンテンツ整理・分類作業</div><div class="ct-item">パイプライン構築完了（スクリプト①〜⑥）・Whisperローカル実行環境構築済み</div><div class="ct-project">週次ダッシュボード（ec-automation）</div><div class="ct-item">週次ダッシュボード自動更新システム構築・2026-05-25付コミット</div></div>
+<div class="completed-task"><h2>今週の完了タスク</h2><div class="ct-project">ブログ自動化（blog-automation）</div><div class="ct-item">執筆者一覧ページ SEO設定変更（タイトル・description更新、WordPress保存済み）</div><div class="ct-item">Google Search Console 所有権確認タグ追加（TCDテーマ &lt;head&gt; に meta タグ出力確認済み）</div><div class="ct-item">phase3_publish.js 改修：WAF 403時のSyntaxErrorクラッシュ修正</div><div class="ct-item">phase3_publish.js 改修：重複投稿防止（カレンダー逐次保存・WordPress既存タイトル照合）</div><div class="ct-item">phase3_publish.js 改修：アイキャッチ画像必須ルール実装（未取得時は投稿スキップ）</div><div class="ct-item">phase3_publish.js 改修：JSON-LD（BlogPosting schema）自動挿入・投稿後URL更新</div><div class="ct-project">楽天RPP広告自動化（rakuten-rpp-auto）</div><div class="ct-item">Playwrightブラウザを headless: false に変更（楽天RMS自動ログイン成功率改善）</div><div class="ct-item">セッション有効期限を36時間→約20時間に修正（実測値ベース）</div><div class="ct-item">ログファイルをDropbox外ローカルパスへ移動（ファイルロック問題対策）</div><div class="ct-item">自動ログイン改善：期限切れCookie除去後に再ログイン（clearCookies実装）</div><div class="ct-item">スケジューラー改善：lastRunKeyを永続化してPM2再起動後の二重実行防止</div><div class="ct-item">毎時セッション有効期限チェック・残り6時間以内でChatwork警告通知</div><div class="ct-project">Amazon自動化（amazon-gas-automation）</div><div class="ct-item">SP-API広告レポート取得エラーのデバッグ対応</div><div class="ct-item">amazon-weekly/ フォルダ追加（Amazon週次レポート用GASプロジェクト）</div><div class="ct-item">Amazon月次データ自動同期の実装継続</div><div class="ct-project">Yahoo自動化（yahoo-automation）</div><div class="ct-item">Yahoo Shopping API と GAS 連携実装</div><div class="ct-item">Yahoo月次自動化システム構築（Playwright CSV自動ダウンロード含む）</div><div class="ct-project">楽天自動化（rakuten-automation）</div><div class="ct-item">楽天週次オペレーション自動化ワークフロー実装</div><div class="ct-item">楽天月次運用レポート自動化</div><div class="ct-project">音声教育化（writing-concepts）</div><div class="ct-item">Vimeo動画の教育コンテンツ整理・分類作業</div><div class="ct-item">パイプライン構築完了（スクリプト①〜⑥）・Whisperローカル実行環境構築済み</div><div class="ct-project">週次ダッシュボード（ec-automation）</div><div class="ct-item">週次ダッシュボード自動更新システム構築・2026-05-25付コミット</div><div class="ct-project">経営・マーケティング（Claude.aiウェブチャットで実施）</div><div class="ct-item">補助金・助成金リサーチ：該当する公的支援制度を調査・整理</div><div class="ct-item">メルマガ配信改善：配信内容・運用フローの見直し・改善実施</div><div class="ct-item">楽天 新商品リサーチ：新規取り扱い商品候補のリサーチ実施</div></div>
 
 <div class="section-title">楽天自動化（rakuten-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
 <div class="card teal" style="margin-bottom:10px"><h2>楽天週次レポート自動集計</h2>
