@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -31,19 +31,6 @@
   .flow-box { background: #eeedfe; color: #3c3489; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 500; }
   .flow-box.green { background: #e1f5ee; color: #085041; }
   .flow-arrow { color: #bbb; font-size: 13px; }
-  .claude-md { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
-  .claude-md h2 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
-  .md-row { display: flex; gap: 8px; align-items: center; font-size: 11px; padding: 4px 0; border-bottom: 1px solid #f1efe8; }
-  .md-row:last-child { border-bottom: none; }
-  .md-name { min-width: 200px; font-weight: 500; }
-  .md-loc { font-size: 10px; color: #888; min-width: 80px; }
-  .md-git { font-size: 10px; padding: 1px 6px; border-radius: 8px; }
-  .git-yes { background: #e1f5ee; color: #085041; }
-  .git-no { background: #f1efe8; color: #888; }
-  .md-status { font-size: 10px; padding: 1px 6px; border-radius: 8px; }
-  .st-done { background: #e1f5ee; color: #085041; }
-  .st-new { background: #eeedfe; color: #3c3489; }
-  .md-date { color: #aaa; font-size: 10px; margin-left: auto; }
   .rule-box { background: #eeedfe; border-radius: 8px; padding: 10px 14px; border: 1px solid #c5c2f5; margin-bottom: 10px; font-size: 11px; color: #3c3489; }
   .rule-box strong { font-size: 12px; display: block; margin-bottom: 3px; }
   .todo { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
@@ -67,12 +54,6 @@
   .tag-js { background: #faeeda; color: #633806; }
   .tag-auto { background: #eeedfe; color: #3c3489; }
   .tag-manual { background: #f1efe8; color: #5f5e5a; }
-  .audio-flow { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
-  .af-box { background: #f1efe8; border-radius: 6px; padding: 4px 9px; font-size: 11px; color: #444; border: 1px solid #d3d1c7; }
-  .af-arrow { color: #bbb; font-size: 12px; }
-  .improve { background: #faeeda; border-radius: 8px; padding: 10px 14px; border: 1px solid #FAC775; margin-bottom: 10px; }
-  .improve h3 { font-size: 12px; font-weight: 600; color: #633806; margin: 0 0 5px; }
-  .improve-item { font-size: 11px; color: #854F0B; padding: 2px 0; }
   .schedule { background: #fff; border-radius: 10px; padding: 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
   .schedule h2 { font-size: 13px; font-weight: 600; margin: 0 0 8px; }
   .sch-row { display: flex; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid #f1efe8; font-size: 11px; }
@@ -83,12 +64,34 @@
   .t-fri { background: #faeeda; color: #633806; }
   .t-mon1 { background: #eeedfe; color: #3c3489; }
   .sch-time { color: #888; min-width: 76px; }
-  .next-run { font-size: 11px; color: #D85A30; font-weight: 500; margin-top: 8px; }
+  .improve { background: #faeeda; border-radius: 8px; padding: 10px 14px; border: 1px solid #FAC775; margin-bottom: 10px; }
+  .improve h3 { font-size: 12px; font-weight: 600; color: #633806; margin: 0 0 5px; }
+  .improve-item { font-size: 11px; color: #854F0B; padding: 2px 0; }
+  .alert-box { background: #fde8e8; border-radius: 8px; padding: 10px 14px; border: 1px solid #f5b8b8; margin-bottom: 10px; font-size: 11px; color: #7a1f1f; }
+  .alert-box.info { background: #e6f1fb; border-color: #b8d4f5; color: #0C447C; }
+  .alert-box.warning { background: #faeeda; border-color: #FAC775; color: #633806; }
+  .alert-box strong { display: block; font-size: 12px; margin-bottom: 4px; }
+  .completed-task { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
+  .completed-task h2 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
+  .ct-project { font-size: 11px; font-weight: 600; color: #1D9E75; margin: 6px 0 3px; }
+  .ct-item { font-size: 11px; padding: 2px 0 2px 12px; color: #2c2c2a; }
+  .ct-item::before { content: "✓ "; color: #1D9E75; }
+  .audio-flow { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+  .af-box { background: #f1efe8; border-radius: 6px; padding: 4px 9px; font-size: 11px; color: #444; border: 1px solid #d3d1c7; }
+  .af-arrow { color: #bbb; font-size: 12px; }
 </style>
 </head>
 <body>
 <h1>自動化プロジェクト ダッシュボード</h1>
-<p class="subtitle">2026年5月18日更新 | 株式会社ネオ・ゲート 全9プロジェクト</p>
+<p class="subtitle">2026年05月25週（2026-05-25）更新 | 株式会社エフェクト 全9プロジェクト</p>
+
+<div class="alert-box warning"><strong>⚠️ アラート</strong>Yahoo IP制限解除申請：承認待ち（1〜2週間）。承認後すぐに連携テストが必要</div>
+<div class="alert-box warning"><strong>⚠️ アラート</strong>EC受注統合：自社ショップ・グースリーのCSVメール転送設定が未完了。毎朝8時自動取得の対象外になっている</div>
+<div class="alert-box warning"><strong>⚠️ アラート</strong>Google Search Console所有権確認：HTMLタグ追加済みだが「確認」ボタン押下がユーザー対応待ち</div>
+<div class="alert-box info"><strong>ℹ️ アラート</strong>楽天RPP広告：headless: false化によりジョブ実行中（1日3回・各10〜15分）にChromeウィンドウが画面表示される仕様。完了後は自動クローズ</div>
+<div class="alert-box info"><strong>ℹ️ アラート</strong>音声教育化：パイプライン構築完了済み。Vimeo動画・lessons.json未投入のため実処理は未着手</div>
+<div class="alert-box info"><strong>ℹ️ アラート</strong>ec-automation・amazon-gas-automation：今週のgitコミットなし。CLAUDE.md記録のみ更新</div>
+
 <div class="section-title">EC受注統合（ec-automation）<span class="tag tag-gas">GAS</span><span class="tag tag-auto">全自動</span></div>
 <div class="grid3">
   <div class="card teal"><h2>楽天</h2>
@@ -116,27 +119,34 @@
     <div class="flow-box">Amazon SP-API</div><div class="flow-arrow">→</div>
     <div class="flow-box">EC注文統合GAS（毎朝8時）</div><div class="flow-arrow">→</div>
     <div class="flow-box green">注文統合シート（全モールDB）</div><div class="flow-arrow">→</div>
-    <div class="flow-box green">週次・月次レポート ✓<br><span style="font-weight:400;font-size:10px">4月実績: 535,026円/61件</span></div>
+    <div class="flow-box green">週次・月次レポート ✓</div>
   </div>
 </div>
+
+<div class="section-title">今週の完了タスク</div>
+<div class="completed-task"><h2>今週の完了タスク</h2><div class="ct-project">ブログ自動化（blog-automation）</div><div class="ct-item">執筆者一覧ページ SEOタイトル・description設定（WordPress固定ページ リビジョン24保存済み）</div><div class="ct-item">Google Search Console 所有権確認タグをTCDテーマ&lt;head&gt;内に追加</div><div class="ct-item">ConoHa WINGメンテ対応：DNS TXT認証の代わりにHTMLタグ方式を採用</div><div class="ct-item">サイト全ページへの&lt;head&gt;出力確認（https://www.e-ffect.co.jp/ で検証済み）</div><div class="ct-item">phase3_publish.js：WAF 403 HTMLレスポンス時のSyntaxErrorクラッシュ修正</div><div class="ct-item">phase3_publish.js：重複投稿防止ロジック追加（カレンダー逐次保存＋WordPress既存タイトル照合）</div><div class="ct-item">phase3_publish.js：アイキャッチ画像必須ルール実装（未取得時は投稿スキップ＋image_failedステータス）</div><div class="ct-item">phase3_publish.js：JSON-LD（BlogPosting schema）全記事末尾自動挿入・投稿後URL更新</div><div class="ct-project">楽天RPP広告（rakuten-rpp-auto）</div><div class="ct-item">Playwrightブラウザ設定をheadless: falseに変更（RMSログイン「サポート対象外ブラウザ」問題を解消）</div><div class="ct-item">--disable-gpuオプション削除</div><div class="ct-item">自動ログイン改善：セッション無効確認後にcontext.clearCookies()実行</div><div class="ct-item">waitForURLタイムアウトを15秒→30秒に延長・エラー時URL・エラー文言ログ出力</div><div class="ct-item">スケジューラー改善：lastRunKeyをdata/last_run_key.jsonに永続化（PM2再起動後の二重実行防止）</div><div class="ct-item">毎時0分セッション有効期限チェック・残り6時間以内でChatwork警告追加</div><div class="ct-item">ログファイルをDropbox外ローカルパスへ移動（Dropboxファイルロック問題対策）</div><div class="ct-item">セッション有効期限を36時間→約20時間に修正（楽天サーバー実測値に合わせて修正）</div><div class="ct-project">Amazon自動化（amazon-gas-automation）</div><div class="ct-item">CLAUDE.md新規作成・運用ルール追記</div><div class="ct-item">amazon-weekly/フォルダ追加（Amazon週次レポート用GASプロジェクト）</div><div class="ct-item">amazon_gas_code.gs更新</div></div>
+
 <div class="section-title">楽天自動化（rakuten-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
 <div class="card teal" style="margin-bottom:10px"><h2>楽天週次レポート自動集計</h2>
   <div class="item done">✓ weekly.js：週次レポート生成</div>
   <div class="item done">✓ run_weekly.bat / ps1：自動実行設定済み</div>
   <div class="item done">✓ Google Sheets連携</div>
 </div>
+
 <div class="section-title">楽天RPP広告自動化（rakuten-rpp-auto）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">デイリー自動</span></div>
 <div class="card pink" style="margin-bottom:10px"><h2>楽天RPP広告デイリー運用</h2>
   <div class="item done">✓ src/：メインロジック実装済み</div>
   <div class="item done">✓ scripts/：実行スクリプト設定済み</div>
-  <div class="item none">— 詳細動作・進捗（CLAUDE.md未記録）</div>
+  <div class="item wait">— DRY_RUN=true 稼働中（本番移行待ち）</div>
 </div>
+
 <div class="section-title">Amazon月次レポート（amazon-monthly）<span class="tag tag-py">Python</span><span class="tag tag-auto">月次自動</span></div>
 <div class="card blue" style="margin-bottom:10px"><h2>Amazon広告月次自動集計</h2>
   <div class="item done">✓ SP全レポート取得（KW・ASIN・検索語句）</div>
   <div class="item done">✓ CTR/CPC/ACOS/ROAS自動計算</div>
   <div class="item done">✓ Google Sheets自動出力</div>
 </div>
+
 <div class="section-title">Yahoo自動化（yahoo-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
 <div class="card amber" style="margin-bottom:10px"><h2>Yahoo!週次レポート自動集計</h2>
   <div class="item done">✓ 毎週月曜9時：Google DriveのCSVを自動読み込み</div>
@@ -144,6 +154,7 @@
   <div class="item done">✓ SEO順位取得・記録</div>
   <div class="item wait">△ 手動作業：月曜5分（CSV DL → Drive保存）</div>
 </div>
+
 <div class="section-title">ブログ自動化（blog-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週3回自動</span></div>
 <div class="schedule"><h2>Goosely ブログ自動投稿スケジュール</h2>
   <div class="sch-row"><span class="sch-tag t-mon1">月初</span><span class="sch-time">毎月1日 9:00</span><span>翌月の記事カレンダー生成 → Sheets更新</span></div>
@@ -156,6 +167,7 @@
   <div class="improve-item">② GA4・Search Console連携（未着手）</div>
   <div class="improve-item">③ 投稿パフォーマンス分析（未着手）</div>
 </div>
+
 <div class="section-title">音声情報の教育化（writing-concepts）<span class="tag tag-js">Node.js</span><span class="tag tag-manual">手動実行</span></div>
 <div class="card coral" style="margin-bottom:10px"><h2>Vimeo動画 → ライティング概念ナレッジベース化</h2>
   <div class="audio-flow">
@@ -168,36 +180,29 @@
   <div class="item done">✓ Whisperローカル環境構築済み</div>
   <div class="item none">— Vimeo動画未投入（実行待ち）</div>
 </div>
-<div class="claude-md"><h2>CLAUDE.md管理状況</h2>
-  <div class="md-row"><span class="md-name">ec-automation</span><span class="md-loc">C:\Users\柳田大輔\</span><span class="md-git git-yes">Git ✓</span><span class="md-status st-done">✓ 更新済み</span><span class="md-date">2026-05-17</span></div>
-  <div class="md-row"><span class="md-name">amazon-gas-automation</span><span class="md-loc">C:\Users\柳田大輔\</span><span class="md-git git-yes">Git ✓</span><span class="md-status st-done">✓ 更新済み</span><span class="md-date">2026-05-17</span></div>
-  <div class="md-row"><span class="md-name">amazon-monthly</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-done">✓ 既存あり</span><span class="md-date">2026-05-14</span></div>
-  <div class="md-row"><span class="md-name">blog-automation</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-18</span></div>
-  <div class="md-row"><span class="md-name">rakuten-automation</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-18</span></div>
-  <div class="md-row"><span class="md-name">rakuten-rpp-auto</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-18</span></div>
-  <div class="md-row"><span class="md-name">yahoo-automation</span><span class="md-loc">Dropbox/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-18</span></div>
-  <div class="md-row"><span class="md-name">writing-automation</span><span class="md-loc">Documents/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-17</span></div>
-  <div class="md-row"><span class="md-name">writing-concepts</span><span class="md-loc">Documents/CloudAI</span><span class="md-git git-no">ローカル</span><span class="md-status st-new">✓ 新規作成</span><span class="md-date">2026-05-17</span></div>
-</div>
+
 <div class="rule-box"><strong>📋 運用ルール（全プロジェクト共通）</strong>各Claude Codeセッション終了前に必ず実行：「今日の作業内容をCLAUDE.mdに追記して」</div>
+
 <div class="todo"><h2>次のアクション</h2>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>weeklyAmazonReport() 動作確認</div>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>yahoo-gas CLAUDE.md作成</div>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>楽天API連携GAS（旧）トリガー削除</div>
-  <div class="todo-item"><span class="badge b-next">次回</span>writing-concepts Vimeo動画投入</div>
-  <div class="todo-item"><span class="badge b-next">次回</span>自社ショップ・グースリーCSV連携設計</div>
-  <div class="todo-item"><span class="badge b-wait">承認後</span>Yahoo API連携</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>Google Search Consoleで「確認」ボタンをクリックし、e-ffect.co.jpの所有権確認を完了させる</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>Search Console URLインデックス登録リクエスト：representative_message・author-list・5/24・5/21公開記事</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>EC受注統合：自社ショップおよびグースリーのCSVメール転送設定を実施</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>integration/Code.gsに月次横断レポート関数を追加（楽天・Amazon・Yahoo統合集計）</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>音声教育化：Vimeo動画・lessons.jsonを投入しパイプライン（①〜⑥）を初回実行</div>
+  <div class="todo-item"><span class="badge b-wait">承認後</span>Yahoo IP制限解除申請の承認確認後、Yahoo週次GAS連携を本稼働させる</div>
 </div>
+
 <div class="progress-wrap"><h2>全体進捗</h2>
-  <div class="prog-row"><div class="prog-label"><span>EC受注統合</span><span>70%</span></div><div class="bar-bg"><div class="bar-fg" style="width:70%;background:#1D9E75"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>EC受注統合</span><span>75%</span></div><div class="bar-bg"><div class="bar-fg" style="width:75%;background:#1D9E75"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>楽天RPP広告</span><span>78%</span></div><div class="bar-bg"><div class="bar-fg" style="width:78%;background:#D85A8C"></div></div></div>
   <div class="prog-row"><div class="prog-label"><span>楽天自動化</span><span>90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#1D9E75"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>楽天RPP広告</span><span>60%</span></div><div class="bar-bg"><div class="bar-fg" style="width:60%;background:#D85A8C"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>Amazon月次</span><span>85%</span></div><div class="bar-bg"><div class="bar-fg" style="width:85%;background:#378ADD"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>Yahoo自動化</span><span>85%</span></div><div class="bar-bg"><div class="bar-fg" style="width:85%;background:#EF9F27"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>ブログ自動化</span><span>80%</span></div><div class="bar-bg"><div class="bar-fg" style="width:80%;background:#7F77DD"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>音声教育化</span><span>40%</span></div><div class="bar-bg"><div class="bar-fg" style="width:40%;background:#D85A30"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>CLAUDE.md整備</span><span>90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#378ADD"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>Amazon月次</span><span>90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#378ADD"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>Yahoo自動化</span><span>90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#EF9F27"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>ブログ自動化</span><span>83%</span></div><div class="bar-bg"><div class="bar-fg" style="width:83%;background:#7F77DD"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>音声教育化</span><span>45%</span></div><div class="bar-bg"><div class="bar-fg" style="width:45%;background:#D85A30"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>CLAUDE.md整備</span><span>92%</span></div><div class="bar-bg"><div class="bar-fg" style="width:92%;background:#378ADD"></div></div></div>
 </div>
-<p class="updated">最終更新: 2026-05-18 | 全9プロジェクト管理中</p>
+
+<p class="updated">最終更新: 2026-05-25 04:31 | 全9プロジェクト管理中 | 自動生成by Claude API</p>
 </body>
 </html>
