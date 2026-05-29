@@ -7,93 +7,144 @@
 <style>
   * { box-sizing: border-box; max-width: 100%; }
   html { overflow-x: hidden; }
-  body { font-family: sans-serif; background: #f5f5f0; color: #2c2c2a; margin: 0; padding: 16px; font-size: 13px; overflow-x: hidden; }
-  h1 { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 4px; }
-  .subtitle { text-align: center; font-size: 11px; color: #888; margin-bottom: 20px; }
-  .section-title { font-size: 13px; font-weight: 600; color: #2c2c2a; margin: 20px 0 8px; border-left: 3px solid #1D9E75; padding-left: 8px; word-break: break-word; }
-  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #eceae3; color: #1e1e1c; margin: 0; padding: 0; font-size: 14px; overflow-x: hidden; }
+
+  /* ===== HEADER ===== */
+  .header { background: linear-gradient(135deg, #1a3a2e 0%, #0f2d22 100%); color: #fff; padding: 24px 20px 18px; text-align: center; }
+  .header h1 { font-size: 22px; font-weight: 700; margin: 0 0 6px; color: #fff; letter-spacing: 0.5px; }
+  .header .subtitle { font-size: 12px; color: #9ed4bc; margin: 0; }
+
+  /* ===== MAIN CONTENT ===== */
+  .content { padding: 16px; max-width: 1200px; margin: 0 auto; }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title { font-size: 15px; font-weight: 700; color: #fff; margin: 22px 0 10px; padding: 8px 14px; background: #2c5f47; border-radius: 8px; display: flex; align-items: center; gap: 8px; word-break: break-word; }
+  .section-title.blue-bg { background: #1e3d6e; }
+  .section-title.amber-bg { background: #7a4e00; }
+  .section-title.purple-bg { background: #3d3480; }
+  .section-title.pink-bg { background: #7a1f4a; }
+  .section-title.coral-bg { background: #7a2a10; }
+  .section-title.gray-bg { background: #444; }
+
+  /* ===== ALERTS ===== */
+  .alert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+  @media (max-width: 700px) { .alert-grid { grid-template-columns: 1fr; } }
+  .alert-box { border-radius: 8px; padding: 10px 14px; font-size: 13px; border-left: 4px solid; }
+  .alert-box.error  { background: #fde8e8; border-color: #d9534f; color: #6e1010; }
+  .alert-box.warning { background: #fff3cd; border-color: #e8a020; color: #6b3c00; }
+  .alert-box.info   { background: #deeefa; border-color: #378ADD; color: #0a3060; }
+  .alert-box strong { display: block; font-size: 13px; margin-bottom: 3px; }
+
+  /* ===== GRID ===== */
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
   @media (max-width: 700px) { .grid3 { grid-template-columns: 1fr; } }
   @media (min-width: 701px) and (max-width: 900px) { .grid3 { grid-template-columns: 1fr 1fr; } }
-  .card { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; }
-  .card h2 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
-  .item { font-size: 11px; padding: 3px 7px; border-radius: 5px; margin-bottom: 3px; }
-  .done { background: #e1f5ee; color: #085041; }
-  .wait { background: #faeeda; color: #633806; }
-  .now  { background: #fde8e8; color: #7a1f1f; }
-  .none { background: #f1efe8; color: #5f5e5a; }
-  .teal { border-left: 3px solid #1D9E75; }
-  .blue { border-left: 3px solid #378ADD; }
-  .amber { border-left: 3px solid #EF9F27; }
-  .coral { border-left: 3px solid #D85A30; }
-  .purple { border-left: 3px solid #7F77DD; }
-  .pink { border-left: 3px solid #D85A8C; }
-  .gray { border-left: 3px solid #aaa; }
-  .flow { background: #fff; border-radius: 10px; padding: 10px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
-  .flow h2 { font-size: 11px; font-weight: 600; color: #5f5e5a; margin: 0 0 6px; }
+
+  /* ===== CARDS ===== */
+  .card { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #d8d5ce; }
+  .card h2 { font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .item { font-size: 13px; padding: 4px 8px; border-radius: 5px; margin-bottom: 4px; }
+  .done { background: #d6f2e6; color: #065035; }
+  .wait { background: #fff0cc; border: 1px solid #e8a020; color: #5a3300; }
+  .now  { background: #fde0d0; color: #7a1f0a; }
+  .none { background: #eeece5; color: #555; }
+  .teal   { border-left: 4px solid #1D9E75; }
+  .blue   { border-left: 4px solid #378ADD; }
+  .amber  { border-left: 4px solid #EF9F27; }
+  .coral  { border-left: 4px solid #D85A30; }
+  .purple { border-left: 4px solid #7F77DD; }
+  .pink   { border-left: 4px solid #D85A8C; }
+  .gray   { border-left: 4px solid #aaa; }
+
+  /* ===== DATA FLOW ===== */
+  .flow { background: #fff; border-radius: 10px; padding: 12px 16px; border: 1px solid #d8d5ce; margin-bottom: 12px; }
+  .flow h2 { font-size: 12px; font-weight: 600; color: #666; margin: 0 0 8px; }
   .flow-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-  .flow-box { background: #eeedfe; color: #3c3489; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 500; }
-  .flow-box.green { background: #e1f5ee; color: #085041; }
-  .flow-arrow { color: #bbb; font-size: 13px; }
-  .rule-box { background: #eeedfe; border-radius: 8px; padding: 10px 14px; border: 1px solid #c5c2f5; margin-bottom: 10px; font-size: 11px; color: #3c3489; }
-  .rule-box strong { font-size: 12px; display: block; margin-bottom: 3px; }
-  .todo { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
-  .todo h2 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
-  .todo-item { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; padding: 4px 0; border-bottom: 1px solid #f1efe8; }
+  .flow-box { background: #e8e6ff; color: #2c2480; border-radius: 6px; padding: 6px 11px; font-size: 12px; font-weight: 500; }
+  .flow-box.green { background: #d6f2e6; color: #065035; }
+  .flow-arrow { color: #999; font-size: 14px; }
+
+  /* ===== RULE BOX ===== */
+  .rule-box { background: #e8e6ff; border-radius: 8px; padding: 12px 16px; border: 1px solid #b0acf0; margin-bottom: 12px; font-size: 13px; color: #2c2480; }
+  .rule-box strong { font-size: 14px; display: block; margin-bottom: 4px; }
+
+  /* ===== TODO / NEXT ACTIONS ===== */
+  .todo { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #d8d5ce; margin-bottom: 12px; }
+  .todo h2 { font-size: 15px; font-weight: 700; margin: 0 0 10px; }
+  .todo-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; padding: 7px 0; border-bottom: 1px solid #eceae3; }
   .todo-item:last-child { border-bottom: none; }
-  .badge { font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: 500; white-space: nowrap; margin-top: 1px; }
-  .b-now { background: #f7c1c1; color: #791f1f; }
-  .b-next { background: #fac775; color: #633806; }
-  .b-wait { background: #d3d1c7; color: #444; }
-  .progress-wrap { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
-  .progress-wrap h2 { font-size: 12px; font-weight: 600; margin: 0 0 10px; }
-  .prog-row { margin-bottom: 8px; }
-  .prog-label { font-size: 11px; color: #5f5e5a; margin-bottom: 2px; display: flex; justify-content: space-between; }
-  .bar-bg { background: #f1efe8; border-radius: 5px; height: 9px; overflow: hidden; }
-  .bar-fg { height: 9px; border-radius: 5px; }
-  .updated { font-size: 10px; color: #aaa; text-align: center; margin-top: 8px; }
-  .tag { font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 500; display: inline-block; margin-right: 3px; }
-  .tag-gas { background: #e1f5ee; color: #085041; }
-  .tag-py { background: #e6f1fb; color: #0C447C; }
-  .tag-js { background: #faeeda; color: #633806; }
-  .tag-auto { background: #eeedfe; color: #3c3489; }
-  .tag-manual { background: #f1efe8; color: #5f5e5a; }
-  .schedule { background: #fff; border-radius: 10px; padding: 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
-  .schedule h2 { font-size: 13px; font-weight: 600; margin: 0 0 8px; }
-  .sch-row { display: flex; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid #f1efe8; font-size: 11px; }
+  .badge { font-size: 11px; padding: 3px 8px; border-radius: 8px; font-weight: 600; white-space: nowrap; margin-top: 1px; }
+  .b-now  { background: #f7c1c1; color: #6e1010; }
+  .b-next { background: #fac775; color: #5a3300; }
+  .b-wait { background: #d3d1c7; color: #333; }
+
+  /* ===== PROGRESS ===== */
+  .progress-wrap { background: #fff; border-radius: 10px; padding: 16px 18px; border: 1px solid #d8d5ce; margin-bottom: 12px; }
+  .progress-wrap h2 { font-size: 15px; font-weight: 700; margin: 0 0 14px; }
+  .prog-row { margin-bottom: 12px; }
+  .prog-label { font-size: 13px; color: #333; margin-bottom: 4px; display: flex; justify-content: space-between; font-weight: 500; }
+  .prog-pct { font-weight: 700; color: #1a1a1a; }
+  .bar-bg { background: #eceae3; border-radius: 8px; height: 14px; overflow: hidden; }
+  .bar-fg { height: 14px; border-radius: 8px; }
+
+  /* ===== TAGS ===== */
+  .tag { font-size: 11px; padding: 2px 7px; border-radius: 8px; font-weight: 600; display: inline-block; margin-left: 6px; }
+  .tag-gas    { background: #d6f2e6; color: #065035; }
+  .tag-py     { background: #deeefa; color: #0a3060; }
+  .tag-js     { background: #fff0cc; color: #5a3300; }
+  .tag-auto   { background: #e8e6ff; color: #2c2480; }
+  .tag-manual { background: #eeece5; color: #444; }
+
+  /* ===== SCHEDULE ===== */
+  .schedule { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #d8d5ce; margin-bottom: 12px; }
+  .schedule h2 { font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .sch-row { display: flex; gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid #eceae3; font-size: 13px; }
   .sch-row:last-child { border-bottom: none; }
-  .sch-tag { min-width: 44px; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 500; text-align: center; white-space: nowrap; }
-  .t-mon { background: #e1f5ee; color: #085041; }
-  .t-wed { background: #e6f1fb; color: #0C447C; }
-  .t-fri { background: #faeeda; color: #633806; }
-  .t-mon1 { background: #eeedfe; color: #3c3489; }
-  .sch-time { color: #888; min-width: 60px; white-space: nowrap; }
-  .improve { background: #faeeda; border-radius: 8px; padding: 10px 14px; border: 1px solid #FAC775; margin-bottom: 10px; }
-  .improve h3 { font-size: 12px; font-weight: 600; color: #633806; margin: 0 0 5px; }
-  .improve-item { font-size: 11px; color: #854F0B; padding: 2px 0; }
-  .alert-box { background: #fde8e8; border-radius: 8px; padding: 10px 14px; border: 1px solid #f5b8b8; margin-bottom: 10px; font-size: 11px; color: #7a1f1f; }
-  .alert-box.info { background: #e6f1fb; border-color: #b8d4f5; color: #0C447C; }
-  .alert-box.warning { background: #faeeda; border-color: #FAC775; color: #633806; }
-  .alert-box strong { display: block; font-size: 12px; margin-bottom: 4px; }
-  .completed-task { background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0d8; margin-bottom: 10px; }
-  .completed-task h2 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
-  .ct-project { font-size: 11px; font-weight: 600; color: #1D9E75; margin: 6px 0 3px; }
-  .ct-item { font-size: 11px; padding: 2px 0 2px 12px; color: #2c2c2a; }
-  .ct-item::before { content: "✓ "; color: #1D9E75; }
-  .audio-flow { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
-  .af-box { background: #f1efe8; border-radius: 6px; padding: 4px 9px; font-size: 11px; color: #444; border: 1px solid #d3d1c7; }
-  .af-arrow { color: #bbb; font-size: 12px; }
+  .sch-tag { min-width: 44px; font-size: 11px; padding: 3px 7px; border-radius: 10px; font-weight: 600; text-align: center; white-space: nowrap; }
+  .t-mon  { background: #d6f2e6; color: #065035; }
+  .t-wed  { background: #deeefa; color: #0a3060; }
+  .t-fri  { background: #fff0cc; color: #5a3300; }
+  .t-mon1 { background: #e8e6ff; color: #2c2480; }
+  .sch-time { color: #777; min-width: 68px; white-space: nowrap; font-size: 12px; }
+
+  /* ===== IMPROVE BOX ===== */
+  .improve { background: #fff0cc; border-radius: 8px; padding: 12px 16px; border: 1px solid #e8a020; margin-bottom: 12px; }
+  .improve h3 { font-size: 13px; font-weight: 700; color: #5a3300; margin: 0 0 6px; }
+  .improve-item { font-size: 13px; color: #6b3c00; padding: 2px 0; }
+
+  /* ===== COMPLETED TASKS ===== */
+  .completed-task { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #d8d5ce; margin-bottom: 12px; }
+  .completed-task h2 { font-size: 15px; font-weight: 700; margin: 0 0 10px; }
+  .ct-project { font-size: 13px; font-weight: 700; color: #1a7a52; margin: 10px 0 4px; padding-bottom: 3px; border-bottom: 1px solid #d6f2e6; }
+  .ct-item { font-size: 13px; padding: 3px 0 3px 14px; color: #1e1e1c; line-height: 1.5; }
+  .ct-item::before { content: "✓ "; color: #1D9E75; font-weight: 700; }
+
+  /* ===== AUDIO FLOW ===== */
+  .audio-flow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
+  .af-box { background: #eeece5; border-radius: 6px; padding: 5px 10px; font-size: 12px; color: #333; border: 1px solid #ccc; }
+  .af-arrow { color: #999; font-size: 13px; }
+
+  /* ===== FOOTER ===== */
+  .footer { font-size: 11px; color: #999; text-align: center; margin-top: 12px; padding-bottom: 20px; }
 </style>
 </head>
 <body>
-<h1>自動化プロジェクト ダッシュボード</h1>
-<p class="subtitle">2026年05月25週（2026-05-25）更新 | 株式会社エフェクト 全9プロジェクト</p>
 
-<div class="alert-box warning"><strong>⚠️ アラート</strong>Yahoo注文API申請を取り下げ・手動CSVダウンロード運用に変更（2026-05-25）。Yahoo自動化の完全自動化は中断中。</div>
-<div class="alert-box warning"><strong>⚠️ アラート</strong>楽天週次レポート：受注取得漏れ未解決（goosely-mattress-s CSV8件 vs API4件など）。次回実行ログで要確認。</div>
-<div class="alert-box warning"><strong>⚠️ アラート</strong>楽天RPP広告：headless:falseでChromeウィンドウが1日3回（各10〜15分）画面に表示される副作用あり。</div>
-<div class="alert-box info"><strong>ℹ️ アラート</strong>amazon-gas-automationは今週コミットなし。SP-APIデバッグセッションはあったが、amazon-gas-automationリポジトリへの反映を確認すること。</div>
-<div class="alert-box info"><strong>ℹ️ アラート</strong>音声教育化：パイプライン構築済みだがVimeo動画・lessons.json未投入のため実質未稼働。早期の初回実行を推奨。</div>
-<div class="alert-box info"><strong>ℹ️ アラート</strong>補助金リサーチ（Jgrants）Webアプリ構築完了。活用方針・運用ルールの策定が次のステップ。</div>
+<div class="header">
+  <h1>🚀 自動化プロジェクト ダッシュボード</h1>
+  <p class="subtitle">2026年05月29週（2026-05-29）更新 ｜ 株式会社エフェクト ｜ 全9プロジェクト</p>
+</div>
+
+<div class="content">
+
+<div class="alert-grid">
+<div class="alert-box warning"><strong>⚠️ アラート</strong>Yahoo自動化：注文API申請を取り下げ・手動CSVダウンロード運用に変更（2026-05-25）。完全自動化率が低下しているため代替手段を検討</div>
+<div class="alert-box warning"><strong>⚠️ アラート</strong>楽天受注取得漏れ：goosely-mattress-s（CSV8件 vs API4件）など複数商品でAPI取得が不完全。次回実行時ログ確認が必要</div>
+<div class="alert-box warning"><strong>⚠️ アラート</strong>楽天RPP広告：channel:chrome + headless:trueでの自動ログイン動作未確認。次回セッション切れまでに検証が必要</div>
+<div class="alert-box info"><strong>ℹ️ アラート</strong>音声教育化：パイプライン①〜⑥構築完了・Whisper環境整備済み。Vimeoデータ未投入のため実稼働は次フェーズ待ち</div>
+<div class="alert-box info"><strong>ℹ️ アラート</strong>amazon-gas-automationリポジトリ：今週コミットなし。SP-APIデバッグは2026-05-25に完了済みだが継続モニタリング推奨</div>
+<div class="alert-box info"><strong>ℹ️ アラート</strong>GooselyグSNS自動化・AIエージェントチームファイル構成・Jgrants補助金検索Webアプリ等、新規プロジェクトのハンドオーバー資料整備が今週完了</div>
+</div>
 
 <div class="section-title">EC受注統合（ec-automation）<span class="tag tag-gas">GAS</span><span class="tag tag-auto">全自動</span></div>
 <div class="grid3">
@@ -112,7 +163,7 @@
   </div>
   <div class="card amber"><h2>Yahoo</h2>
     <div class="item done">✓ 週次レポート（CSV運用）</div>
-    <div class="item wait">⏳ API承認待ち</div>
+    <div class="item wait">⏳ API申請取り下げ・手動CSV運用</div>
     <div class="item none">— 注文自動取得（未着手）</div>
   </div>
 </div>
@@ -127,38 +178,38 @@
 </div>
 
 <div class="section-title">今週の完了タスク</div>
-<div class="completed-task"><h2>今週の完了タスク</h2><div class="ct-project">EC受注統合</div><div class="ct-item">Yahoo注文API申請を取り下げ・手動CSVダウンロード運用に方針変更（2026-05-25）</div><div class="ct-item">Yahoo Shopping API integration with GAS automation</div><div class="ct-item">ダッシュボード週次自動更新（2026-05-25 ×2回）</div><div class="ct-item">ダッシュボード手動補正（Yahoo方針変更・補助金リサーチ・メルマガ・新商品リサーチ追加）</div><div class="ct-project">楽天RPP広告</div><div class="ct-item">楽天RPP広告の自動運用システム構築</div><div class="ct-item">headless: false への変更でglogin.rms自動ログイン問題を解消（2026-05-24）</div><div class="ct-item">ログファイルをDropbox外ローカルパスへ移動（ファイルロック対策）</div><div class="ct-item">セッション有効期限を約20時間に修正・Chatwork警告通知実装</div><div class="ct-item">lastRunKeyをJSONファイルに永続化（PM2再起動後の二重実行防止）</div><div class="ct-project">楽天自動化（週次）</div><div class="ct-item">Automate Rakuten weekly operations workflow</div><div class="ct-item">Automate Rakuten monthly operations reporting</div><div class="ct-item">SEO削除バグ修正：skipSeo時にnullを設定し既存SEOデータを上書きしない仕組みに変更</div><div class="ct-item">AF列（5/8〜）SEOデータ復元：recover-af-seo.jsでリビジョン621から正常復元</div><div class="ct-item">AG列（5/15〜）計算式をハードコード値からGoogle Sheets数式に変更</div><div class="ct-item">売上金額計算バグ修正：aggregateByProduct()で複数個購入時に単価×数量の乗算を追加</div><div class="ct-item">Build Rakuten marketplace competitive research pipeline</div><div class="ct-project">Amazon自動化</div><div class="ct-item">Debug SP-API advertising report fetch errors</div><div class="ct-item">Continue Amazon data auto-sync implementation</div><div class="ct-item">amazon-weekly/フォルダ追加（Amazon週次レポート用GASプロジェクト）</div><div class="ct-project">Yahoo自動化</div><div class="ct-item">Yahoo注文API申請取り下げ・手動CSVダウンロード運用への方針変更対応</div><div class="ct-item">Build Yahoo Shopping monthly automation system</div><div class="ct-project">ブログ自動化</div><div class="ct-item">Organize Goosely SNS automation project handover</div><div class="ct-item">執筆者一覧ページSEO設定変更（タイトル・description更新・WordPress保存済み）</div><div class="ct-item">Google Search Console所有権確認タグをTCDテーマhead内に追加</div><div class="ct-item">phase3_publish.js主要改修：WAF 403 SyntaxErrorクラッシュ修正・重複投稿防止・アイキャッチ必須ルール・JSON-LD自動挿入</div><div class="ct-item">Write content using knowledge base</div><div class="ct-project">音声教育化</div><div class="ct-item">Organize Vimeo videos into educational content</div><div class="ct-item">音声教育化パイプライン構築完了（スクリプト①〜⑥）確認</div><div class="ct-item">Whisperローカル実行環境構築済み確認</div><div class="ct-project">その他・経営支援</div><div class="ct-item">Build weekly dashboard automation system</div><div class="ct-item">Build Jgrants subsidy search web application（補助金リサーチWebアプリ構築）</div><div class="ct-item">Free up PC storage and identify large folders（PCストレージ整理・大容量フォルダ特定）</div><div class="ct-item">This session is being continued from a previous conversation that ran out of context（コンテキスト継続セッション）</div></div>
+<div class="completed-task"><h2>今週の完了タスク</h2><div class="ct-project">EC受注統合</div><div class="ct-item">ChatworkメッセージにGitHub Pages URLを追加</div><div class="ct-item">週次ダッシュボード自動更新（2026-05-25）</div><div class="ct-item">手動補正：Yahoo方針変更・補助金リサーチ・メルマガ・新商品リサーチ追加</div><div class="ct-item">Yahoo注文API申請を取り下げ・手動CSVダウンロード運用に変更（2026-05-25）</div><div class="ct-project">楽天RPP広告</div><div class="ct-item">楽天RPP広告の自動運用システム構築（2026-05-29）</div><div class="ct-item">ログファイルをDropbox外ローカルパスに移動（Dropboxファイルロック問題対策）</div><div class="ct-item">セッション有効期限を約20時間に修正（旧36時間設定を実測値に更新）</div><div class="ct-item">Chatwork警告タイミングを経過14時間→12時間に変更（2026-05-27）</div><div class="ct-item">PlaywrightをChannel:chrome + headless:trueに変更（Bot検出対策）</div><div class="ct-item">PIDファイル方式によるChromeゾンビ対策（2026-05-28）</div><div class="ct-item">RPP広告自動化継続セッション（2026-05-26）</div><div class="ct-project">楽天自動化</div><div class="ct-item">Automate Rakuten weekly operations workflow（2026-05-29）</div><div class="ct-item">SEO削除バグ修正：skipSeo ? [] : ranks → skipSeo ? null : ranks</div><div class="ct-item">AF列（5/8〜）SEOデータ復元：recover-af-seo.jsでリビジョン621から復元</div><div class="ct-item">AG列（5/15〜）計算式をハードコード値→Google Sheets数式に変更</div><div class="ct-item">売上金額計算バグ修正：複数個購入時に単価×数量を正しく集計</div><div class="ct-item">Build Rakuten marketplace competitive research pipeline（2026-05-28）</div><div class="ct-project">Amazon月次</div><div class="ct-item">Continue Amazon data auto-sync implementation（2026-05-29）</div><div class="ct-item">Debug SP-API advertising report fetch errors（2026-05-25）</div><div class="ct-item">amazon-weekly/フォルダ追加（2026-05-17記録）</div><div class="ct-item">amazon_gas_code.gs更新済み</div><div class="ct-project">Yahoo自動化</div><div class="ct-item">Build Yahoo Shopping monthly automation system（2026-05-28）</div><div class="ct-item">Yahoo Shopping API integration with GAS automation（2026-05-26）</div><div class="ct-item">Yahoo注文API申請取り下げ・手動CSVダウンロード運用に方針変更（2026-05-25）</div><div class="ct-project">ブログ自動化</div><div class="ct-item">執筆者一覧ページSEO設定変更（タイトル・description更新、リビジョン24）</div><div class="ct-item">Google Search Console所有権確認タグ追加（HTMLタグ方式、ConoHa WINGメンテ対応）</div><div class="ct-item">phase3_publish.js：WAF 403 HTMLレスポンス時のSyntaxErrorクラッシュ修正</div><div class="ct-item">phase3_publish.js：重複投稿防止・アイキャッチ画像必須ルール実装</div><div class="ct-item">phase3_publish.js：JSON-LD（BlogPosting schema）自動挿入</div><div class="ct-project">音声教育化</div><div class="ct-item">Organize Vimeo videos into educational content（2026-05-28）</div><div class="ct-item">音声教育化パイプライン①〜⑥スクリプト構築完了</div><div class="ct-item">Whisperローカル実行環境構築済み</div><div class="ct-project">その他・経営支援</div><div class="ct-item">Organize Goosely SNS automation project handover（2026-05-29）</div><div class="ct-item">Build AI agent team file structure（2026-05-29）</div><div class="ct-item">Build Jgrants subsidy search web application（2026-05-28）</div><div class="ct-item">Free up PC storage and identify large folders（2026-05-28）</div><div class="ct-item">Setup daily report automation handover（2026-05-28）</div><div class="ct-item">Build weekly dashboard automation system（2026-05-27）</div><div class="ct-item">Convert two images to PDF（2026-05-26）</div></div>
 
 <div class="section-title">楽天自動化（rakuten-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
-<div class="card teal" style="margin-bottom:10px"><h2>楽天週次レポート自動集計</h2>
+<div class="card teal" style="margin-bottom:12px"><h2>楽天週次レポート自動集計</h2>
   <div class="item done">✓ weekly.js：週次レポート生成</div>
   <div class="item done">✓ run_weekly.bat / ps1：自動実行設定済み</div>
   <div class="item done">✓ Google Sheets連携</div>
 </div>
 
-<div class="section-title">楽天RPP広告自動化（rakuten-rpp-auto）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">デイリー自動</span></div>
-<div class="card pink" style="margin-bottom:10px"><h2>楽天RPP広告デイリー運用</h2>
+<div class="section-title pink-bg">楽天RPP広告自動化（rakuten-rpp-auto）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">デイリー自動</span></div>
+<div class="card pink" style="margin-bottom:12px"><h2>楽天RPP広告デイリー運用</h2>
   <div class="item done">✓ src/：メインロジック実装済み</div>
   <div class="item done">✓ scripts/：実行スクリプト設定済み</div>
   <div class="item wait">— DRY_RUN=true 稼働中（本番移行待ち）</div>
 </div>
 
-<div class="section-title">Amazon月次レポート（amazon-monthly）<span class="tag tag-py">Python</span><span class="tag tag-auto">月次自動</span></div>
-<div class="card blue" style="margin-bottom:10px"><h2>Amazon広告月次自動集計</h2>
+<div class="section-title blue-bg">Amazon月次レポート（amazon-monthly）<span class="tag tag-py">Python</span><span class="tag tag-auto">月次自動</span></div>
+<div class="card blue" style="margin-bottom:12px"><h2>Amazon広告月次自動集計</h2>
   <div class="item done">✓ SP全レポート取得（KW・ASIN・検索語句）</div>
   <div class="item done">✓ CTR/CPC/ACOS/ROAS自動計算</div>
   <div class="item done">✓ Google Sheets自動出力</div>
 </div>
 
-<div class="section-title">Yahoo自動化（yahoo-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
-<div class="card amber" style="margin-bottom:10px"><h2>Yahoo!週次レポート自動集計</h2>
+<div class="section-title amber-bg">Yahoo自動化（yahoo-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
+<div class="card amber" style="margin-bottom:12px"><h2>Yahoo!週次レポート自動集計</h2>
   <div class="item done">✓ 毎週月曜9時：Google DriveのCSVを自動読み込み</div>
   <div class="item done">✓ スプレッドシートに売上・広告データ書き込み</div>
   <div class="item done">✓ SEO順位取得・記録</div>
   <div class="item wait">△ 手動作業：月曜5分（CSV DL → Drive保存）</div>
 </div>
 
-<div class="section-title">ブログ自動化（blog-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週3回自動</span></div>
+<div class="section-title purple-bg">ブログ自動化（blog-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週3回自動</span></div>
 <div class="schedule"><h2>Goosely ブログ自動投稿スケジュール</h2>
   <div class="sch-row"><span class="sch-tag t-mon1">月初</span><span class="sch-time">毎月1日 9:00</span><span>翌月の記事カレンダー生成 → Sheets更新</span></div>
   <div class="sch-row"><span class="sch-tag t-mon">月曜</span><span class="sch-time">毎週 7:00</span><span>記事生成・監査・投稿（教育コンテンツ）</span></div>
@@ -171,13 +222,13 @@
   <div class="improve-item">③ 投稿パフォーマンス分析（未着手）</div>
 </div>
 
-<div class="section-title">音声情報の教育化（writing-concepts）<span class="tag tag-js">Node.js</span><span class="tag tag-manual">手動実行</span></div>
-<div class="card coral" style="margin-bottom:10px"><h2>Vimeo動画 → ライティング概念ナレッジベース化</h2>
+<div class="section-title coral-bg">音声情報の教育化（writing-concepts）<span class="tag tag-js">Node.js</span><span class="tag tag-manual">手動実行</span></div>
+<div class="card coral" style="margin-bottom:12px"><h2>Vimeo動画 → ライティング概念ナレッジベース化</h2>
   <div class="audio-flow">
     <div class="af-box">① Vimeo音声DL</div><div class="af-arrow">→</div>
     <div class="af-box">② Whisper文字起こし</div><div class="af-arrow">→</div>
     <div class="af-box">③ Claude API概念抽出</div><div class="af-arrow">→</div>
-    <div class="af-box" style="background:#e1f5ee;border-color:#9FE1CB;color:#085041">④ knowledge_base.md</div>
+    <div class="af-box" style="background:#d6f2e6;border-color:#9FE1CB;color:#065035">④ knowledge_base.md</div>
   </div>
   <div class="item done">✓ パイプライン構築完了</div>
   <div class="item done">✓ Whisperローカル環境構築済み</div>
@@ -186,26 +237,27 @@
 
 <div class="rule-box"><strong>📋 運用ルール（全プロジェクト共通）</strong>各Claude Codeセッション終了前に必ず実行：「今日の作業内容をCLAUDE.mdに追記して」</div>
 
-<div class="todo"><h2>次のアクション</h2>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>Google Search Consoleで「確認」ボタンをクリックし所有権確認を完了させる</div>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>Search Console URLインデックス登録リクエスト：representative_message・author-list・5/24・5/21公開記事</div>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>楽天週次レポート：受注取得漏れ問題（goosely-mattress-s: CSV8件 vs API4件等）を次回実行ログで確認・調査</div>
+<div class="todo"><h2>⚡ 次のアクション</h2>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>Google Search Consoleで「確認」ボタンをクリックし所有権確認を完了させる（ユーザー対応待ち）</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>Search Console URLインデックス登録リクエスト：representative_message / author-list / 5/24・5/21公開記事</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>楽天RPP広告：次回セッション切れ時にchannel:chrome + headless:trueでの自動ログイン成否を確認</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>楽天受注取得漏れ問題を調査：goosely-mattress-s（CSV8件 vs API4件）など次回実行時にログ確認</div>
   <div class="todo-item"><span class="badge b-next">次回</span>EC受注統合：自社ショップ・グースリーのCSVメール転送設定を完了させる</div>
-  <div class="todo-item"><span class="badge b-next">次回</span>integration/Code.gsに月次横断レポート関数を追加（楽天週次レポートをec-automationへ統合）</div>
-  <div class="todo-item"><span class="badge b-next">次回</span>音声教育化：Vimeo動画・lessons.jsonを投入してパイプライン初回実行を行う</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>音声教育化：Vimeo動画・lessons.jsonを投入してパイプライン実行（環境構築済み・データ未投入）</div>
 </div>
 
-<div class="progress-wrap"><h2>全体進捗</h2>
-  <div class="prog-row"><div class="prog-label"><span>EC受注統合</span><span>76%</span></div><div class="bar-bg"><div class="bar-fg" style="width:76%;background:#1D9E75"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>楽天RPP広告</span><span>78%</span></div><div class="bar-bg"><div class="bar-fg" style="width:78%;background:#D85A8C"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>楽天自動化</span><span>91%</span></div><div class="bar-bg"><div class="bar-fg" style="width:91%;background:#1D9E75"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>Amazon月次</span><span>90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#378ADD"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>Yahoo自動化</span><span>88%</span></div><div class="bar-bg"><div class="bar-fg" style="width:88%;background:#EF9F27"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>ブログ自動化</span><span>82%</span></div><div class="bar-bg"><div class="bar-fg" style="width:82%;background:#7F77DD"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>音声教育化</span><span>46%</span></div><div class="bar-bg"><div class="bar-fg" style="width:46%;background:#D85A30"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>CLAUDE.md整備</span><span>91%</span></div><div class="bar-bg"><div class="bar-fg" style="width:91%;background:#378ADD"></div></div></div>
+<div class="progress-wrap"><h2>📊 全体進捗</h2>
+  <div class="prog-row"><div class="prog-label"><span>EC受注統合</span><span class="prog-pct">77%</span></div><div class="bar-bg"><div class="bar-fg" style="width:77%;background:#1D9E75"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>楽天RPP広告</span><span class="prog-pct">78%</span></div><div class="bar-bg"><div class="bar-fg" style="width:78%;background:#D85A8C"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>楽天自動化</span><span class="prog-pct">91%</span></div><div class="bar-bg"><div class="bar-fg" style="width:91%;background:#1D9E75"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>Amazon月次</span><span class="prog-pct">90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#378ADD"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>Yahoo自動化</span><span class="prog-pct">88%</span></div><div class="bar-bg"><div class="bar-fg" style="width:88%;background:#EF9F27"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>ブログ自動化</span><span class="prog-pct">82%</span></div><div class="bar-bg"><div class="bar-fg" style="width:82%;background:#7F77DD"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>音声教育化</span><span class="prog-pct">48%</span></div><div class="bar-bg"><div class="bar-fg" style="width:48%;background:#D85A30"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>CLAUDE.md整備</span><span class="prog-pct">91%</span></div><div class="bar-bg"><div class="bar-fg" style="width:91%;background:#378ADD"></div></div></div>
 </div>
 
-<p class="updated">最終更新: 2026-05-25 12:00 | 全9プロジェクト管理中 | 自動生成by Claude API</p>
+</div><!-- /content -->
+<p class="footer">最終更新: 2026-05-29 11:09 ｜ 全9プロジェクト管理中 ｜ 自動生成 by Claude API</p>
 </body>
 </html>
