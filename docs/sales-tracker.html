@@ -679,8 +679,9 @@ function saveManual() {
 /* ── 初期ロード ── */
 (function init() {
   /* GAS URL を復元 */
-  var savedUrl = localStorage.getItem('gas_url');
-  if (savedUrl) document.getElementById('gas-url').value = savedUrl;
+  var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbwNT5hZvahJlfK949MLCxmyIz3oZDutOJDseRNA0Qkkk-9zM8okA5M4o13MOxTnWGkcSA/exec';
+  var savedUrl = localStorage.getItem('gas_url') || GAS_DEFAULT;
+  document.getElementById('gas-url').value = savedUrl;
 
   /* 目標値の復元 */
   var targets = JSON.parse(localStorage.getItem('tracker_targets') || '{}');
@@ -692,16 +693,27 @@ function saveManual() {
   /* GAS キャッシュを復元（最終取得データ） */
   var last     = localStorage.getItem('gas_last');
   var lastTime = localStorage.getItem('gas_last_time');
+  var today    = new Date().toLocaleDateString('ja-JP');
+
   if (last) {
     try {
       var data = JSON.parse(last);
-      setStatus('ok', '前回取得: ' + lastTime + ' — 楽天+Amazon合計 今月:' +
+      setStatus('ok', '前回取得: ' + lastTime + ' — 今月:' +
         fy(data.monthly.total) + ' / 今日:' + fy(data.today.total) +
-        '（「売上を自動取得」で最新に更新できます）');
+        '（「売上を自動取得」で最新に更新）');
       setAutoSales(data);
-      return; // autoで初期化済み
+      // 今日まだ取得していなければバックグラウンドで自動更新
+      if (lastTime && !lastTime.startsWith(today)) {
+        setStatus('ing', '最新データを自動取得中...');
+        fetchGAS();
+      }
+      return;
     } catch(e) {}
   }
+
+  /* 初回 or キャッシュなし → 自動取得 */
+  setStatus('ing', 'データを自動取得中...');
+  fetchGAS();
 
   /* 手動入力を復元 */
   var ms = JSON.parse(localStorage.getItem('manual_sales') || '{}');
