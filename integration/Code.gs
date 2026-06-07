@@ -631,7 +631,7 @@ function getSalesSummary_() {
   if (!sheet) return { error: 'シートが存在しません' };
 
   var lastRow = sheet.getLastRow();
-  if (lastRow <= 1) return { date: '', today: {}, monthly: {} };
+  if (lastRow <= 1) return { date: '', today: {}, yesterday: {}, monthly: {} };
 
   var data = sheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
 
@@ -639,13 +639,16 @@ function getSalesSummary_() {
   var today       = Utilities.formatDate(now, 'Asia/Tokyo', 'yyyy/MM/dd');
   var monthPrefix = today.slice(0, 7); // 'yyyy/MM'
 
-  // モール別合計（楽天は注文ID単位で重複排除、Amazonは商品行単位で合算）
-  var todayM   = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
-  var monthlyM = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
+  // 昨日の日付
+  var yd = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  var yesterday = Utilities.formatDate(yd, 'Asia/Tokyo', 'yyyy/MM/dd');
 
-  // 楽天: ORDER_ID 単位で重複排除するためのセット
-  var rakutenTodayOrders   = {};
-  var rakutenMonthlyOrders = {};
+  var todayM     = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
+  var yesterdayM = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
+  var monthlyM   = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
+
+  // 楽天は ORDER_ID 単位で重複排除（totalPrice が行ごとに繰り返されるため）
+  var r_today = {}, r_yesterday = {}, r_monthly = {};
 
   data.forEach(function(row) {
     var orderDate = row[COL.ORDER_DATE];
@@ -657,45 +660,27 @@ function getSalesSummary_() {
     var orderId = String(row[COL.ORDER_ID]);
     var price   = Number(row[COL.PRICE]) || 0;
 
-    // ── 月次集計 ──
-    if (dateStr.slice(0, 7) === monthPrefix) {
+    function add(bucket, rakutenSet) {
       if (mall === '楽天') {
-        if (!rakutenMonthlyOrders[orderId]) {
-          rakutenMonthlyOrders[orderId] = true;
-          monthlyM.rakuten += price;
-          monthlyM.total   += price;
-        }
+        if (!rakutenSet[orderId]) { rakutenSet[orderId] = true; bucket.rakuten += price; bucket.total += price; }
       } else if (mall === 'Amazon') {
-        monthlyM.amazon += price;
-        monthlyM.total  += price;
+        bucket.amazon += price; bucket.total += price;
       } else if (mall === 'Yahoo') {
-        monthlyM.yahoo += price;
-        monthlyM.total += price;
+        bucket.yahoo += price; bucket.total += price;
       }
     }
 
-    // ── 今日の集計 ──
-    if (dateStr === today) {
-      if (mall === '楽天') {
-        if (!rakutenTodayOrders[orderId]) {
-          rakutenTodayOrders[orderId] = true;
-          todayM.rakuten += price;
-          todayM.total   += price;
-        }
-      } else if (mall === 'Amazon') {
-        todayM.amazon += price;
-        todayM.total  += price;
-      } else if (mall === 'Yahoo') {
-        todayM.yahoo += price;
-        todayM.total += price;
-      }
-    }
+    if (dateStr.slice(0, 7) === monthPrefix) add(monthlyM,   r_monthly);
+    if (dateStr === today)                    add(todayM,     r_today);
+    if (dateStr === yesterday)                add(yesterdayM, r_yesterday);
   });
 
   return {
-    date:    today,
-    today:   todayM,
-    monthly: monthlyM
+    date:      today,
+    yesterday: yesterday,
+    today:     todayM,
+    yesterdayS: yesterdayM,
+    monthly:   monthlyM
   };
 }
 

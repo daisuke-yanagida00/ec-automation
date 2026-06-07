@@ -230,16 +230,22 @@ body {
       <span class="auto-badge" id="badge-total">手動</span>
       <div class="mall-label">合計（3モール）</div>
       <div class="auto-val c-green" id="av-total-monthly">—</div>
-      <div class="auto-sub c-muted" id="as-total-monthly">今月累計</div>
-      <div style="margin-top:10px;border-top:1px solid #21262d;padding-top:8px">
-        <div class="auto-val" id="av-total-today" style="font-size:16px;color:#e6edf3">—</div>
-        <div class="auto-sub c-muted">今日の売上</div>
+      <div class="auto-sub c-muted">今月累計</div>
+      <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-total-yesterday">—</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px">昨日</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#58a6ff" id="av-total-today">—</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px">今日</div>
+        </div>
       </div>
-      <div class="save-row" style="margin-top:10px">
-        <input type="number" id="in-total-monthly" placeholder="累計（手動入力）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
-        <input type="number" id="in-total-today" placeholder="今日（手動入力）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+      <div style="display:flex;gap:4px;margin-top:8px">
+        <input type="number" id="in-total-monthly" placeholder="累計（手動）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
+        <input type="number" id="in-total-today" placeholder="今日（手動）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
     </div>
 
@@ -247,16 +253,22 @@ body {
       <span class="auto-badge" id="badge-r">手動</span>
       <div class="mall-label" style="color:#d29922">楽天市場</div>
       <div class="auto-val" style="color:#d29922" id="av-r-monthly">—</div>
-      <div class="auto-sub c-muted" id="as-r-monthly">今月累計</div>
-      <div style="margin-top:10px;border-top:1px solid #21262d;padding-top:8px">
-        <div class="auto-val" id="av-r-today" style="font-size:16px;color:#e6edf3">—</div>
-        <div class="auto-sub c-muted">今日の売上</div>
+      <div class="auto-sub c-muted">今月累計</div>
+      <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-r-yesterday">—</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px">昨日</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#58a6ff" id="av-r-today">—</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px">今日</div>
+        </div>
       </div>
-      <div class="save-row" style="margin-top:10px">
+      <div style="display:flex;gap:4px;margin-top:8px">
         <input type="number" id="in-r-monthly" placeholder="累計（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
         <input type="number" id="in-r-today" placeholder="今日（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
     </div>
 
@@ -264,16 +276,22 @@ body {
       <span class="auto-badge" id="badge-a">手動</span>
       <div class="mall-label c-blue">Amazon</div>
       <div class="auto-val c-blue" id="av-a-monthly">—</div>
-      <div class="auto-sub c-muted" id="as-a-monthly">今月累計</div>
-      <div style="margin-top:10px;border-top:1px solid #21262d;padding-top:8px">
-        <div class="auto-val" id="av-a-today" style="font-size:16px;color:#e6edf3">—</div>
-        <div class="auto-sub c-muted">今日の売上</div>
+      <div class="auto-sub c-muted">今月累計</div>
+      <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-a-yesterday">—</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px">昨日</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#58a6ff" id="av-a-today">—</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px">今日</div>
+        </div>
       </div>
-      <div class="save-row" style="margin-top:10px">
+      <div style="display:flex;gap:4px;margin-top:8px">
         <input type="number" id="in-a-monthly" placeholder="累計（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
         <input type="number" id="in-a-today" placeholder="今日（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
     </div>
 
@@ -281,16 +299,22 @@ body {
       <span class="auto-badge" id="badge-y">手動</span>
       <div class="mall-label c-amber">Yahoo!</div>
       <div class="auto-val c-amber" id="av-y-monthly">—</div>
-      <div class="auto-sub c-muted" id="as-y-monthly">今月累計</div>
-      <div style="margin-top:10px;border-top:1px solid #21262d;padding-top:8px">
-        <div class="auto-val" id="av-y-today" style="font-size:16px;color:#e6edf3">—</div>
-        <div class="auto-sub c-muted">今日の売上</div>
+      <div class="auto-sub c-muted">今月累計</div>
+      <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-y-yesterday">—</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px">昨日</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#58a6ff" id="av-y-today">—</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px">今日</div>
+        </div>
       </div>
-      <div class="save-row" style="margin-top:10px">
+      <div style="display:flex;gap:4px;margin-top:8px">
         <input type="number" id="in-y-monthly" placeholder="累計（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
         <input type="number" id="in-y-today" placeholder="今日（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
     </div>
 
@@ -463,23 +487,28 @@ function sv(id, v) { document.getElementById(id).textContent = v; }
 
 /* ── 現在の実績値（GAS自動 or 手動） ── */
 var SALES = {
-  total:   { monthly: 0, today: 0 },
-  rakuten: { monthly: 0, today: 0 },
-  amazon:  { monthly: 0, today: 0 },
-  yahoo:   { monthly: 0, today: 0 },
-  source:  'manual'   // 'auto' | 'manual'
+  total:   { monthly: 0, today: 0, yesterday: 0 },
+  rakuten: { monthly: 0, today: 0, yesterday: 0 },
+  amazon:  { monthly: 0, today: 0, yesterday: 0 },
+  yahoo:   { monthly: 0, today: 0, yesterday: 0 },
+  source:  'manual'
 };
 
 function setAutoSales(data) {
-  SALES.source          = 'auto';
-  SALES.rakuten.monthly = data.monthly.rakuten || 0;
-  SALES.rakuten.today   = data.today.rakuten   || 0;
-  SALES.amazon.monthly  = data.monthly.amazon  || 0;
-  SALES.amazon.today    = data.today.amazon    || 0;
-  SALES.yahoo.monthly   = data.monthly.yahoo   || 0;
-  SALES.yahoo.today     = data.today.yahoo     || 0;
-  SALES.total.monthly   = data.monthly.total   || 0;
-  SALES.total.today     = data.today.total     || 0;
+  SALES.source = 'auto';
+  var ys = data.yesterdayS || {};
+  SALES.rakuten.monthly   = (data.monthly   || {}).rakuten || 0;
+  SALES.rakuten.today     = (data.today     || {}).rakuten || 0;
+  SALES.rakuten.yesterday = (ys).rakuten || 0;
+  SALES.amazon.monthly    = (data.monthly   || {}).amazon  || 0;
+  SALES.amazon.today      = (data.today     || {}).amazon  || 0;
+  SALES.amazon.yesterday  = (ys).amazon  || 0;
+  SALES.yahoo.monthly     = (data.monthly   || {}).yahoo   || 0;
+  SALES.yahoo.today       = (data.today     || {}).yahoo   || 0;
+  SALES.yahoo.yesterday   = (ys).yahoo   || 0;
+  SALES.total.monthly     = (data.monthly   || {}).total   || 0;
+  SALES.total.today       = (data.today     || {}).total   || 0;
+  SALES.total.yesterday   = (ys).total   || 0;
   renderSalesDisplay('live');
   recalc();
 }
@@ -512,8 +541,9 @@ function renderSalesDisplay(src) {
 
   var map = { total: SALES.total, r: SALES.rakuten, a: SALES.amazon, y: SALES.yahoo };
   Object.keys(map).forEach(function(k) {
-    sv('av-' + k + '-monthly', fy(map[k].monthly));
-    sv('av-' + k + '-today',   fy(map[k].today));
+    sv('av-' + k + '-monthly',   fy(map[k].monthly));
+    sv('av-' + k + '-today',     fy(map[k].today));
+    sv('av-' + k + '-yesterday', fy(map[k].yesterday));
   });
 }
 
@@ -633,8 +663,9 @@ function fetchGAS() {
     })
     .then(function(data) {
       if (data.error) throw new Error(data.error);
-      setStatus('ok', '✓ 取得成功（' + data.date + '）楽天+Amazon+Yahoo合計 今月:' +
-        fy(data.monthly.total) + ' / 今日:' + fy(data.today.total));
+      var ys = data.yesterdayS || {};
+      setStatus('ok', '✓ 取得成功（' + data.date + '）今月累計:' +
+        fy(data.monthly.total) + ' / 昨日:' + fy(ys.total) + ' / 今日:' + fy(data.today.total));
       localStorage.setItem('gas_last', JSON.stringify(data));
       localStorage.setItem('gas_last_time', new Date().toLocaleString('ja-JP'));
       setAutoSales(data);
@@ -698,8 +729,9 @@ function saveManual() {
   if (last) {
     try {
       var data = JSON.parse(last);
-      setStatus('ok', '前回取得: ' + lastTime + ' — 今月:' +
-        fy(data.monthly.total) + ' / 今日:' + fy(data.today.total) +
+      var ys2 = data.yesterdayS || {};
+      setStatus('ok', '前回取得: ' + lastTime + ' — 今月累計:' +
+        fy(data.monthly.total) + ' / 昨日:' + fy(ys2.total) + ' / 今日:' + fy(data.today.total) +
         '（「売上を自動取得」で最新に更新）');
       setAutoSales(data);
       // 今日まだ取得していなければバックグラウンドで自動更新
