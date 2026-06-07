@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>エージェント経営 ｜ 株式会社ネオ・ゲート</title>
+<style>
+  * { box-sizing: border-box; max-width: 100%; }
+  html { overflow-x: hidden; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #eceae3; color: #1e1e1c; margin: 0; padding: 0; font-size: 14px; overflow-x: hidden; }
+
+  /* ===== HEADER ===== */
+  .header { background: linear-gradient(135deg, #0f2d22 0%, #1a3a5e 100%); color: #fff; padding: 28px 20px 22px; text-align: center; }
+  .header h1 { font-size: 26px; font-weight: 700; margin: 0 0 8px; color: #fff; letter-spacing: 1px; }
+  .header .subtitle { font-size: 13px; color: #9ed4bc; margin: 0; }
+  .header .tagline { font-size: 15px; color: #c8e6f5; margin: 10px 0 0; font-weight: 500; }
+
+  /* ===== NAV ===== */
+  .nav { background: #1a3a2e; padding: 10px 20px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .nav a { color: #9ed4bc; font-size: 13px; text-decoration: none; padding: 4px 10px; border-radius: 6px; }
+  .nav a:hover { background: #2c5f47; color: #fff; }
+
+  /* ===== MAIN CONTENT ===== */
+  .content { padding: 20px 16px; max-width: 960px; margin: 0 auto; }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin: 28px 0 12px; padding: 10px 16px; background: #1a3a5e; border-radius: 8px; display: flex; align-items: center; gap: 8px; }
+  .section-title.green { background: #1a3a2e; }
+  .section-title.amber { background: #7a4e00; }
+  .section-title.purple { background: #3d3480; }
+  .section-title.coral { background: #7a2a10; }
+
+  /* ===== CONCEPT BOX ===== */
+  .concept { background: linear-gradient(135deg, #1a3a5e, #0f2d22); color: #fff; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .concept h2 { font-size: 18px; font-weight: 700; margin: 0 0 12px; color: #9ed4bc; }
+  .concept p { font-size: 14px; line-height: 1.8; margin: 0 0 10px; color: #e8f4ef; }
+  .concept .highlight { background: rgba(255,255,255,0.12); border-radius: 8px; padding: 12px 16px; font-size: 15px; font-weight: 600; color: #fff; border-left: 4px solid #1D9E75; }
+
+  /* ===== STATS GRID ===== */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 700px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+  .stat-card { background: #fff; border-radius: 10px; padding: 16px; text-align: center; border: 1px solid #d8d5ce; }
+  .stat-num { font-size: 32px; font-weight: 700; color: #1a3a5e; line-height: 1; }
+  .stat-unit { font-size: 13px; color: #888; margin-top: 4px; }
+  .stat-label { font-size: 12px; color: #555; margin-top: 6px; }
+
+  /* ===== AGENT CARDS ===== */
+  .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  @media (max-width: 700px) { .agent-grid { grid-template-columns: 1fr; } }
+  .agent-card { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #d8d5ce; }
+  .agent-card h3 { font-size: 14px; font-weight: 700; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+  .agent-icon { font-size: 20px; }
+  .agent-role { font-size: 12px; color: #777; margin-bottom: 10px; font-weight: 500; }
+  .agent-tasks { list-style: none; padding: 0; margin: 0; }
+  .agent-tasks li { font-size: 13px; padding: 3px 0 3px 18px; color: #333; line-height: 1.5; position: relative; }
+  .agent-tasks li::before { content: "✓"; position: absolute; left: 0; color: #1D9E75; font-weight: 700; }
+  .agent-tasks li.wait::before { content: "⏳"; color: #e8a020; }
+  .agent-tasks li.plan::before { content: "→"; color: #378ADD; }
+  .agent-border-teal { border-top: 4px solid #1D9E75; }
+  .agent-border-blue { border-top: 4px solid #378ADD; }
+  .agent-border-amber { border-top: 4px solid #EF9F27; }
+  .agent-border-purple { border-top: 4px solid #7F77DD; }
+  .agent-border-coral { border-top: 4px solid #D85A30; }
+  .agent-border-pink { border-top: 4px solid #D85A8C; }
+  .agent-border-gray { border-top: 4px solid #888; }
+  .agent-border-indigo { border-top: 4px solid #4B6BBB; }
+
+  /* ===== FLOW DIAGRAM ===== */
+  .flow-wrap { background: #fff; border-radius: 10px; padding: 20px; border: 1px solid #d8d5ce; margin-bottom: 16px; }
+  .flow-wrap h2 { font-size: 15px; font-weight: 700; margin: 0 0 16px; }
+  .flow-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+  .flow-box { border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 500; border: 1px solid; }
+  .fb-input { background: #e8f4ff; border-color: #378ADD; color: #0a3060; }
+  .fb-agent { background: #e8e6ff; border-color: #7F77DD; color: #2c2480; }
+  .fb-output { background: #d6f2e6; border-color: #1D9E75; color: #065035; }
+  .fb-human { background: #fff0cc; border-color: #EF9F27; color: #5a3300; }
+  .flow-arrow { color: #999; font-size: 16px; font-weight: 700; }
+  .flow-label { font-size: 11px; color: #999; margin-top: -6px; margin-bottom: 8px; padding-left: 4px; }
+
+  /* ===== PRINCIPLE CARDS ===== */
+  .principle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 700px) { .principle-grid { grid-template-columns: 1fr; } }
+  .principle-card { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #d8d5ce; text-align: center; }
+  .principle-num { font-size: 28px; font-weight: 700; color: #1a3a5e; }
+  .principle-title { font-size: 14px; font-weight: 700; margin: 6px 0 8px; }
+  .principle-desc { font-size: 12px; color: #555; line-height: 1.6; }
+
+  /* ===== RESULT BOX ===== */
+  .result-box { background: #fff; border-radius: 10px; padding: 18px; border: 1px solid #d8d5ce; margin-bottom: 12px; }
+  .result-box h2 { font-size: 15px; font-weight: 700; margin: 0 0 12px; }
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eceae3; font-size: 13px; }
+  .result-row:last-child { border-bottom: none; }
+  .result-before { color: #888; text-decoration: line-through; }
+  .result-after { color: #065035; font-weight: 600; }
+  .result-arrow { color: #1D9E75; font-weight: 700; margin: 0 8px; }
+
+  /* ===== ROADMAP ===== */
+  .roadmap { background: #fff; border-radius: 10px; padding: 18px; border: 1px solid #d8d5ce; margin-bottom: 12px; }
+  .roadmap h2 { font-size: 15px; font-weight: 700; margin: 0 0 14px; }
+  .phase { margin-bottom: 14px; }
+  .phase-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .phase-tag { font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 600; white-space: nowrap; }
+  .ph-done { background: #d6f2e6; color: #065035; }
+  .ph-now  { background: #fde0d0; color: #7a1f0a; }
+  .ph-next { background: #e8e6ff; color: #2c2480; }
+  .ph-future { background: #eeece5; color: #444; }
+  .phase-title { font-size: 14px; font-weight: 600; }
+  .phase-items { padding-left: 20px; }
+  .phase-items li { font-size: 13px; color: #444; line-height: 1.7; }
+
+  /* ===== QUOTE ===== */
+  .quote-box { background: linear-gradient(135deg, #1a3a5e, #3d3480); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; color: #fff; }
+  .quote-box blockquote { font-size: 16px; font-weight: 500; line-height: 1.7; margin: 0 0 10px; color: #e8f4ef; font-style: italic; }
+  .quote-box cite { font-size: 12px; color: #9ed4bc; }
+
+  /* ===== FOOTER ===== */
+  .footer { font-size: 11px; color: #999; text-align: center; margin-top: 20px; padding-bottom: 24px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>エージェント経営</h1>
+  <p class="tagline">AIエージェントが動かす、次世代のEC運営</p>
+  <p class="subtitle">株式会社ネオ・ゲート ｜ 2026年6月 更新</p>
+</div>
+
+<div class="nav">
+  <a href="index.html">← ダッシュボードに戻る</a>
+  <a href="#concept">概念</a>
+  <a href="#agents">エージェント一覧</a>
+  <a href="#flow">自動化フロー</a>
+  <a href="#results">効果</a>
+  <a href="#roadmap">ロードマップ</a>
+</div>
+
+<div class="content">
+
+<!-- ===== CONCEPT ===== -->
+<div id="concept"></div>
+<div class="concept">
+  <h2>エージェント経営とは</h2>
+  <p>
+    「エージェント経営」とは、AIエージェント（自律的に判断・実行するAIシステム）に日常業務を委任し、
+    人間は戦略立案・意思決定・関係構築に集中する経営スタイルです。
+  </p>
+  <p>
+    当社では <strong>Claude（Anthropic社）</strong> をコアエンジンとして、
+    楽天・Amazon・Yahoo!の受注管理、広告最適化、レポート生成、ブログ投稿など
+    複数のビジネスプロセスを自動化しています。
+  </p>
+  <div class="highlight">
+    「ルーティンはエージェントへ、創造と判断は人間へ」― これが私たちの経営哲学です。
+  </div>
+</div>
+
+<!-- ===== STATS ===== -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-num">9</div>
+    <div class="stat-unit">プロジェクト</div>
+    <div class="stat-label">自動化稼働中</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">5</div>
+    <div class="stat-unit">モール</div>
+    <div class="stat-label">楽天・Amazon・Yahoo・自社・グースリー</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">8:00</div>
+    <div class="stat-unit">毎朝</div>
+    <div class="stat-label">注文データ自動統合</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">85%</div>
+    <div class="stat-unit">自動化率</div>
+    <div class="stat-label">ルーティン業務</div>
+  </div>
+</div>
+
+<!-- ===== AGENTS ===== -->
+<div id="agents"></div>
+<div class="section-title green">稼働中のAIエージェント</div>
+
+<div class="agent-grid">
+
+  <div class="agent-card agent-border-teal">
+    <h3><span class="agent-icon">🛒</span>EC受注統合エージェント</h3>
+    <div class="agent-role">毎朝8時に全モールの注文データを自動取得・統合</div>
+    <ul class="agent-tasks">
+      <li>楽天 RMS API から注文データ取得</li>
+      <li>Amazon SP-API から注文・売上データ取得</li>
+      <li>Googleスプレッドシート「注文統合」シートへ書き込み</li>
+      <li>重複排除・キー名正規化の自動処理</li>
+      <li class="wait">Yahoo・自社・グースリー統合（CSV手動運用中）</li>
+    </ul>
+  </div>
+
+  <div class="agent-card agent-border-pink">
+    <h3><span class="agent-icon">📢</span>楽天RPP広告エージェント</h3>
+    <div class="agent-role">楽天RPP広告のデイリー入札最適化を自動実行</div>
+    <ul class="agent-tasks">
+      <li>週次CSVデータ取込・KPI集計</li>
+      <li>キーワード別CPC・CVR分析</li>
+      <li>入札価格の自動調整提案</li>
+      <li>100クリック未満キーワードは停止提案禁止（ルール遵守）</li>
+      <li class="wait">DRY_RUN=true 稼働中（本番適用承認待ち）</li>
+    </ul>
+  </div>
+
+  <div class="agent-card agent-border-teal">
+    <h3><span class="agent-icon">📊</span>楽天週次レポートエージェント</h3>
+    <div class="agent-role">楽天の売上・広告データを毎週自動集計</div>
+    <ul class="agent-tasks">
+      <li>RMSレポートCSV自動読み込み（Node.js）</li>
+      <li>KPI自動計算（売上・セッション・CVR・RPP効果）</li>
+      <li>Googleスプレッドシートへ自動書き込み</li>
+      <li>run_weekly.bat / .ps1 で定期実行</li>
+    </ul>
+  </div>
+
+  <div class="agent-card agent-border-blue">
+    <h3><span class="agent-icon">🔵</span>Amazon月次レポートエージェント</h3>
+    <div class="agent-role">Amazon広告の月次レポートをSP-APIから自動取得・分析</div>
+    <ul class="agent-tasks">
+      <li>SP全レポート取得（KW・ASIN・検索語句）</li>
+      <li>CTR / CPC / ACOS / ROAS 自動計算</li>
+      <li>Googleスプレッドシートへ自動出力（Python）</li>
+      <li>childAsin優先・parentAsinフォールバック処理</li>
+    </ul>
+  </div>
+
+  <div class="agent-card agent-border-amber">
+    <h3><span class="agent-icon">🟡</span>Yahoo週次レポートエージェント</h3>
+    <div class="agent-role">Yahoo!ショッピングの売上・広告データを毎週集計</div>
+    <ul class="agent-tasks">
+      <li>毎週月曜9時：Google DriveのCSVを自動読み込み</li>
+      <li>売上・広告データ自動書き込み</li>
+      <li>SEO順位取得・記録</li>
+      <li class="wait">手動5分：月曜にCSV DL → Drive保存</li>
+    </ul>
+  </div>
+
+  <div class="agent-card agent-border-purple">
+    <h3><span class="agent-icon">✍️</span>ブログ自動投稿エージェント</h3>
+    <div class="agent-role">Goosely公式ブログに週3回、SEO最適化記事を自動投稿</div>
+    <ul class="agent-tasks">
+      <li>月初に翌月記事カレンダーを自動生成</li>
+      <li>月曜：教育コンテンツ記事生成・投稿（7:00）</li>
+      <li>水曜：比較・レビュー記事生成・投稿（7:00）</li>
+      <li>金曜：ライフスタイル記事生成・投稿（7:00）</li>
+    </ul>
+  </div>
+
+  <div class="agent-card agent-border-coral">
+    <h3><span class="agent-icon">🎙️</span>音声教育化エージェント</h3>
+    <div class="agent-role">Vimeo動画をWhisperで文字起こし → Claudeで概念抽出</div>
+    <ul class="agent-tasks">
+      <li>Vimeo音声ダウンロード自動化</li>
+      <li>Whisperによるローカル文字起こし</li>
+      <li>Claude APIによる概念・ナレッジ抽出</li>
+      <li class="wait">Vimeo動画・lessons.json 未投入（実行待ち）</li>
+    </ul>
+  </div>
+
+  <div class="agent-card agent-border-gray">
+    <h3><span class="agent-icon">📋</span>週次ダッシュボードエージェント</h3>
+    <div class="agent-role">全プロジェクトの進捗を毎週自動でダッシュボードに反映</div>
+    <ul class="agent-tasks">
+      <li>Claude API でサマリー生成</li>
+      <li>docs/index.html を自動更新</li>
+      <li>git push で自動公開</li>
+      <li>Chatwork で完了通知</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- ===== PRINCIPLES ===== -->
+<div class="section-title">エージェント経営の3原則</div>
+<div class="principle-grid">
+  <div class="principle-card">
+    <div class="principle-num">01</div>
+    <div class="principle-title">自動化ファースト</div>
+    <div class="principle-desc">新しい業務が生まれたとき、まず「これはエージェントに任せられるか？」を問う。ルーティンは即自動化を検討する。</div>
+  </div>
+  <div class="principle-card">
+    <div class="principle-num">02</div>
+    <div class="principle-title">人間は戦略・承認のみ</div>
+    <div class="principle-desc">AIの実行結果を人間がレビュー・承認する体制を維持。完全自律ではなく「人間in the loop」で品質と安全を担保する。</div>
+  </div>
+  <div class="principle-card">
+    <div class="principle-num">03</div>
+    <div class="principle-title">記録・継続改善</div>
+    <div class="principle-desc">各セッションの作業をCLAUDE.mdに記録し、エージェントが次回も文脈を引き継げる状態を維持する。知識の蓄積が競争優位になる。</div>
+  </div>
+</div>
+
+<!-- ===== FLOW ===== -->
+<div id="flow"></div>
+<div class="section-title">自動化フロー全体像</div>
+<div class="flow-wrap">
+  <h2>データ取得 → 分析 → 意思決定 → 実行</h2>
+
+  <div class="flow-label">【受注統合】</div>
+  <div class="flow-row">
+    <div class="flow-box fb-input">楽天 RMS API</div>
+    <div class="flow-arrow">+</div>
+    <div class="flow-box fb-input">Amazon SP-API</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-agent">EC受注統合GAS（毎朝8時）</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-output">注文統合シート（全モールDB）</div>
+  </div>
+
+  <div class="flow-label">【広告最適化】</div>
+  <div class="flow-row">
+    <div class="flow-box fb-input">RPP週次CSV</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-agent">楽天RPP広告エージェント</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-output">入札最適化提案</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-human">人間が承認</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-output">RMS反映</div>
+  </div>
+
+  <div class="flow-label">【コンテンツ生成】</div>
+  <div class="flow-row">
+    <div class="flow-box fb-input">記事カレンダー</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-agent">Claude API（記事生成）</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-agent">監査・品質チェック</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-output">WordPress自動投稿</div>
+  </div>
+
+  <div class="flow-label">【ナレッジ構築】</div>
+  <div class="flow-row">
+    <div class="flow-box fb-input">Vimeo動画</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-agent">Whisper文字起こし</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-agent">Claude API概念抽出</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-output">knowledge_base.md</div>
+  </div>
+</div>
+
+<!-- ===== RESULTS ===== -->
+<div id="results"></div>
+<div class="section-title amber">自動化による効果（ビフォー/アフター）</div>
+<div class="result-box">
+  <h2>業務効率の変化</h2>
+  <div class="result-row">
+    <span>楽天・Amazon 注文集計</span>
+    <span>
+      <span class="result-before">毎朝30〜60分の手作業</span>
+      <span class="result-arrow">→</span>
+      <span class="result-after">毎朝8時に自動完了（0分）</span>
+    </span>
+  </div>
+  <div class="result-row">
+    <span>楽天RPP週次レポート</span>
+    <span>
+      <span class="result-before">CSV手集計2〜3時間</span>
+      <span class="result-arrow">→</span>
+      <span class="result-after">node weekly.js で5分以内</span>
+    </span>
+  </div>
+  <div class="result-row">
+    <span>Amazon広告月次分析</span>
+    <span>
+      <span class="result-before">半日かけてExcel集計</span>
+      <span class="result-arrow">→</span>
+      <span class="result-after">Python自動実行で30分以内</span>
+    </span>
+  </div>
+  <div class="result-row">
+    <span>Gooselyブログ投稿</span>
+    <span>
+      <span class="result-before">毎週手書き・手動投稿（週4〜8時間）</span>
+      <span class="result-arrow">→</span>
+      <span class="result-after">週3回 Claude が自動生成・投稿</span>
+    </span>
+  </div>
+  <div class="result-row">
+    <span>週次ダッシュボード更新</span>
+    <span>
+      <span class="result-before">手動で進捗まとめ・メール共有（1〜2時間）</span>
+      <span class="result-arrow">→</span>
+      <span class="result-after">Claude API が自動生成・git push・Chatwork通知</span>
+    </span>
+  </div>
+</div>
+
+<!-- ===== QUOTE ===== -->
+<div class="quote-box">
+  <blockquote>
+    「AIに任せることで、私たちは"仕事をすること"から"仕事をデザインすること"にシフトできた。
+    エージェントはミスを犯さず、休まず、文句を言わない。
+    私たちは彼らに正しい仕事を与え、正しく動いているかを確認することに集中する。」
+  </blockquote>
+  <cite>― 株式会社ネオ・ゲート, エージェント経営実践記録より</cite>
+</div>
+
+<!-- ===== ROADMAP ===== -->
+<div id="roadmap"></div>
+<div class="section-title purple">エージェント化ロードマップ</div>
+<div class="roadmap">
+  <h2>Phase別 自動化計画</h2>
+
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-tag ph-done">Phase 1 完了</span>
+      <span class="phase-title">基盤構築（2026年4〜5月）</span>
+    </div>
+    <ul class="phase-items">
+      <li>楽天・Amazon 注文自動取得 + 統合シート構築</li>
+      <li>楽天週次レポート自動化（Node.js）</li>
+      <li>Amazon月次レポート自動化（Python）</li>
+      <li>Goosely ブログ週3回自動投稿</li>
+      <li>週次ダッシュボード自動更新（Claude API + git）</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-tag ph-now">Phase 2 進行中</span>
+      <span class="phase-title">最適化・高度化（2026年6月〜）</span>
+    </div>
+    <ul class="phase-items">
+      <li>楽天RPP広告 本番自動運用（DRY_RUN解除）</li>
+      <li>自社ショップ・グースリー CSVメール転送設定</li>
+      <li>integration/Code.gs 月次横断レポート関数追加</li>
+      <li>音声教育化パイプライン初回実行</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-tag ph-next">Phase 3 計画中</span>
+      <span class="phase-title">横断分析・意思決定支援（2026年7〜9月）</span>
+    </div>
+    <ul class="phase-items">
+      <li>全モール横断 月次損益レポート自動生成</li>
+      <li>Amazon週次レポート自動化（ec-automationへ統合）</li>
+      <li>売上・広告 ROI 自動計算・アラート配信</li>
+      <li>GA4・Search Console 連携（ブログ効果測定）</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-tag ph-future">Phase 4 将来構想</span>
+      <span class="phase-title">自律経営（2026年10月〜）</span>
+    </div>
+    <ul class="phase-items">
+      <li>AIエージェントによる価格自動最適化（各モール）</li>
+      <li>需要予測に基づく在庫・仕入れ自動提案</li>
+      <li>マルチエージェント協調（複数Claudeが連携して意思決定）</li>
+      <li>経営KPIダッシュボードの経営者向け音声ブリーフィング</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /content -->
+<p class="footer">最終更新: 2026-06-07 ｜ 株式会社ネオ・ゲート ｜ エージェント経営推進プロジェクト</p>
+</body>
+</html>

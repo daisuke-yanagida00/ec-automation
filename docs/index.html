@@ -124,6 +124,34 @@
   .af-box { background: #eeece5; border-radius: 6px; padding: 5px 10px; font-size: 12px; color: #333; border: 1px solid #ccc; }
   .af-arrow { color: #999; font-size: 13px; }
 
+  /* ===== SALES DASHBOARD ===== */
+  .sales-panel { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #d8d5ce; margin-bottom: 12px; }
+  .sales-input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 700px) { .sales-input-grid { grid-template-columns: 1fr; } }
+  .sales-input-item label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; font-weight: 600; }
+  .sales-input-item input { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; font-family: inherit; box-sizing: border-box; }
+  .sales-input-item input:focus { outline: none; border-color: #1D9E75; }
+  .sales-update-btn { background: #1a3a2e; color: #fff; border: none; padding: 9px 18px; border-radius: 6px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .sales-update-btn:hover { background: #2c5f47; }
+  .sales-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  @media (max-width: 700px) { .sales-kpi-grid { grid-template-columns: 1fr 1fr; } }
+  .sales-kpi { background: #fff; border-radius: 10px; padding: 14px 10px; border: 1px solid #d8d5ce; text-align: center; }
+  .sales-kpi-num { font-size: 22px; font-weight: 700; line-height: 1.2; word-break: break-all; }
+  .sales-kpi-label { font-size: 11px; color: #777; margin-top: 4px; }
+  .sales-kpi-sub { font-size: 12px; color: #555; margin-top: 3px; font-weight: 600; }
+  .sales-bar-section { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #d8d5ce; margin-bottom: 12px; }
+  .sales-bar-row { margin-bottom: 16px; }
+  .sales-bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; font-weight: 600; }
+  .sales-bar-bg { background: #eceae3; border-radius: 8px; height: 20px; overflow: visible; position: relative; }
+  .sales-bar-fg { height: 20px; border-radius: 8px; transition: width 0.6s ease; position: relative; z-index: 1; }
+  .sales-bar-pace { position: absolute; top: -3px; height: 26px; width: 3px; background: #333; opacity: 0.4; border-radius: 2px; z-index: 2; }
+  .sales-bar-sub { display: flex; justify-content: space-between; font-size: 11px; color: #999; margin-top: 4px; }
+  .pace-box { border-radius: 8px; padding: 12px 16px; font-size: 13px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .pace-ahead { background: #d6f2e6; color: #065035; border: 1px solid #9FE1CB; }
+  .pace-behind { background: #fde8e8; color: #6e1010; border: 1px solid #f0a0a0; }
+  .pace-on { background: #fff0cc; color: #5a3300; border: 1px solid #e8a020; }
+  .pace-icon { font-size: 20px; flex-shrink: 0; }
+
   /* ===== FOOTER ===== */
   .footer { font-size: 11px; color: #999; text-align: center; margin-top: 12px; padding-bottom: 20px; }
 </style>
@@ -145,6 +173,102 @@
 <div class="alert-box info"><strong>ℹ️ アラート</strong>Yahoo注文API申請は取り下げ済み（2026-05-25）。手動CSVダウンロード運用に方針変更済み。</div>
 <div class="alert-box info"><strong>ℹ️ アラート</strong>楽天RPP広告：100クリック未満のキーワードへの停止提案は禁止ルール（2026-06-04確定）。RPP広告データは手動CSVアップロードのみ正データ（2026-06-03確定）。</div>
 <div class="alert-box info"><strong>ℹ️ アラート</strong>amazon-gas-automation：今週のgitコミットなし。SP-APIデバッグセッションの内容がCLAUDE.mdに反映されているか確認推奨。</div>
+</div>
+
+<div class="section-title" style="background:linear-gradient(135deg,#0f2d22,#1a3a5e);margin-top:4px">売上目標 vs 実績ダッシュボード <a href="sales-tracker.html" style="font-size:11px;font-weight:400;color:#9ed4bc;margin-left:12px;text-decoration:none;">→ 専用ページで開く</a></div>
+
+<!-- 入力パネル -->
+<div class="sales-panel">
+  <div class="sales-input-grid">
+    <div class="sales-input-item">
+      <label>月次売上目標（円）</label>
+      <input type="number" id="in-monthly-target" placeholder="例: 3000000">
+    </div>
+    <div class="sales-input-item">
+      <label>現在の累計売上（円）</label>
+      <input type="number" id="in-cumulative" placeholder="例: 1500000">
+    </div>
+    <div class="sales-input-item">
+      <label>今日の売上（円）</label>
+      <input type="number" id="in-today-sales" placeholder="例: 150000">
+    </div>
+  </div>
+  <button class="sales-update-btn" onclick="updateSales()">更新する</button>
+  <span id="sales-updated-at" style="font-size:11px;color:#999;margin-left:12px;"></span>
+</div>
+
+<!-- KPIカード -->
+<div class="sales-kpi-grid">
+  <div class="sales-kpi">
+    <div class="sales-kpi-num" id="kpi-monthly" style="color:#1a3a5e">未設定</div>
+    <div class="sales-kpi-label">月次売上目標</div>
+    <div class="sales-kpi-sub" id="kpi-monthly-sub"></div>
+  </div>
+  <div class="sales-kpi">
+    <div class="sales-kpi-num" id="kpi-cumulative" style="color:#1D9E75">—</div>
+    <div class="sales-kpi-label">累計売上（今月）</div>
+    <div class="sales-kpi-sub" id="kpi-cumulative-sub"></div>
+  </div>
+  <div class="sales-kpi">
+    <div class="sales-kpi-num" id="kpi-daily" style="color:#378ADD">—</div>
+    <div class="sales-kpi-label">日次目標（1日あたり）</div>
+    <div class="sales-kpi-sub" id="kpi-daily-sub"></div>
+  </div>
+  <div class="sales-kpi">
+    <div class="sales-kpi-num" id="kpi-today" style="color:#D85A30">—</div>
+    <div class="sales-kpi-label">今日の売上</div>
+    <div class="sales-kpi-sub" id="kpi-today-sub"></div>
+  </div>
+</div>
+
+<!-- ペース判定 -->
+<div id="pace-box" class="pace-box pace-on" style="display:none">
+  <span class="pace-icon" id="pace-icon">—</span>
+  <span id="pace-text"></span>
+</div>
+
+<!-- プログレスバー -->
+<div class="sales-bar-section">
+  <div class="sales-bar-row">
+    <div class="sales-bar-label">
+      <span>月次目標達成率</span>
+      <span id="monthly-pct-text" style="color:#1D9E75">—%</span>
+    </div>
+    <div class="sales-bar-bg">
+      <div class="sales-bar-fg" id="bar-monthly" style="width:0%;background:#1D9E75"></div>
+      <div class="sales-bar-pace" id="bar-pace-mark" style="left:0%;display:none"></div>
+    </div>
+    <div class="sales-bar-sub">
+      <span>¥0</span>
+      <span id="bar-pace-label" style="color:#555;font-weight:600">ペース目標: —</span>
+      <span id="bar-target-label">目標: —</span>
+    </div>
+  </div>
+
+  <div class="sales-bar-row">
+    <div class="sales-bar-label">
+      <span>本日の売上 vs 日次目標</span>
+      <span id="daily-pct-text" style="color:#378ADD">—%</span>
+    </div>
+    <div class="sales-bar-bg">
+      <div class="sales-bar-fg" id="bar-today" style="width:0%;background:#378ADD"></div>
+    </div>
+    <div class="sales-bar-sub">
+      <span>¥0</span>
+      <span id="bar-daily-label">日次目標: —</span>
+      <span id="bar-today-label">今日: —</span>
+    </div>
+  </div>
+
+  <div class="sales-bar-row" style="margin-bottom:0">
+    <div class="sales-bar-label">
+      <span>残り達成必要額</span>
+      <span id="remaining-amt" style="color:#D85A30">—</span>
+    </div>
+    <div style="font-size:12px;color:#888;margin-top:2px">
+      残り <strong id="remaining-days">—</strong> 日で、1日あたり <strong id="required-daily" style="color:#D85A30">—</strong> 必要
+    </div>
+  </div>
 </div>
 
 <div class="section-title">EC受注統合（ec-automation）<span class="tag tag-gas">GAS</span><span class="tag tag-auto">全自動</span></div>
@@ -260,5 +384,123 @@
 
 </div><!-- /content -->
 <p class="footer">最終更新: 2026-06-05 09:00 ｜ 全9プロジェクト管理中 ｜ 自動生成 by Claude API</p>
+<script>
+function fmtYen(n) {
+  if (isNaN(n) || n === 0) return '—';
+  if (n >= 1000000) return '¥' + (n / 1000000).toFixed(2) + 'M';
+  if (n >= 10000)   return '¥' + Math.round(n / 10000) + '万';
+  return '¥' + n.toLocaleString('ja-JP');
+}
+function fmtPct(r) { return (r * 100).toFixed(1) + '%'; }
+
+function updateSales() {
+  var monthly    = parseInt(document.getElementById('in-monthly-target').value) || 0;
+  var cumulative = parseInt(document.getElementById('in-cumulative').value) || 0;
+  var today      = parseInt(document.getElementById('in-today-sales').value) || 0;
+  localStorage.setItem('s_monthly',    monthly);
+  localStorage.setItem('s_cumulative', cumulative);
+  localStorage.setItem('s_today',      today);
+  localStorage.setItem('s_updated',    new Date().toLocaleString('ja-JP'));
+  renderSales(monthly, cumulative, today);
+}
+
+function renderSales(monthly, cumulative, today) {
+  var now = new Date();
+  var daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  var dayOfMonth  = now.getDate();
+  var remaining   = daysInMonth - dayOfMonth;
+
+  var dailyTarget  = monthly > 0 ? monthly / daysInMonth : 0;
+  var paceTarget   = dailyTarget * dayOfMonth;
+  var paceRatio    = paceTarget > 0 ? cumulative / paceTarget : 0;
+  var monthlyRatio = monthly > 0 ? cumulative / monthly : 0;
+  var dailyRatio   = dailyTarget > 0 ? today / dailyTarget : 0;
+  var needed       = Math.max(0, monthly - cumulative);
+  var reqDaily     = remaining > 0 ? needed / remaining : 0;
+
+  // KPIs
+  document.getElementById('kpi-monthly').textContent    = monthly > 0 ? fmtYen(monthly) : '未設定';
+  document.getElementById('kpi-monthly-sub').textContent = daysInMonth + '日間';
+  document.getElementById('kpi-cumulative').textContent  = fmtYen(cumulative);
+  document.getElementById('kpi-cumulative-sub').textContent = monthly > 0 ? fmtPct(monthlyRatio) + '達成' : '';
+  document.getElementById('kpi-daily').textContent       = fmtYen(Math.round(dailyTarget));
+  document.getElementById('kpi-daily-sub').textContent   = dayOfMonth + '日目 / ' + daysInMonth + '日';
+  document.getElementById('kpi-today').textContent       = fmtYen(today);
+  document.getElementById('kpi-today-sub').textContent   = dailyTarget > 0 ? '日次目標の' + fmtPct(dailyRatio) : '';
+
+  // Monthly bar
+  var mPct     = Math.min(100, monthlyRatio * 100);
+  var mColor   = monthlyRatio >= 1 ? '#1D9E75' : monthlyRatio >= 0.7 ? '#EF9F27' : '#D85A30';
+  var pacePct  = monthly > 0 ? Math.min(99, (paceTarget / monthly) * 100) : 0;
+  document.getElementById('bar-monthly').style.width      = mPct + '%';
+  document.getElementById('bar-monthly').style.background = mColor;
+  document.getElementById('monthly-pct-text').textContent  = mPct.toFixed(1) + '%';
+  document.getElementById('monthly-pct-text').style.color  = mColor;
+  if (monthly > 0) {
+    var pm = document.getElementById('bar-pace-mark');
+    pm.style.display = 'block';
+    pm.style.left    = pacePct + '%';
+  }
+  document.getElementById('bar-pace-label').textContent  = 'ペース目標: ' + fmtYen(Math.round(paceTarget));
+  document.getElementById('bar-target-label').textContent = '目標: ' + fmtYen(monthly);
+
+  // Daily bar
+  var dPct   = Math.min(100, dailyRatio * 100);
+  var dColor = dailyRatio >= 1 ? '#1D9E75' : dailyRatio >= 0.7 ? '#EF9F27' : '#378ADD';
+  document.getElementById('bar-today').style.width      = dPct + '%';
+  document.getElementById('bar-today').style.background = dColor;
+  document.getElementById('daily-pct-text').textContent  = dPct.toFixed(0) + '%';
+  document.getElementById('daily-pct-text').style.color  = dColor;
+  document.getElementById('bar-daily-label').textContent = '日次目標: ' + fmtYen(Math.round(dailyTarget));
+  document.getElementById('bar-today-label').textContent = '今日: ' + fmtYen(today);
+
+  // Remaining
+  document.getElementById('remaining-amt').textContent   = needed > 0 ? fmtYen(needed) : '達成済み！';
+  document.getElementById('remaining-days').textContent  = remaining;
+  document.getElementById('required-daily').textContent  = reqDaily > 0 ? fmtYen(Math.round(reqDaily)) : '—';
+
+  // Pace box
+  var pb = document.getElementById('pace-box');
+  if (monthly > 0 && (cumulative > 0 || today > 0)) {
+    pb.style.display = 'flex';
+    var diff = Math.abs(cumulative - paceTarget);
+    if (paceRatio >= 1.05) {
+      pb.className = 'pace-box pace-ahead';
+      document.getElementById('pace-icon').textContent = '🚀';
+      document.getElementById('pace-text').textContent =
+        'ペース先行中！目標より ' + fmtYen(Math.round(diff)) + ' 上回っています（進捗' + fmtPct(paceRatio) + '）';
+    } else if (paceRatio >= 0.9) {
+      pb.className = 'pace-box pace-on';
+      document.getElementById('pace-icon').textContent = '✅';
+      document.getElementById('pace-text').textContent =
+        'ほぼ計画通り。ペースの ' + fmtPct(paceRatio) + ' — 残り' + remaining + '日で1日' + fmtYen(Math.round(reqDaily)) + '必要';
+    } else {
+      pb.className = 'pace-box pace-behind';
+      document.getElementById('pace-icon').textContent = '⚠️';
+      document.getElementById('pace-text').textContent =
+        'ペース遅れ。目標より ' + fmtYen(Math.round(diff)) + ' 不足（' + fmtPct(paceRatio) + '）→ 残り' + remaining + '日で1日' + fmtYen(Math.round(reqDaily)) + 'が必要';
+    }
+  } else {
+    pb.style.display = 'none';
+  }
+
+  // Timestamp
+  var ts = localStorage.getItem('s_updated');
+  if (ts) document.getElementById('sales-updated-at').textContent = '最終更新: ' + ts;
+}
+
+// 初期ロード
+(function() {
+  var m = parseInt(localStorage.getItem('s_monthly'))    || 0;
+  var c = parseInt(localStorage.getItem('s_cumulative')) || 0;
+  var t = parseInt(localStorage.getItem('s_today'))      || 0;
+  if (m || c || t) {
+    document.getElementById('in-monthly-target').value = m || '';
+    document.getElementById('in-cumulative').value     = c || '';
+    document.getElementById('in-today-sales').value    = t || '';
+    renderSales(m, c, t);
+  }
+})();
+</script>
 </body>
 </html>

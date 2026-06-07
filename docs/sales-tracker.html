@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>売上目標トラッカー ｜ ネオ・ゲート</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0d1117;
+  color: #e6edf3;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #161b22 0%, #1a2332 100%);
+  border-bottom: 1px solid #30363d;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.header-left h1 { font-size: 18px; font-weight: 700; color: #e6edf3; }
+.header-left p  { font-size: 12px; color: #8b949e; margin-top: 2px; }
+.header-right   { font-size: 11px; color: #8b949e; text-align: right; }
+.header-right strong { color: #58a6ff; }
+.back-link { font-size: 12px; color: #58a6ff; text-decoration: none; }
+.back-link:hover { text-decoration: underline; }
+
+/* ── MAIN ── */
+.main { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+
+/* ── INPUT CARD ── */
+.input-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.input-card h2 { font-size: 13px; color: #8b949e; font-weight: 600; margin-bottom: 14px; letter-spacing: 0.5px; text-transform: uppercase; }
+.input-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+@media (max-width: 640px) { .input-grid { grid-template-columns: 1fr; } }
+.input-item label {
+  display: block;
+  font-size: 11px;
+  color: #8b949e;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+.input-item input {
+  width: 100%;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  font-size: 14px;
+  padding: 8px 10px;
+  font-family: inherit;
+  transition: border-color .2s;
+}
+.input-item input:focus { outline: none; border-color: #58a6ff; }
+.input-item input::placeholder { color: #484f58; }
+.btn-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.save-btn {
+  background: #238636;
+  color: #fff;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .2s;
+}
+.save-btn:hover { background: #2ea043; }
+.updated-at { font-size: 11px; color: #484f58; }
+
+/* ── KPI GRID ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+@media (max-width: 640px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
+.kpi {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+}
+.kpi-val  { font-size: 22px; font-weight: 700; line-height: 1.2; word-break: break-all; }
+.kpi-lbl  { font-size: 11px; color: #8b949e; margin-top: 5px; }
+.kpi-sub  { font-size: 12px; font-weight: 600; margin-top: 3px; }
+.c-blue   { color: #58a6ff; }
+.c-green  { color: #3fb950; }
+.c-orange { color: #d29922; }
+.c-red    { color: #f85149; }
+.c-teal   { color: #39d353; }
+.c-muted  { color: #8b949e; }
+
+/* ── PACE BOX ── */
+.pace-box {
+  border-radius: 8px;
+  padding: 13px 18px;
+  margin-bottom: 14px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.pace-ahead  { background: #0d2a1f; border: 1px solid #238636; color: #3fb950; }
+.pace-on     { background: #271f00; border: 1px solid #9e6a03; color: #d29922; }
+.pace-behind { background: #2a0d0d; border: 1px solid #8b1922; color: #f85149; }
+.pace-icon   { font-size: 22px; flex-shrink: 0; }
+
+/* ── BAR SECTION ── */
+.bar-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.bar-card h2 { font-size: 13px; color: #8b949e; font-weight: 600; margin-bottom: 16px; letter-spacing: 0.5px; text-transform: uppercase; }
+.bar-row { margin-bottom: 20px; }
+.bar-row:last-child { margin-bottom: 0; }
+.bar-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.bar-title { font-size: 13px; font-weight: 600; }
+.bar-pct   { font-size: 16px; font-weight: 700; }
+.bar-track {
+  background: #21262d;
+  border-radius: 6px;
+  height: 14px;
+  position: relative;
+  overflow: visible;
+}
+.bar-fill {
+  height: 14px;
+  border-radius: 6px;
+  transition: width .7s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  z-index: 1;
+}
+.bar-target-line {
+  position: absolute;
+  top: -4px;
+  width: 3px;
+  height: 22px;
+  background: #8b949e;
+  border-radius: 2px;
+  z-index: 2;
+  display: none;
+}
+.bar-foot { display: flex; justify-content: space-between; font-size: 11px; color: #8b949e; margin-top: 5px; }
+.bar-foot .mid { font-weight: 600; color: #c9d1d9; }
+
+/* ── REMAINING BOX ── */
+.remaining-box {
+  background: #1a1a2e;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.remaining-main { font-size: 13px; }
+.remaining-main strong { font-size: 22px; color: #f85149; margin-right: 6px; }
+.remaining-detail { font-size: 12px; color: #8b949e; line-height: 1.8; text-align: right; }
+.remaining-detail strong { color: #e6edf3; }
+
+/* ── MULTI STORE ── */
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+@media (max-width: 640px) { .store-grid { grid-template-columns: 1fr; } }
+.store-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.store-card h3 { font-size: 12px; font-weight: 700; color: #8b949e; margin-bottom: 10px; }
+.store-input-pair { display: flex; gap: 6px; margin-bottom: 6px; }
+.store-input-pair input {
+  flex: 1;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  color: #e6edf3;
+  font-size: 12px;
+  padding: 6px 8px;
+  font-family: inherit;
+  min-width: 0;
+}
+.store-input-pair input:focus { outline: none; border-color: #58a6ff; }
+.store-input-pair label { font-size: 10px; color: #484f58; white-space: nowrap; padding-top: 7px; }
+.store-bar { background: #21262d; border-radius: 4px; height: 8px; margin-top: 8px; overflow: hidden; }
+.store-bar-fill { height: 8px; border-radius: 4px; transition: width .6s; }
+.store-stat { font-size: 11px; color: #8b949e; margin-top: 5px; display: flex; justify-content: space-between; }
+
+/* ── FOOTER ── */
+.footer { font-size: 11px; color: #484f58; text-align: center; padding: 20px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>📊 売上目標トラッカー</h1>
+    <p>月次・日次の目標 vs 実績をリアルタイム可視化</p>
+  </div>
+  <div class="header-right">
+    <div><strong id="today-date">—</strong></div>
+    <div id="month-progress-hdr" style="margin-top:2px"></div>
+    <a href="index.html" class="back-link" style="display:block;margin-top:4px">← ダッシュボードへ</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ── 入力 ── -->
+  <div class="input-card">
+    <h2>目標・実績の入力</h2>
+    <div class="input-grid">
+      <div class="input-item">
+        <label>月次売上目標（合計）</label>
+        <input type="number" id="in-monthly" placeholder="例: 7840000">
+      </div>
+      <div class="input-item">
+        <label>今月の累計売上（現時点）</label>
+        <input type="number" id="in-cumulative" placeholder="例: 3200000">
+      </div>
+      <div class="input-item">
+        <label>今日の売上</label>
+        <input type="number" id="in-today" placeholder="例: 180000">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="save-btn" onclick="save()">更新する</button>
+      <span class="updated-at" id="updated-at"></span>
+    </div>
+  </div>
+
+  <!-- ── KPI ── -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-val c-blue" id="kv-monthly">—</div>
+      <div class="kpi-lbl">月次売上目標</div>
+      <div class="kpi-sub c-muted" id="ks-monthly">—日間</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val c-teal" id="kv-cumulative">—</div>
+      <div class="kpi-lbl">累計売上（今月）</div>
+      <div class="kpi-sub" id="ks-cumulative" style="color:#3fb950">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val c-orange" id="kv-daily">—</div>
+      <div class="kpi-lbl">日次目標（1日あたり）</div>
+      <div class="kpi-sub c-muted" id="ks-daily">—日目</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" id="kv-today" style="color:#e6edf3">—</div>
+      <div class="kpi-lbl">今日の売上</div>
+      <div class="kpi-sub" id="ks-today" style="color:#d29922">—</div>
+    </div>
+  </div>
+
+  <!-- ── ペース判定 ── -->
+  <div class="pace-box" id="pace-box">
+    <span class="pace-icon" id="pace-icon">—</span>
+    <span id="pace-text">—</span>
+  </div>
+
+  <!-- ── プログレスバー ── -->
+  <div class="bar-card">
+    <h2>達成率グラフ</h2>
+
+    <!-- 月次 -->
+    <div class="bar-row">
+      <div class="bar-header">
+        <span class="bar-title">月次目標達成率</span>
+        <span class="bar-pct" id="pct-monthly" style="color:#3fb950">— %</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="fill-monthly" style="width:0%;background:#3fb950"></div>
+        <div class="bar-target-line" id="pace-line"></div>
+      </div>
+      <div class="bar-foot">
+        <span>¥0</span>
+        <span class="mid" id="foot-pace">ペース目標: —</span>
+        <span id="foot-monthly-target">目標: —</span>
+      </div>
+    </div>
+
+    <!-- 日次 -->
+    <div class="bar-row">
+      <div class="bar-header">
+        <span class="bar-title">本日の売上 vs 日次目標</span>
+        <span class="bar-pct" id="pct-daily" style="color:#58a6ff">— %</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="fill-daily" style="width:0%;background:#58a6ff"></div>
+      </div>
+      <div class="bar-foot">
+        <span>¥0</span>
+        <span class="mid" id="foot-daily-target">日次目標: —</span>
+        <span id="foot-today">今日: —</span>
+      </div>
+    </div>
+
+    <!-- ペース対比 -->
+    <div class="bar-row">
+      <div class="bar-header">
+        <span class="bar-title">ペース達成率（累計 ÷ 経過日ペース目標）</span>
+        <span class="bar-pct" id="pct-pace" style="color:#d29922">— %</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="fill-pace" style="width:0%;background:#d29922"></div>
+      </div>
+      <div class="bar-foot">
+        <span>0%</span>
+        <span class="mid">100% = ちょうどペース</span>
+        <span id="foot-pace-r">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 残り必要額 ── -->
+  <div class="remaining-box" id="remaining-box" style="display:none">
+    <div class="remaining-main">
+      残り達成必要額：<strong id="remaining-amt">—</strong>
+    </div>
+    <div class="remaining-detail">
+      残り <strong id="remaining-days">—</strong> 日間<br>
+      1日あたり <strong id="required-daily" style="color:#f85149">—</strong> 必要
+    </div>
+  </div>
+
+  <!-- ── モール別内訳 ── -->
+  <div class="bar-card">
+    <h2>モール別 目標・実績（任意）</h2>
+    <div class="store-grid">
+
+      <div class="store-card">
+        <h3 style="color:#d29922">楽天市場</h3>
+        <div class="store-input-pair">
+          <div>
+            <input type="number" id="r-target" placeholder="月次目標" oninput="renderStore('r')">
+          </div>
+          <label>目標</label>
+          <div>
+            <input type="number" id="r-actual" placeholder="累計実績" oninput="renderStore('r')">
+          </div>
+          <label>累計</label>
+        </div>
+        <div class="store-bar"><div class="store-bar-fill" id="r-bar" style="width:0%;background:#d29922"></div></div>
+        <div class="store-stat">
+          <span id="r-pct">—%</span>
+          <span id="r-rem">残り —</span>
+        </div>
+      </div>
+
+      <div class="store-card">
+        <h3 style="color:#58a6ff">Amazon</h3>
+        <div class="store-input-pair">
+          <div>
+            <input type="number" id="a-target" placeholder="月次目標" oninput="renderStore('a')">
+          </div>
+          <label>目標</label>
+          <div>
+            <input type="number" id="a-actual" placeholder="累計実績" oninput="renderStore('a')">
+          </div>
+          <label>累計</label>
+        </div>
+        <div class="store-bar"><div class="store-bar-fill" id="a-bar" style="width:0%;background:#58a6ff"></div></div>
+        <div class="store-stat">
+          <span id="a-pct">—%</span>
+          <span id="a-rem">残り —</span>
+        </div>
+      </div>
+
+      <div class="store-card">
+        <h3 style="color:#f0883e">Yahoo!</h3>
+        <div class="store-input-pair">
+          <div>
+            <input type="number" id="y-target" placeholder="月次目標" oninput="renderStore('y')">
+          </div>
+          <label>目標</label>
+          <div>
+            <input type="number" id="y-actual" placeholder="累計実績" oninput="renderStore('y')">
+          </div>
+          <label>累計</label>
+        </div>
+        <div class="store-bar"><div class="store-bar-fill" id="y-bar" style="width:0%;background:#f0883e"></div></div>
+        <div class="store-stat">
+          <span id="y-pct">—%</span>
+          <span id="y-rem">残り —</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  株式会社ネオ・ゲート ｜ 売上目標トラッカー ｜ 入力値はブラウザに保存されます
+</div>
+
+<script>
+/* ── utils ── */
+function fy(n) {
+  if (!n || isNaN(n)) return '—';
+  if (n >= 1000000) return '¥' + (n / 1000000).toFixed(2) + 'M';
+  if (n >= 10000)   return '¥' + Math.round(n / 10000) + '万';
+  return '¥' + n.toLocaleString('ja-JP');
+}
+function fp(r) { return (r * 100).toFixed(1) + '%'; }
+function clamp(v) { return Math.min(100, Math.max(0, v)); }
+
+/* ── date ── */
+var now          = new Date();
+var daysInMonth  = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+var dayOfMonth   = now.getDate();
+var remainDays   = daysInMonth - dayOfMonth;
+
+document.getElementById('today-date').textContent =
+  now.getFullYear() + '年' + (now.getMonth()+1) + '月' + dayOfMonth + '日';
+document.getElementById('month-progress-hdr').textContent =
+  dayOfMonth + '日目 / ' + daysInMonth + '日';
+
+/* ── main render ── */
+function render(monthly, cumulative, today) {
+  var dailyTarget = monthly > 0 ? monthly / daysInMonth : 0;
+  var paceTarget  = dailyTarget * dayOfMonth;
+  var mRatio      = monthly  > 0 ? cumulative / monthly    : 0;
+  var dRatio      = dailyTarget > 0 ? today / dailyTarget  : 0;
+  var paceRatio   = paceTarget > 0 ? cumulative / paceTarget : 0;
+  var needed      = Math.max(0, monthly - cumulative);
+  var reqDaily    = remainDays > 0 ? needed / remainDays : 0;
+
+  /* KPIs */
+  document.getElementById('kv-monthly').textContent    = monthly > 0 ? fy(monthly) : '未設定';
+  document.getElementById('ks-monthly').textContent    = daysInMonth + '日間';
+  document.getElementById('kv-cumulative').textContent = fy(cumulative);
+  document.getElementById('ks-cumulative').textContent = monthly > 0 ? fp(mRatio) + '達成' : '';
+  document.getElementById('kv-daily').textContent      = fy(Math.round(dailyTarget));
+  document.getElementById('ks-daily').textContent      = dayOfMonth + '日目 / ' + daysInMonth + '日';
+
+  var todayColor = dRatio >= 1 ? '#3fb950' : dRatio >= 0.7 ? '#d29922' : '#f85149';
+  document.getElementById('kv-today').textContent      = fy(today);
+  document.getElementById('kv-today').style.color      = todayColor;
+  document.getElementById('ks-today').textContent      = dailyTarget > 0 ? '日次目標の' + fp(dRatio) : '—';
+  document.getElementById('ks-today').style.color      = todayColor;
+
+  /* Monthly bar */
+  var mPct    = clamp(mRatio * 100);
+  var mColor  = mRatio >= 1 ? '#3fb950' : mRatio >= 0.8 ? '#d29922' : '#f85149';
+  document.getElementById('fill-monthly').style.width      = mPct + '%';
+  document.getElementById('fill-monthly').style.background = mColor;
+  document.getElementById('pct-monthly').textContent        = mPct.toFixed(1) + '%';
+  document.getElementById('pct-monthly').style.color        = mColor;
+
+  var pacePctOnBar = monthly > 0 ? clamp((paceTarget / monthly) * 100) : 0;
+  var pl = document.getElementById('pace-line');
+  if (monthly > 0) {
+    pl.style.display = 'block';
+    pl.style.left    = pacePctOnBar + '%';
+  }
+  document.getElementById('foot-pace').textContent           = 'ペース目標: ' + fy(Math.round(paceTarget));
+  document.getElementById('foot-monthly-target').textContent = '目標: ' + fy(monthly);
+
+  /* Daily bar */
+  var dPct   = clamp(dRatio * 100);
+  var dColor = dRatio >= 1 ? '#3fb950' : dRatio >= 0.7 ? '#d29922' : '#58a6ff';
+  document.getElementById('fill-daily').style.width      = dPct + '%';
+  document.getElementById('fill-daily').style.background = dColor;
+  document.getElementById('pct-daily').textContent        = dPct.toFixed(0) + '%';
+  document.getElementById('pct-daily').style.color        = dColor;
+  document.getElementById('foot-daily-target').textContent = '日次目標: ' + fy(Math.round(dailyTarget));
+  document.getElementById('foot-today').textContent        = '今日: ' + fy(today);
+
+  /* Pace bar */
+  var ppPct   = clamp(paceRatio * 100);
+  var ppColor = paceRatio >= 1.05 ? '#3fb950' : paceRatio >= 0.9 ? '#d29922' : '#f85149';
+  document.getElementById('fill-pace').style.width      = ppPct + '%';
+  document.getElementById('fill-pace').style.background = ppColor;
+  document.getElementById('pct-pace').textContent        = ppPct.toFixed(0) + '%';
+  document.getElementById('pct-pace').style.color        = ppColor;
+  document.getElementById('foot-pace-r').textContent     = cumulative > 0 ? fp(paceRatio) : '—';
+
+  /* Remaining */
+  if (monthly > 0) {
+    document.getElementById('remaining-box').style.display = 'flex';
+    document.getElementById('remaining-amt').textContent   = needed > 0 ? fy(needed) : '達成済み！';
+    document.getElementById('remaining-amt').style.color   = needed > 0 ? '#f85149' : '#3fb950';
+    document.getElementById('remaining-days').textContent  = remainDays;
+    document.getElementById('required-daily').textContent  = reqDaily > 0 ? fy(Math.round(reqDaily)) : '—';
+  }
+
+  /* Pace box */
+  var pb = document.getElementById('pace-box');
+  if (monthly > 0 && (cumulative > 0 || today > 0)) {
+    pb.style.display = 'flex';
+    var diff = Math.abs(cumulative - paceTarget);
+    if (paceRatio >= 1.05) {
+      pb.className = 'pace-box pace-ahead';
+      document.getElementById('pace-icon').textContent = '🚀';
+      document.getElementById('pace-text').textContent =
+        'ペース先行！ 目標より ' + fy(Math.round(diff)) + ' 上回り中（ペース達成率 ' + fp(paceRatio) + '）';
+    } else if (paceRatio >= 0.9) {
+      pb.className = 'pace-box pace-on';
+      document.getElementById('pace-icon').textContent = '✅';
+      document.getElementById('pace-text').textContent =
+        'ほぼ計画通り（ペース達成率 ' + fp(paceRatio) + '）— 残り' + remainDays + '日で1日' + fy(Math.round(reqDaily)) + '必要';
+    } else {
+      pb.className = 'pace-box pace-behind';
+      document.getElementById('pace-icon').textContent = '⚠️';
+      document.getElementById('pace-text').textContent =
+        'ペース遅れ。目標より ' + fy(Math.round(diff)) + ' 不足（' + fp(paceRatio) + '）→ 残り' + remainDays + '日で1日' + fy(Math.round(reqDaily)) + '必要';
+    }
+  } else {
+    pb.style.display = 'none';
+  }
+}
+
+/* ── save / load ── */
+function save() {
+  var m = parseInt(document.getElementById('in-monthly').value)    || 0;
+  var c = parseInt(document.getElementById('in-cumulative').value) || 0;
+  var t = parseInt(document.getElementById('in-today').value)      || 0;
+  var stores = {
+    r: { target: document.getElementById('r-target').value, actual: document.getElementById('r-actual').value },
+    a: { target: document.getElementById('a-target').value, actual: document.getElementById('a-actual').value },
+    y: { target: document.getElementById('y-target').value, actual: document.getElementById('y-actual').value },
+  };
+  localStorage.setItem('st_monthly',    m);
+  localStorage.setItem('st_cumulative', c);
+  localStorage.setItem('st_today',      t);
+  localStorage.setItem('st_stores',     JSON.stringify(stores));
+  localStorage.setItem('st_updated',    new Date().toLocaleString('ja-JP'));
+  document.getElementById('updated-at').textContent = '保存: ' + new Date().toLocaleString('ja-JP');
+  render(m, c, t);
+  ['r','a','y'].forEach(renderStore);
+}
+
+function renderStore(id) {
+  var tgt = parseInt(document.getElementById(id+'-target').value) || 0;
+  var act = parseInt(document.getElementById(id+'-actual').value) || 0;
+  var r   = tgt > 0 ? act / tgt : 0;
+  var pct = clamp(r * 100);
+  var colors = { r:'#d29922', a:'#58a6ff', y:'#f0883e' };
+  document.getElementById(id+'-bar').style.width      = pct + '%';
+  document.getElementById(id+'-bar').style.background = colors[id];
+  document.getElementById(id+'-pct').textContent = tgt > 0 ? pct.toFixed(1) + '%' : '—%';
+  var rem = Math.max(0, tgt - act);
+  document.getElementById(id+'-rem').textContent = tgt > 0 ? '残り ' + fy(rem) : '残り —';
+}
+
+(function init() {
+  var m = parseInt(localStorage.getItem('st_monthly'))    || 0;
+  var c = parseInt(localStorage.getItem('st_cumulative')) || 0;
+  var t = parseInt(localStorage.getItem('st_today'))      || 0;
+  var ts = localStorage.getItem('st_updated');
+  if (m || c || t) {
+    document.getElementById('in-monthly').value    = m || '';
+    document.getElementById('in-cumulative').value = c || '';
+    document.getElementById('in-today').value      = t || '';
+    if (ts) document.getElementById('updated-at').textContent = '前回保存: ' + ts;
+    render(m, c, t);
+  }
+  try {
+    var s = JSON.parse(localStorage.getItem('st_stores') || '{}');
+    ['r','a','y'].forEach(function(id) {
+      if (s[id]) {
+        document.getElementById(id+'-target').value = s[id].target || '';
+        document.getElementById(id+'-actual').value = s[id].actual || '';
+        renderStore(id);
+      }
+    });
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
