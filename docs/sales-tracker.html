@@ -6,123 +6,100 @@
 <title>売上目標トラッカー ｜ ネオ・ゲート</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #0d1117;
-  color: #e6edf3;
-  font-size: 14px;
-  min-height: 100vh;
+  background: #0d1117; color: #e6edf3; font-size: 14px; min-height: 100vh;
 }
 
 /* ── HEADER ── */
 .header {
-  background: linear-gradient(135deg, #161b22 0%, #1a2332 100%);
+  background: linear-gradient(135deg, #161b22, #1a2332);
   border-bottom: 1px solid #30363d;
-  padding: 18px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
 }
-.header-left h1 { font-size: 18px; font-weight: 700; color: #e6edf3; }
-.header-left p  { font-size: 12px; color: #8b949e; margin-top: 2px; }
-.header-right   { font-size: 11px; color: #8b949e; text-align: right; }
-.header-right strong { color: #58a6ff; }
-.back-link { font-size: 12px; color: #58a6ff; text-decoration: none; }
+.header h1 { font-size: 17px; font-weight: 700; }
+.header-right { font-size: 12px; color: #8b949e; text-align: right; }
+.header-right strong { color: #58a6ff; display: block; font-size: 14px; }
+.back-link { color: #58a6ff; text-decoration: none; font-size: 12px; }
 .back-link:hover { text-decoration: underline; }
 
-/* ── MAIN ── */
-.main { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+.main { max-width: 980px; margin: 0 auto; padding: 18px 14px; }
 
-/* ── INPUT CARD ── */
-.input-card {
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 10px;
-  padding: 18px 20px;
-  margin-bottom: 16px;
-}
-.input-card h2 { font-size: 13px; color: #8b949e; font-weight: 600; margin-bottom: 14px; letter-spacing: 0.5px; text-transform: uppercase; }
-.input-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 14px;
-}
-@media (max-width: 640px) { .input-grid { grid-template-columns: 1fr; } }
-.input-item label {
-  display: block;
-  font-size: 11px;
-  color: #8b949e;
-  margin-bottom: 5px;
-  font-weight: 600;
-}
-.input-item input {
-  width: 100%;
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  color: #e6edf3;
-  font-size: 14px;
-  padding: 8px 10px;
-  font-family: inherit;
-  transition: border-color .2s;
-}
-.input-item input:focus { outline: none; border-color: #58a6ff; }
-.input-item input::placeholder { color: #484f58; }
-.btn-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.save-btn {
-  background: #238636;
-  color: #fff;
-  border: none;
-  padding: 9px 20px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background .2s;
-}
-.save-btn:hover { background: #2ea043; }
-.updated-at { font-size: 11px; color: #484f58; }
+/* ── SECTION TITLE ── */
+.sec { font-size: 11px; font-weight: 700; color: #8b949e; letter-spacing: 1px;
+       text-transform: uppercase; margin: 20px 0 10px; padding-bottom: 4px;
+       border-bottom: 1px solid #21262d; }
 
-/* ── KPI GRID ── */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
+/* ── GAS SETUP CARD ── */
+.gas-card {
+  background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 14px;
 }
-@media (max-width: 640px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
-.kpi {
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 10px;
-  padding: 16px 12px;
-  text-align: center;
+.gas-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.gas-row label { font-size: 12px; color: #8b949e; white-space: nowrap; min-width: 130px; }
+.gas-row input {
+  flex: 1; background: #0d1117; border: 1px solid #30363d; border-radius: 6px;
+  color: #e6edf3; font-size: 12px; padding: 7px 10px; font-family: inherit; min-width: 0;
 }
-.kpi-val  { font-size: 22px; font-weight: 700; line-height: 1.2; word-break: break-all; }
-.kpi-lbl  { font-size: 11px; color: #8b949e; margin-top: 5px; }
-.kpi-sub  { font-size: 12px; font-weight: 600; margin-top: 3px; }
+.gas-row input:focus { outline: none; border-color: #58a6ff; }
+.gas-row input::placeholder { color: #484f58; }
+.btn { border: none; border-radius: 6px; font-size: 12px; font-weight: 600;
+       cursor: pointer; font-family: inherit; padding: 7px 16px; transition: opacity .2s; }
+.btn:hover { opacity: .85; }
+.btn-fetch  { background: #1f6feb; color: #fff; }
+.btn-save   { background: #238636; color: #fff; }
+.btn-reset  { background: #30363d; color: #e6edf3; }
+.gas-status { font-size: 11px; margin-top: 6px; min-height: 16px; }
+.gas-status.ok  { color: #3fb950; }
+.gas-status.err { color: #f85149; }
+.gas-status.ing { color: #d29922; }
+
+/* ── TARGET INPUT ── */
+.target-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;
+}
+@media (max-width: 640px) { .target-grid { grid-template-columns: 1fr 1fr; } }
+.t-card {
+  background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 12px 14px;
+}
+.t-card label { display: block; font-size: 11px; color: #8b949e; margin-bottom: 5px; font-weight: 600; }
+.t-card input {
+  width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 6px;
+  color: #e6edf3; font-size: 13px; padding: 7px 9px; font-family: inherit;
+}
+.t-card input:focus { outline: none; border-color: #58a6ff; }
+.t-card input::placeholder { color: #484f58; }
+.t-header { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+
+/* ── AUTO SALES DISPLAY ── */
+.auto-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;
+}
+@media (max-width: 640px) { .auto-grid { grid-template-columns: 1fr 1fr; } }
+.auto-card {
+  background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+  padding: 14px 12px; text-align: center; position: relative;
+}
+.auto-card .mall-label { font-size: 11px; color: #8b949e; margin-bottom: 4px; }
+.auto-val { font-size: 20px; font-weight: 700; line-height: 1.2; }
+.auto-sub { font-size: 11px; margin-top: 4px; font-weight: 600; }
+.auto-badge {
+  position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 700;
+  background: #21262d; color: #8b949e; padding: 2px 6px; border-radius: 4px;
+}
+.auto-badge.live { background: #0d2a1f; color: #3fb950; }
 .c-blue   { color: #58a6ff; }
 .c-green  { color: #3fb950; }
 .c-orange { color: #d29922; }
 .c-red    { color: #f85149; }
-.c-teal   { color: #39d353; }
+.c-amber  { color: #f0883e; }
 .c-muted  { color: #8b949e; }
 
 /* ── PACE BOX ── */
 .pace-box {
-  border-radius: 8px;
-  padding: 13px 18px;
-  margin-bottom: 14px;
-  display: none;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
-  font-weight: 600;
+  border-radius: 8px; padding: 12px 18px; margin-bottom: 14px;
+  display: none; align-items: center; gap: 12px; font-size: 13px; font-weight: 600;
 }
 .pace-ahead  { background: #0d2a1f; border: 1px solid #238636; color: #3fb950; }
 .pace-on     { background: #271f00; border: 1px solid #9e6a03; color: #d29922; }
@@ -131,178 +108,212 @@ body {
 
 /* ── BAR SECTION ── */
 .bar-card {
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 10px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
+  background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+  padding: 16px 18px; margin-bottom: 14px;
 }
-.bar-card h2 { font-size: 13px; color: #8b949e; font-weight: 600; margin-bottom: 16px; letter-spacing: 0.5px; text-transform: uppercase; }
-.bar-row { margin-bottom: 20px; }
+.bar-row { margin-bottom: 18px; }
 .bar-row:last-child { margin-bottom: 0; }
 .bar-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
 .bar-title { font-size: 13px; font-weight: 600; }
 .bar-pct   { font-size: 16px; font-weight: 700; }
 .bar-track {
-  background: #21262d;
-  border-radius: 6px;
-  height: 14px;
-  position: relative;
-  overflow: visible;
+  background: #21262d; border-radius: 6px; height: 14px;
+  position: relative; overflow: visible;
 }
 .bar-fill {
-  height: 14px;
-  border-radius: 6px;
-  transition: width .7s cubic-bezier(.4,0,.2,1);
-  position: relative;
-  z-index: 1;
+  height: 14px; border-radius: 6px;
+  transition: width .7s cubic-bezier(.4,0,.2,1); position: relative; z-index: 1;
 }
 .bar-target-line {
-  position: absolute;
-  top: -4px;
-  width: 3px;
-  height: 22px;
-  background: #8b949e;
-  border-radius: 2px;
-  z-index: 2;
-  display: none;
+  position: absolute; top: -4px; width: 3px; height: 22px;
+  background: #8b949e; border-radius: 2px; z-index: 2; display: none;
 }
 .bar-foot { display: flex; justify-content: space-between; font-size: 11px; color: #8b949e; margin-top: 5px; }
 .bar-foot .mid { font-weight: 600; color: #c9d1d9; }
 
-/* ── REMAINING BOX ── */
-.remaining-box {
-  background: #1a1a2e;
-  border: 1px solid #30363d;
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin-bottom: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.remaining-main { font-size: 13px; }
-.remaining-main strong { font-size: 22px; color: #f85149; margin-right: 6px; }
-.remaining-detail { font-size: 12px; color: #8b949e; line-height: 1.8; text-align: right; }
-.remaining-detail strong { color: #e6edf3; }
-
-/* ── MULTI STORE ── */
+/* ── STORE BARS ── */
 .store-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px;
 }
 @media (max-width: 640px) { .store-grid { grid-template-columns: 1fr; } }
 .store-card {
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 10px;
-  padding: 14px 16px;
+  background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px 16px;
 }
-.store-card h3 { font-size: 12px; font-weight: 700; color: #8b949e; margin-bottom: 10px; }
-.store-input-pair { display: flex; gap: 6px; margin-bottom: 6px; }
-.store-input-pair input {
-  flex: 1;
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 5px;
-  color: #e6edf3;
-  font-size: 12px;
-  padding: 6px 8px;
-  font-family: inherit;
-  min-width: 0;
-}
-.store-input-pair input:focus { outline: none; border-color: #58a6ff; }
-.store-input-pair label { font-size: 10px; color: #484f58; white-space: nowrap; padding-top: 7px; }
-.store-bar { background: #21262d; border-radius: 4px; height: 8px; margin-top: 8px; overflow: hidden; }
+.store-card h3 { font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+.store-kpi-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.store-kpi-item { text-align: center; }
+.store-kpi-val { font-size: 15px; font-weight: 700; }
+.store-kpi-lbl { font-size: 10px; color: #8b949e; margin-top: 2px; }
+.store-bar-bg { background: #21262d; border-radius: 4px; height: 8px; margin-top: 6px; overflow: hidden; }
 .store-bar-fill { height: 8px; border-radius: 4px; transition: width .6s; }
-.store-stat { font-size: 11px; color: #8b949e; margin-top: 5px; display: flex; justify-content: space-between; }
+.store-bar-foot { display: flex; justify-content: space-between; font-size: 10px; color: #8b949e; margin-top: 4px; }
+
+/* ── REMAINING BOX ── */
+.remaining-box {
+  background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 14px;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+}
+.remaining-main { font-size: 13px; }
+.remaining-main strong { font-size: 22px; display: block; margin-bottom: 2px; }
+.remaining-detail { font-size: 12px; color: #8b949e; line-height: 1.8; text-align: right; }
+.remaining-detail strong { color: #e6edf3; }
 
 /* ── FOOTER ── */
-.footer { font-size: 11px; color: #484f58; text-align: center; padding: 20px 0; }
+.footer { font-size: 11px; color: #484f58; text-align: center; padding: 16px 0; }
+.save-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.updated-at { font-size: 11px; color: #484f58; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-left">
+  <div>
     <h1>📊 売上目標トラッカー</h1>
-    <p>月次・日次の目標 vs 実績をリアルタイム可視化</p>
+    <div style="font-size:11px;color:#8b949e;margin-top:2px">月次・日次の目標 vs 実績をリアルタイム可視化</div>
   </div>
   <div class="header-right">
-    <div><strong id="today-date">—</strong></div>
-    <div id="month-progress-hdr" style="margin-top:2px"></div>
-    <a href="index.html" class="back-link" style="display:block;margin-top:4px">← ダッシュボードへ</a>
+    <strong id="today-label">—</strong>
+    <span id="month-progress-label"></span>
+    <a href="index.html" class="back-link" style="display:block;margin-top:3px">← ダッシュボードへ</a>
   </div>
 </div>
 
 <div class="main">
 
-  <!-- ── 入力 ── -->
-  <div class="input-card">
-    <h2>目標・実績の入力</h2>
-    <div class="input-grid">
-      <div class="input-item">
-        <label>月次売上目標（合計）</label>
-        <input type="number" id="in-monthly" placeholder="例: 7840000">
-      </div>
-      <div class="input-item">
-        <label>今月の累計売上（現時点）</label>
-        <input type="number" id="in-cumulative" placeholder="例: 3200000">
-      </div>
-      <div class="input-item">
-        <label>今日の売上</label>
-        <input type="number" id="in-today" placeholder="例: 180000">
-      </div>
+  <!-- ── GAS 自動取得設定 ── -->
+  <div class="sec">自動取得設定（GAS Web App）</div>
+  <div class="gas-card">
+    <div style="font-size:12px;color:#8b949e;margin-bottom:10px">
+      注文統合スプレッドシートから今日・今月の売上を自動取得します。<br>
+      GASエディタ → デプロイ → 新しいデプロイ → ウェブアプリ（実行:自分、アクセス:全員）で発行したURLを貼ってください。
     </div>
-    <div class="btn-row">
-      <button class="save-btn" onclick="save()">更新する</button>
-      <span class="updated-at" id="updated-at"></span>
+    <div class="gas-row">
+      <label>GAS Web App URL</label>
+      <input type="text" id="gas-url" placeholder="https://script.google.com/macros/s/...../exec">
+      <button class="btn btn-fetch" onclick="fetchGAS()">売上を自動取得</button>
+      <button class="btn btn-reset" onclick="clearGAS()">クリア</button>
+    </div>
+    <div class="gas-status" id="gas-status"></div>
+  </div>
+
+  <!-- ── 6月目標設定 ── -->
+  <div class="sec">6月 月次売上目標（円）</div>
+  <div class="target-grid">
+    <div class="t-card">
+      <div class="t-header c-blue">合計（3モール）</div>
+      <label>月次目標</label>
+      <input type="number" id="t-total" value="7840000" oninput="recalc()">
+    </div>
+    <div class="t-card">
+      <div class="t-header" style="color:#d29922">楽天市場</div>
+      <label>月次目標</label>
+      <input type="number" id="t-rakuten" value="2740000" oninput="recalcStore('r')">
+    </div>
+    <div class="t-card">
+      <div class="t-header c-blue">Amazon</div>
+      <label>月次目標</label>
+      <input type="number" id="t-amazon" value="4200000" oninput="recalcStore('a')">
+    </div>
+    <div class="t-card">
+      <div class="t-header c-amber">Yahoo!</div>
+      <label>月次目標</label>
+      <input type="number" id="t-yahoo" value="900000" oninput="recalcStore('y')">
     </div>
   </div>
 
-  <!-- ── KPI ── -->
-  <div class="kpi-grid">
-    <div class="kpi">
-      <div class="kpi-val c-blue" id="kv-monthly">—</div>
-      <div class="kpi-lbl">月次売上目標</div>
-      <div class="kpi-sub c-muted" id="ks-monthly">—日間</div>
+  <!-- ── 売上実績（自動取得 or 手動入力） ── -->
+  <div class="sec">売上実績</div>
+  <div class="auto-grid">
+
+    <div class="auto-card">
+      <span class="auto-badge" id="badge-total">手動</span>
+      <div class="mall-label">合計（3モール）</div>
+      <div class="auto-val c-green" id="av-total-monthly">—</div>
+      <div class="auto-sub c-muted" id="as-total-monthly">今月累計</div>
+      <div style="margin-top:10px;border-top:1px solid #21262d;padding-top:8px">
+        <div class="auto-val" id="av-total-today" style="font-size:16px;color:#e6edf3">—</div>
+        <div class="auto-sub c-muted">今日の売上</div>
+      </div>
+      <div class="save-row" style="margin-top:10px">
+        <input type="number" id="in-total-monthly" placeholder="累計（手動入力）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+        <input type="number" id="in-total-today" placeholder="今日（手動入力）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+      </div>
     </div>
-    <div class="kpi">
-      <div class="kpi-val c-teal" id="kv-cumulative">—</div>
-      <div class="kpi-lbl">累計売上（今月）</div>
-      <div class="kpi-sub" id="ks-cumulative" style="color:#3fb950">—</div>
+
+    <div class="auto-card">
+      <span class="auto-badge" id="badge-r">手動</span>
+      <div class="mall-label" style="color:#d29922">楽天市場</div>
+      <div class="auto-val" style="color:#d29922" id="av-r-monthly">—</div>
+      <div class="auto-sub c-muted" id="as-r-monthly">今月累計</div>
+      <div style="margin-top:10px;border-top:1px solid #21262d;padding-top:8px">
+        <div class="auto-val" id="av-r-today" style="font-size:16px;color:#e6edf3">—</div>
+        <div class="auto-sub c-muted">今日の売上</div>
+      </div>
+      <div class="save-row" style="margin-top:10px">
+        <input type="number" id="in-r-monthly" placeholder="累計（手動）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+        <input type="number" id="in-r-today" placeholder="今日（手動）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+      </div>
     </div>
-    <div class="kpi">
-      <div class="kpi-val c-orange" id="kv-daily">—</div>
-      <div class="kpi-lbl">日次目標（1日あたり）</div>
-      <div class="kpi-sub c-muted" id="ks-daily">—日目</div>
+
+    <div class="auto-card">
+      <span class="auto-badge" id="badge-a">手動</span>
+      <div class="mall-label c-blue">Amazon</div>
+      <div class="auto-val c-blue" id="av-a-monthly">—</div>
+      <div class="auto-sub c-muted" id="as-a-monthly">今月累計</div>
+      <div style="margin-top:10px;border-top:1px solid #21262d;padding-top:8px">
+        <div class="auto-val" id="av-a-today" style="font-size:16px;color:#e6edf3">—</div>
+        <div class="auto-sub c-muted">今日の売上</div>
+      </div>
+      <div class="save-row" style="margin-top:10px">
+        <input type="number" id="in-a-monthly" placeholder="累計（手動）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+        <input type="number" id="in-a-today" placeholder="今日（手動）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+      </div>
     </div>
-    <div class="kpi">
-      <div class="kpi-val" id="kv-today" style="color:#e6edf3">—</div>
-      <div class="kpi-lbl">今日の売上</div>
-      <div class="kpi-sub" id="ks-today" style="color:#d29922">—</div>
+
+    <div class="auto-card">
+      <span class="auto-badge" id="badge-y">手動</span>
+      <div class="mall-label c-amber">Yahoo!</div>
+      <div class="auto-val c-amber" id="av-y-monthly">—</div>
+      <div class="auto-sub c-muted" id="as-y-monthly">今月累計</div>
+      <div style="margin-top:10px;border-top:1px solid #21262d;padding-top:8px">
+        <div class="auto-val" id="av-y-today" style="font-size:16px;color:#e6edf3">—</div>
+        <div class="auto-sub c-muted">今日の売上</div>
+      </div>
+      <div class="save-row" style="margin-top:10px">
+        <input type="number" id="in-y-monthly" placeholder="累計（手動）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+        <input type="number" id="in-y-today" placeholder="今日（手動）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:5px 7px;font-family:inherit;min-width:0">
+      </div>
     </div>
+
+  </div>
+
+  <div class="save-row">
+    <button class="btn btn-save" onclick="saveManual()">手動入力を保存・反映</button>
+    <span class="updated-at" id="updated-at"></span>
   </div>
 
   <!-- ── ペース判定 ── -->
   <div class="pace-box" id="pace-box">
-    <span class="pace-icon" id="pace-icon">—</span>
-    <span id="pace-text">—</span>
+    <span class="pace-icon" id="pace-icon"></span>
+    <span id="pace-text"></span>
   </div>
 
-  <!-- ── プログレスバー ── -->
+  <!-- ── 全体プログレスバー ── -->
+  <div class="sec" style="margin-top:20px">達成率グラフ（合計）</div>
   <div class="bar-card">
-    <h2>達成率グラフ</h2>
-
-    <!-- 月次 -->
     <div class="bar-row">
       <div class="bar-header">
-        <span class="bar-title">月次目標達成率</span>
-        <span class="bar-pct" id="pct-monthly" style="color:#3fb950">— %</span>
+        <span class="bar-title">月次目標達成率（3モール合計）</span>
+        <span class="bar-pct c-green" id="pct-monthly">— %</span>
       </div>
       <div class="bar-track">
         <div class="bar-fill" id="fill-monthly" style="width:0%;background:#3fb950"></div>
@@ -311,14 +322,13 @@ body {
       <div class="bar-foot">
         <span>¥0</span>
         <span class="mid" id="foot-pace">ペース目標: —</span>
-        <span id="foot-monthly-target">目標: —</span>
+        <span id="foot-target">目標: —</span>
       </div>
     </div>
 
-    <!-- 日次 -->
     <div class="bar-row">
       <div class="bar-header">
-        <span class="bar-title">本日の売上 vs 日次目標</span>
+        <span class="bar-title">今日の売上 vs 日次目標</span>
         <span class="bar-pct" id="pct-daily" style="color:#58a6ff">— %</span>
       </div>
       <div class="bar-track">
@@ -326,12 +336,11 @@ body {
       </div>
       <div class="bar-foot">
         <span>¥0</span>
-        <span class="mid" id="foot-daily-target">日次目標: —</span>
-        <span id="foot-today">今日: —</span>
+        <span class="mid" id="foot-daily">日次目標: —</span>
+        <span id="foot-today-val">今日: —</span>
       </div>
     </div>
 
-    <!-- ペース対比 -->
     <div class="bar-row">
       <div class="bar-header">
         <span class="bar-title">ペース達成率（累計 ÷ 経過日ペース目標）</span>
@@ -348,10 +357,75 @@ body {
     </div>
   </div>
 
+  <!-- ── モール別バー ── -->
+  <div class="sec">モール別 達成率</div>
+  <div class="store-grid">
+    <div class="store-card">
+      <h3 style="color:#d29922">楽天市場</h3>
+      <div class="store-kpi-row">
+        <div class="store-kpi-item">
+          <div class="store-kpi-val" id="sk-r-monthly" style="color:#d29922">—</div>
+          <div class="store-kpi-lbl">今月累計</div>
+        </div>
+        <div class="store-kpi-item">
+          <div class="store-kpi-val" id="sk-r-today" style="color:#e6edf3">—</div>
+          <div class="store-kpi-lbl">今日</div>
+        </div>
+        <div class="store-kpi-item">
+          <div class="store-kpi-val" id="sk-r-pct" style="color:#d29922">—%</div>
+          <div class="store-kpi-lbl">達成率</div>
+        </div>
+      </div>
+      <div class="store-bar-bg"><div class="store-bar-fill" id="sbar-r" style="width:0%;background:#d29922"></div></div>
+      <div class="store-bar-foot"><span>¥0</span><span id="sfoot-r">目標: —</span></div>
+    </div>
+
+    <div class="store-card">
+      <h3 class="c-blue">Amazon</h3>
+      <div class="store-kpi-row">
+        <div class="store-kpi-item">
+          <div class="store-kpi-val c-blue" id="sk-a-monthly">—</div>
+          <div class="store-kpi-lbl">今月累計</div>
+        </div>
+        <div class="store-kpi-item">
+          <div class="store-kpi-val" id="sk-a-today" style="color:#e6edf3">—</div>
+          <div class="store-kpi-lbl">今日</div>
+        </div>
+        <div class="store-kpi-item">
+          <div class="store-kpi-val c-blue" id="sk-a-pct">—%</div>
+          <div class="store-kpi-lbl">達成率</div>
+        </div>
+      </div>
+      <div class="store-bar-bg"><div class="store-bar-fill" id="sbar-a" style="width:0%;background:#58a6ff"></div></div>
+      <div class="store-bar-foot"><span>¥0</span><span id="sfoot-a">目標: —</span></div>
+    </div>
+
+    <div class="store-card">
+      <h3 class="c-amber">Yahoo!</h3>
+      <div class="store-kpi-row">
+        <div class="store-kpi-item">
+          <div class="store-kpi-val c-amber" id="sk-y-monthly">—</div>
+          <div class="store-kpi-lbl">今月累計</div>
+        </div>
+        <div class="store-kpi-item">
+          <div class="store-kpi-val" id="sk-y-today" style="color:#e6edf3">—</div>
+          <div class="store-kpi-lbl">今日</div>
+        </div>
+        <div class="store-kpi-item">
+          <div class="store-kpi-val c-amber" id="sk-y-pct">—%</div>
+          <div class="store-kpi-lbl">達成率</div>
+        </div>
+      </div>
+      <div class="store-bar-bg"><div class="store-bar-fill" id="sbar-y" style="width:0%;background:#f0883e"></div></div>
+      <div class="store-bar-foot"><span>¥0</span><span id="sfoot-y">目標: —</span></div>
+    </div>
+  </div>
+
   <!-- ── 残り必要額 ── -->
   <div class="remaining-box" id="remaining-box" style="display:none">
     <div class="remaining-main">
-      残り達成必要額：<strong id="remaining-amt">—</strong>
+      残り達成必要額
+      <strong id="remaining-amt" style="color:#f85149">—</strong>
     </div>
     <div class="remaining-detail">
       残り <strong id="remaining-days">—</strong> 日間<br>
@@ -359,249 +433,303 @@ body {
     </div>
   </div>
 
-  <!-- ── モール別内訳 ── -->
-  <div class="bar-card">
-    <h2>モール別 目標・実績（任意）</h2>
-    <div class="store-grid">
-
-      <div class="store-card">
-        <h3 style="color:#d29922">楽天市場</h3>
-        <div class="store-input-pair">
-          <div>
-            <input type="number" id="r-target" placeholder="月次目標" oninput="renderStore('r')">
-          </div>
-          <label>目標</label>
-          <div>
-            <input type="number" id="r-actual" placeholder="累計実績" oninput="renderStore('r')">
-          </div>
-          <label>累計</label>
-        </div>
-        <div class="store-bar"><div class="store-bar-fill" id="r-bar" style="width:0%;background:#d29922"></div></div>
-        <div class="store-stat">
-          <span id="r-pct">—%</span>
-          <span id="r-rem">残り —</span>
-        </div>
-      </div>
-
-      <div class="store-card">
-        <h3 style="color:#58a6ff">Amazon</h3>
-        <div class="store-input-pair">
-          <div>
-            <input type="number" id="a-target" placeholder="月次目標" oninput="renderStore('a')">
-          </div>
-          <label>目標</label>
-          <div>
-            <input type="number" id="a-actual" placeholder="累計実績" oninput="renderStore('a')">
-          </div>
-          <label>累計</label>
-        </div>
-        <div class="store-bar"><div class="store-bar-fill" id="a-bar" style="width:0%;background:#58a6ff"></div></div>
-        <div class="store-stat">
-          <span id="a-pct">—%</span>
-          <span id="a-rem">残り —</span>
-        </div>
-      </div>
-
-      <div class="store-card">
-        <h3 style="color:#f0883e">Yahoo!</h3>
-        <div class="store-input-pair">
-          <div>
-            <input type="number" id="y-target" placeholder="月次目標" oninput="renderStore('y')">
-          </div>
-          <label>目標</label>
-          <div>
-            <input type="number" id="y-actual" placeholder="累計実績" oninput="renderStore('y')">
-          </div>
-          <label>累計</label>
-        </div>
-        <div class="store-bar"><div class="store-bar-fill" id="y-bar" style="width:0%;background:#f0883e"></div></div>
-        <div class="store-stat">
-          <span id="y-pct">—%</span>
-          <span id="y-rem">残り —</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
 </div><!-- /main -->
 
-<div class="footer">
-  株式会社ネオ・ゲート ｜ 売上目標トラッカー ｜ 入力値はブラウザに保存されます
-</div>
+<div class="footer">株式会社ネオ・ゲート ｜ 入力値はブラウザに保存されます</div>
 
 <script>
+/* ── 日付 ── */
+var now         = new Date();
+var DOM         = now.getDate();
+var DAYS        = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+var REMAIN_DAYS = DAYS - DOM;
+
+document.getElementById('today-label').textContent =
+  now.getFullYear() + '年' + (now.getMonth()+1) + '月' + DOM + '日';
+document.getElementById('month-progress-label').textContent =
+  DOM + '日目 / ' + DAYS + '日';
+
 /* ── utils ── */
 function fy(n) {
-  if (!n || isNaN(n)) return '—';
-  if (n >= 1000000) return '¥' + (n / 1000000).toFixed(2) + 'M';
-  if (n >= 10000)   return '¥' + Math.round(n / 10000) + '万';
-  return '¥' + n.toLocaleString('ja-JP');
+  if (!n || isNaN(n) || n === 0) return '—';
+  if (n >= 1000000) return '¥' + (n/1000000).toFixed(2) + 'M';
+  if (n >= 10000)   return '¥' + Math.round(n/10000) + '万';
+  return '¥' + Math.round(n).toLocaleString('ja-JP');
 }
-function fp(r) { return (r * 100).toFixed(1) + '%'; }
-function clamp(v) { return Math.min(100, Math.max(0, v)); }
+function fp(r) { return isNaN(r) ? '—%' : (r*100).toFixed(1) + '%'; }
+function cl(v) { return Math.min(100, Math.max(0, isNaN(v) ? 0 : v)); }
+function gv(id) { return parseInt(document.getElementById(id).value) || 0; }
+function sv(id, v) { document.getElementById(id).textContent = v; }
 
-/* ── date ── */
-var now          = new Date();
-var daysInMonth  = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-var dayOfMonth   = now.getDate();
-var remainDays   = daysInMonth - dayOfMonth;
+/* ── 現在の実績値（GAS自動 or 手動） ── */
+var SALES = {
+  total:   { monthly: 0, today: 0 },
+  rakuten: { monthly: 0, today: 0 },
+  amazon:  { monthly: 0, today: 0 },
+  yahoo:   { monthly: 0, today: 0 },
+  source:  'manual'   // 'auto' | 'manual'
+};
 
-document.getElementById('today-date').textContent =
-  now.getFullYear() + '年' + (now.getMonth()+1) + '月' + dayOfMonth + '日';
-document.getElementById('month-progress-hdr').textContent =
-  dayOfMonth + '日目 / ' + daysInMonth + '日';
+function setAutoSales(data) {
+  SALES.source          = 'auto';
+  SALES.rakuten.monthly = data.monthly.rakuten || 0;
+  SALES.rakuten.today   = data.today.rakuten   || 0;
+  SALES.amazon.monthly  = data.monthly.amazon  || 0;
+  SALES.amazon.today    = data.today.amazon    || 0;
+  SALES.yahoo.monthly   = data.monthly.yahoo   || 0;
+  SALES.yahoo.today     = data.today.yahoo     || 0;
+  SALES.total.monthly   = data.monthly.total   || 0;
+  SALES.total.today     = data.today.total     || 0;
+  renderSalesDisplay('live');
+  recalc();
+}
 
-/* ── main render ── */
-function render(monthly, cumulative, today) {
-  var dailyTarget = monthly > 0 ? monthly / daysInMonth : 0;
-  var paceTarget  = dailyTarget * dayOfMonth;
-  var mRatio      = monthly  > 0 ? cumulative / monthly    : 0;
-  var dRatio      = dailyTarget > 0 ? today / dailyTarget  : 0;
-  var paceRatio   = paceTarget > 0 ? cumulative / paceTarget : 0;
-  var needed      = Math.max(0, monthly - cumulative);
-  var reqDaily    = remainDays > 0 ? needed / remainDays : 0;
+function setManualSales() {
+  SALES.source          = 'manual';
+  SALES.rakuten.monthly = gv('in-r-monthly');
+  SALES.rakuten.today   = gv('in-r-today');
+  SALES.amazon.monthly  = gv('in-a-monthly');
+  SALES.amazon.today    = gv('in-a-today');
+  SALES.yahoo.monthly   = gv('in-y-monthly');
+  SALES.yahoo.today     = gv('in-y-today');
+  var tm = gv('in-total-monthly');
+  var tt = gv('in-total-today');
+  SALES.total.monthly = tm || (SALES.rakuten.monthly + SALES.amazon.monthly + SALES.yahoo.monthly);
+  SALES.total.today   = tt || (SALES.rakuten.today   + SALES.amazon.today   + SALES.yahoo.today);
+  renderSalesDisplay('manual');
+  recalc();
+}
 
-  /* KPIs */
-  document.getElementById('kv-monthly').textContent    = monthly > 0 ? fy(monthly) : '未設定';
-  document.getElementById('ks-monthly').textContent    = daysInMonth + '日間';
-  document.getElementById('kv-cumulative').textContent = fy(cumulative);
-  document.getElementById('ks-cumulative').textContent = monthly > 0 ? fp(mRatio) + '達成' : '';
-  document.getElementById('kv-daily').textContent      = fy(Math.round(dailyTarget));
-  document.getElementById('ks-daily').textContent      = dayOfMonth + '日目 / ' + daysInMonth + '日';
+function renderSalesDisplay(src) {
+  var isAuto = src === 'live';
+  var badge  = isAuto ? 'live' : '';
+  var btext  = isAuto ? '自動取得' : '手動';
 
-  var todayColor = dRatio >= 1 ? '#3fb950' : dRatio >= 0.7 ? '#d29922' : '#f85149';
-  document.getElementById('kv-today').textContent      = fy(today);
-  document.getElementById('kv-today').style.color      = todayColor;
-  document.getElementById('ks-today').textContent      = dailyTarget > 0 ? '日次目標の' + fp(dRatio) : '—';
-  document.getElementById('ks-today').style.color      = todayColor;
+  ['total','r','a','y'].forEach(function(k) {
+    var el = document.getElementById('badge-' + k);
+    if (el) { el.textContent = btext; el.className = 'auto-badge ' + badge; }
+  });
 
-  /* Monthly bar */
-  var mPct    = clamp(mRatio * 100);
-  var mColor  = mRatio >= 1 ? '#3fb950' : mRatio >= 0.8 ? '#d29922' : '#f85149';
+  var map = { total: SALES.total, r: SALES.rakuten, a: SALES.amazon, y: SALES.yahoo };
+  Object.keys(map).forEach(function(k) {
+    sv('av-' + k + '-monthly', fy(map[k].monthly));
+    sv('av-' + k + '-today',   fy(map[k].today));
+  });
+}
+
+/* ── メイン再計算 ── */
+function recalc() {
+  var monthly = gv('t-total');
+  var cum     = SALES.total.monthly;
+  var today   = SALES.total.today;
+
+  var dailyTarget = monthly > 0 ? monthly / DAYS : 0;
+  var paceTarget  = dailyTarget * DOM;
+  var mRatio      = monthly > 0 ? cum / monthly : 0;
+  var dRatio      = dailyTarget > 0 ? today / dailyTarget : 0;
+  var paceRatio   = paceTarget > 0 ? cum / paceTarget : 0;
+  var needed      = Math.max(0, monthly - cum);
+  var reqDaily    = REMAIN_DAYS > 0 ? needed / REMAIN_DAYS : 0;
+
+  /* 月次バー */
+  var mPct   = cl(mRatio * 100);
+  var mColor = mRatio >= 1 ? '#3fb950' : mRatio >= 0.8 ? '#d29922' : '#f85149';
   document.getElementById('fill-monthly').style.width      = mPct + '%';
   document.getElementById('fill-monthly').style.background = mColor;
-  document.getElementById('pct-monthly').textContent        = mPct.toFixed(1) + '%';
-  document.getElementById('pct-monthly').style.color        = mColor;
+  sv('pct-monthly', mPct.toFixed(1) + '%');
+  document.getElementById('pct-monthly').style.color = mColor;
 
-  var pacePctOnBar = monthly > 0 ? clamp((paceTarget / monthly) * 100) : 0;
+  var pacePct = monthly > 0 ? cl((paceTarget / monthly) * 100) : 0;
   var pl = document.getElementById('pace-line');
-  if (monthly > 0) {
-    pl.style.display = 'block';
-    pl.style.left    = pacePctOnBar + '%';
-  }
-  document.getElementById('foot-pace').textContent           = 'ペース目標: ' + fy(Math.round(paceTarget));
-  document.getElementById('foot-monthly-target').textContent = '目標: ' + fy(monthly);
+  if (monthly > 0) { pl.style.display = 'block'; pl.style.left = pacePct + '%'; }
+  sv('foot-pace',   'ペース目標: ' + fy(Math.round(paceTarget)));
+  sv('foot-target', '目標: ' + fy(monthly));
 
-  /* Daily bar */
-  var dPct   = clamp(dRatio * 100);
+  /* 日次バー */
+  var dPct   = cl(dRatio * 100);
   var dColor = dRatio >= 1 ? '#3fb950' : dRatio >= 0.7 ? '#d29922' : '#58a6ff';
   document.getElementById('fill-daily').style.width      = dPct + '%';
   document.getElementById('fill-daily').style.background = dColor;
-  document.getElementById('pct-daily').textContent        = dPct.toFixed(0) + '%';
-  document.getElementById('pct-daily').style.color        = dColor;
-  document.getElementById('foot-daily-target').textContent = '日次目標: ' + fy(Math.round(dailyTarget));
-  document.getElementById('foot-today').textContent        = '今日: ' + fy(today);
+  sv('pct-daily', dPct.toFixed(0) + '%');
+  document.getElementById('pct-daily').style.color = dColor;
+  sv('foot-daily',     '日次目標: ' + fy(Math.round(dailyTarget)));
+  sv('foot-today-val', '今日: ' + fy(today));
 
-  /* Pace bar */
-  var ppPct   = clamp(paceRatio * 100);
+  /* ペースバー */
+  var ppPct   = cl(paceRatio * 100);
   var ppColor = paceRatio >= 1.05 ? '#3fb950' : paceRatio >= 0.9 ? '#d29922' : '#f85149';
   document.getElementById('fill-pace').style.width      = ppPct + '%';
   document.getElementById('fill-pace').style.background = ppColor;
-  document.getElementById('pct-pace').textContent        = ppPct.toFixed(0) + '%';
-  document.getElementById('pct-pace').style.color        = ppColor;
-  document.getElementById('foot-pace-r').textContent     = cumulative > 0 ? fp(paceRatio) : '—';
+  sv('pct-pace',    ppPct.toFixed(0) + '%');
+  sv('foot-pace-r', cum > 0 ? fp(paceRatio) : '—');
+  document.getElementById('pct-pace').style.color = ppColor;
 
-  /* Remaining */
+  /* 残り */
   if (monthly > 0) {
     document.getElementById('remaining-box').style.display = 'flex';
-    document.getElementById('remaining-amt').textContent   = needed > 0 ? fy(needed) : '達成済み！';
-    document.getElementById('remaining-amt').style.color   = needed > 0 ? '#f85149' : '#3fb950';
-    document.getElementById('remaining-days').textContent  = remainDays;
-    document.getElementById('required-daily').textContent  = reqDaily > 0 ? fy(Math.round(reqDaily)) : '—';
+    sv('remaining-amt', needed > 0 ? fy(needed) : '達成済み！');
+    document.getElementById('remaining-amt').style.color = needed > 0 ? '#f85149' : '#3fb950';
+    sv('remaining-days',  REMAIN_DAYS);
+    sv('required-daily', reqDaily > 0 ? fy(Math.round(reqDaily)) : '—');
   }
 
-  /* Pace box */
+  /* ペース判定 */
   var pb = document.getElementById('pace-box');
-  if (monthly > 0 && (cumulative > 0 || today > 0)) {
+  if (monthly > 0 && (cum > 0 || today > 0)) {
     pb.style.display = 'flex';
-    var diff = Math.abs(cumulative - paceTarget);
+    var diff = Math.abs(cum - paceTarget);
     if (paceRatio >= 1.05) {
       pb.className = 'pace-box pace-ahead';
-      document.getElementById('pace-icon').textContent = '🚀';
-      document.getElementById('pace-text').textContent =
-        'ペース先行！ 目標より ' + fy(Math.round(diff)) + ' 上回り中（ペース達成率 ' + fp(paceRatio) + '）';
+      sv('pace-icon', '🚀');
+      sv('pace-text', 'ペース先行！目標より ' + fy(Math.round(diff)) + ' 上回り中（' + fp(paceRatio) + '）');
     } else if (paceRatio >= 0.9) {
       pb.className = 'pace-box pace-on';
-      document.getElementById('pace-icon').textContent = '✅';
-      document.getElementById('pace-text').textContent =
-        'ほぼ計画通り（ペース達成率 ' + fp(paceRatio) + '）— 残り' + remainDays + '日で1日' + fy(Math.round(reqDaily)) + '必要';
+      sv('pace-icon', '✅');
+      sv('pace-text', 'ほぼ計画通り（' + fp(paceRatio) + '）— 残り' + REMAIN_DAYS + '日で1日' + fy(Math.round(reqDaily)) + '必要');
     } else {
       pb.className = 'pace-box pace-behind';
-      document.getElementById('pace-icon').textContent = '⚠️';
-      document.getElementById('pace-text').textContent =
-        'ペース遅れ。目標より ' + fy(Math.round(diff)) + ' 不足（' + fp(paceRatio) + '）→ 残り' + remainDays + '日で1日' + fy(Math.round(reqDaily)) + '必要';
+      sv('pace-icon', '⚠️');
+      sv('pace-text', 'ペース遅れ。目標より ' + fy(Math.round(diff)) + ' 不足（' + fp(paceRatio) + '）→ 残り' + REMAIN_DAYS + '日で1日' + fy(Math.round(reqDaily)) + '必要');
     }
   } else {
     pb.style.display = 'none';
   }
+
+  /* モール別バー */
+  recalcStore('r', gv('t-rakuten'), SALES.rakuten.monthly, SALES.rakuten.today);
+  recalcStore('a', gv('t-amazon'),  SALES.amazon.monthly,  SALES.amazon.today);
+  recalcStore('y', gv('t-yahoo'),   SALES.yahoo.monthly,   SALES.yahoo.today);
 }
 
-/* ── save / load ── */
-function save() {
-  var m = parseInt(document.getElementById('in-monthly').value)    || 0;
-  var c = parseInt(document.getElementById('in-cumulative').value) || 0;
-  var t = parseInt(document.getElementById('in-today').value)      || 0;
-  var stores = {
-    r: { target: document.getElementById('r-target').value, actual: document.getElementById('r-actual').value },
-    a: { target: document.getElementById('a-target').value, actual: document.getElementById('a-actual').value },
-    y: { target: document.getElementById('y-target').value, actual: document.getElementById('y-actual').value },
-  };
-  localStorage.setItem('st_monthly',    m);
-  localStorage.setItem('st_cumulative', c);
-  localStorage.setItem('st_today',      t);
-  localStorage.setItem('st_stores',     JSON.stringify(stores));
-  localStorage.setItem('st_updated',    new Date().toLocaleString('ja-JP'));
-  document.getElementById('updated-at').textContent = '保存: ' + new Date().toLocaleString('ja-JP');
-  render(m, c, t);
-  ['r','a','y'].forEach(renderStore);
-}
-
-function renderStore(id) {
-  var tgt = parseInt(document.getElementById(id+'-target').value) || 0;
-  var act = parseInt(document.getElementById(id+'-actual').value) || 0;
-  var r   = tgt > 0 ? act / tgt : 0;
-  var pct = clamp(r * 100);
-  var colors = { r:'#d29922', a:'#58a6ff', y:'#f0883e' };
-  document.getElementById(id+'-bar').style.width      = pct + '%';
-  document.getElementById(id+'-bar').style.background = colors[id];
-  document.getElementById(id+'-pct').textContent = tgt > 0 ? pct.toFixed(1) + '%' : '—%';
-  var rem = Math.max(0, tgt - act);
-  document.getElementById(id+'-rem').textContent = tgt > 0 ? '残り ' + fy(rem) : '残り —';
-}
-
-(function init() {
-  var m = parseInt(localStorage.getItem('st_monthly'))    || 0;
-  var c = parseInt(localStorage.getItem('st_cumulative')) || 0;
-  var t = parseInt(localStorage.getItem('st_today'))      || 0;
-  var ts = localStorage.getItem('st_updated');
-  if (m || c || t) {
-    document.getElementById('in-monthly').value    = m || '';
-    document.getElementById('in-cumulative').value = c || '';
-    document.getElementById('in-today').value      = t || '';
-    if (ts) document.getElementById('updated-at').textContent = '前回保存: ' + ts;
-    render(m, c, t);
+function recalcStore(id, target, monthly, today) {
+  if (target === undefined) {
+    var tMap = { r: 't-rakuten', a: 't-amazon', y: 't-yahoo' };
+    target  = gv(tMap[id]);
+    monthly = SALES[id === 'r' ? 'rakuten' : id === 'a' ? 'amazon' : 'yahoo'].monthly;
+    today   = SALES[id === 'r' ? 'rakuten' : id === 'a' ? 'amazon' : 'yahoo'].today;
   }
-  try {
-    var s = JSON.parse(localStorage.getItem('st_stores') || '{}');
-    ['r','a','y'].forEach(function(id) {
-      if (s[id]) {
-        document.getElementById(id+'-target').value = s[id].target || '';
-        document.getElementById(id+'-actual').value = s[id].actual || '';
-        renderStore(id);
-      }
+  var r    = target > 0 ? monthly / target : 0;
+  var pct  = cl(r * 100);
+  var colors = { r: '#d29922', a: '#58a6ff', y: '#f0883e' };
+  document.getElementById('sbar-' + id).style.width      = pct + '%';
+  document.getElementById('sbar-' + id).style.background = colors[id];
+  sv('sk-' + id + '-monthly', fy(monthly));
+  sv('sk-' + id + '-today',   fy(today));
+  sv('sk-' + id + '-pct',     target > 0 ? pct.toFixed(1) + '%' : '—%');
+  sv('sfoot-' + id, '目標: ' + fy(target));
+}
+
+/* ── GAS 自動取得 ── */
+function fetchGAS() {
+  var url = document.getElementById('gas-url').value.trim();
+  if (!url) { setStatus('err', 'URLを入力してください'); return; }
+  localStorage.setItem('gas_url', url);
+  setStatus('ing', '取得中...');
+
+  fetch(url)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error);
+      setStatus('ok', '✓ 取得成功（' + data.date + '）楽天+Amazon+Yahoo合計 今月:' +
+        fy(data.monthly.total) + ' / 今日:' + fy(data.today.total));
+      localStorage.setItem('gas_last', JSON.stringify(data));
+      localStorage.setItem('gas_last_time', new Date().toLocaleString('ja-JP'));
+      setAutoSales(data);
+    })
+    .catch(function(e) {
+      setStatus('err', '取得失敗: ' + e.message + ' ※GASデプロイ後にURLを確認してください');
     });
-  } catch(e) {}
+}
+
+function clearGAS() {
+  localStorage.removeItem('gas_last');
+  SALES.source = 'manual';
+  ['total','r','a','y'].forEach(function(k) {
+    var el = document.getElementById('badge-' + k);
+    if (el) { el.textContent = '手動'; el.className = 'auto-badge'; }
+    sv('av-' + k + '-monthly', '—');
+    sv('av-' + k + '-today',   '—');
+  });
+  setStatus('', '');
+}
+
+function setStatus(cls, msg) {
+  var el = document.getElementById('gas-status');
+  el.textContent = msg;
+  el.className = 'gas-status' + (cls ? ' ' + cls : '');
+}
+
+/* ── 手動保存 ── */
+function saveManual() {
+  setManualSales();
+  var s = {
+    rm: gv('in-r-monthly'), rt: gv('in-r-today'),
+    am: gv('in-a-monthly'), at: gv('in-a-today'),
+    ym: gv('in-y-monthly'), yt: gv('in-y-today'),
+    tm: gv('in-total-monthly'), tt: gv('in-total-today')
+  };
+  localStorage.setItem('manual_sales', JSON.stringify(s));
+  localStorage.setItem('manual_updated', new Date().toLocaleString('ja-JP'));
+  sv('updated-at', '保存: ' + new Date().toLocaleString('ja-JP'));
+}
+
+/* ── 初期ロード ── */
+(function init() {
+  /* GAS URL を復元 */
+  var savedUrl = localStorage.getItem('gas_url');
+  if (savedUrl) document.getElementById('gas-url').value = savedUrl;
+
+  /* 目標値の復元 */
+  var targets = JSON.parse(localStorage.getItem('tracker_targets') || '{}');
+  if (targets.total)   document.getElementById('t-total').value   = targets.total;
+  if (targets.rakuten) document.getElementById('t-rakuten').value = targets.rakuten;
+  if (targets.amazon)  document.getElementById('t-amazon').value  = targets.amazon;
+  if (targets.yahoo)   document.getElementById('t-yahoo').value   = targets.yahoo;
+
+  /* GAS キャッシュを復元（最終取得データ） */
+  var last     = localStorage.getItem('gas_last');
+  var lastTime = localStorage.getItem('gas_last_time');
+  if (last) {
+    try {
+      var data = JSON.parse(last);
+      setStatus('ok', '前回取得: ' + lastTime + ' — 楽天+Amazon合計 今月:' +
+        fy(data.monthly.total) + ' / 今日:' + fy(data.today.total) +
+        '（「売上を自動取得」で最新に更新できます）');
+      setAutoSales(data);
+      return; // autoで初期化済み
+    } catch(e) {}
+  }
+
+  /* 手動入力を復元 */
+  var ms = JSON.parse(localStorage.getItem('manual_sales') || '{}');
+  if (ms.rm || ms.am) {
+    ['r','a','y','total'].forEach(function(k) {
+      var m = ms[k === 'total' ? 'tm' : k + 'm'];
+      var t = ms[k === 'total' ? 'tt' : k + 't'];
+      if (m) document.getElementById('in-' + k + '-monthly').value = m;
+      if (t) document.getElementById('in-' + k + '-today').value   = t;
+    });
+    var ts = localStorage.getItem('manual_updated');
+    if (ts) sv('updated-at', '前回保存: ' + ts);
+    setManualSales();
+  } else {
+    recalc(); // 目標だけで初期描画
+  }
+
+  /* 目標保存（入力変更時） */
+  ['t-total','t-rakuten','t-amazon','t-yahoo'].forEach(function(id) {
+    document.getElementById(id).addEventListener('change', function() {
+      var t = {
+        total:   gv('t-total'), rakuten: gv('t-rakuten'),
+        amazon:  gv('t-amazon'), yahoo:  gv('t-yahoo')
+      };
+      localStorage.setItem('tracker_targets', JSON.stringify(t));
+      recalc();
+    });
+  });
 })();
 </script>
 </body>

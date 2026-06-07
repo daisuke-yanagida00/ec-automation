@@ -614,6 +614,92 @@ function weeklyRakutenReport() {
 }
 
 // ================================================================
+// Web App：売上サマリーを JSON で返す（sales-tracker.html 用）
+// デプロイ方法: GASエディタ → デプロイ → 新しいデプロイ → ウェブアプリ
+//   実行ユーザー: 自分、アクセス: 全員
+// ================================================================
+function doGet(e) {
+  var result = getSalesSummary_();
+  return ContentService
+    .createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getSalesSummary_() {
+  var ss    = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  if (!sheet) return { error: 'シートが存在しません' };
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { date: '', today: {}, monthly: {} };
+
+  var data = sheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
+
+  var now         = new Date();
+  var today       = Utilities.formatDate(now, 'Asia/Tokyo', 'yyyy/MM/dd');
+  var monthPrefix = today.slice(0, 7); // 'yyyy/MM'
+
+  // モール別合計（楽天は注文ID単位で重複排除、Amazonは商品行単位で合算）
+  var todayM   = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
+  var monthlyM = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
+
+  // 楽天: ORDER_ID 単位で重複排除するためのセット
+  var rakutenTodayOrders   = {};
+  var rakutenMonthlyOrders = {};
+
+  data.forEach(function(row) {
+    var orderDate = row[COL.ORDER_DATE];
+    if (!orderDate) return;
+
+    var d       = new Date(orderDate);
+    var dateStr = Utilities.formatDate(d, 'Asia/Tokyo', 'yyyy/MM/dd');
+    var mall    = String(row[COL.MALL]);
+    var orderId = String(row[COL.ORDER_ID]);
+    var price   = Number(row[COL.PRICE]) || 0;
+
+    // ── 月次集計 ──
+    if (dateStr.slice(0, 7) === monthPrefix) {
+      if (mall === '楽天') {
+        if (!rakutenMonthlyOrders[orderId]) {
+          rakutenMonthlyOrders[orderId] = true;
+          monthlyM.rakuten += price;
+          monthlyM.total   += price;
+        }
+      } else if (mall === 'Amazon') {
+        monthlyM.amazon += price;
+        monthlyM.total  += price;
+      } else if (mall === 'Yahoo') {
+        monthlyM.yahoo += price;
+        monthlyM.total += price;
+      }
+    }
+
+    // ── 今日の集計 ──
+    if (dateStr === today) {
+      if (mall === '楽天') {
+        if (!rakutenTodayOrders[orderId]) {
+          rakutenTodayOrders[orderId] = true;
+          todayM.rakuten += price;
+          todayM.total   += price;
+        }
+      } else if (mall === 'Amazon') {
+        todayM.amazon += price;
+        todayM.total  += price;
+      } else if (mall === 'Yahoo') {
+        todayM.yahoo += price;
+        todayM.total += price;
+      }
+    }
+  });
+
+  return {
+    date:    today,
+    today:   todayM,
+    monthly: monthlyM
+  };
+}
+
+// ================================================================
 // 日次トリガー設定（初回のみ手動実行）
 // ================================================================
 function setupDailyTrigger() {
