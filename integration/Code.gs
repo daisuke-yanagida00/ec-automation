@@ -814,7 +814,7 @@ function getYahooAuthUrl() {
     + '?response_type=code'
     + '&client_id='    + encodeURIComponent(clientId)
     + '&redirect_uri=' + encodeURIComponent('https://localhost')
-    + '&scope='        + encodeURIComponent('openid offline_access')
+    + '&scope='        + encodeURIComponent('openid')
     + '&state='        + encodeURIComponent(state)
     + '&bail=1';
 
@@ -846,14 +846,46 @@ function handleYahooCallback(code) {
   if (body.error) { Logger.log('Yahoo 認証エラー: ' + JSON.stringify(body)); return; }
 
   PROPS.setProperty('YAHOO_REFRESH_TOKEN', body.refresh_token || '');
+  PROPS.setProperty('YAHOO_ACCESS_TOKEN',  body.access_token  || '');
+  var expiry = Date.now() + ((body.expires_in || 3600) - 300) * 1000;
+  PROPS.setProperty('YAHOO_ACCESS_TOKEN_EXPIRY', String(expiry));
   Logger.log('Yahoo: 認証成功！integrateYahooOrders() を実行して動作確認してください。');
 }
 
+// GASのドロップダウンから引数なしで実行できる認証コード交換ラッパー
+// 事前にスクリプトプロパティ YAHOO_AUTH_CODE に code= の値を設定すること
+function runYahooCallback() {
+  var code = PROPS.getProperty('YAHOO_AUTH_CODE');
+  if (!code) {
+    Logger.log('【手順】\n'
+      + '1. getYahooAuthUrl() を実行してURLをブラウザで開く\n'
+      + '2. Yahoo! IDでログイン → 同意する\n'
+      + '3. localhost へリダイレクト（エラー画面でOK）\n'
+      + '4. URLバーの code= 以降の値をコピー（例: DtC4DKN3）\n'
+      + '5. GASエディタ → プロジェクトの設定 → スクリプトプロパティ\n'
+      + '   YAHOO_AUTH_CODE = コピーした値 を追加\n'
+      + '6. この関数 runYahooCallback() を再実行');
+    return;
+  }
+  handleYahooCallback(code);
+  PROPS.deleteProperty('YAHOO_AUTH_CODE');
+}
+
 function getYahooAccessToken_() {
+  // キャッシュ済みアクセストークンが有効なら再利用
+  var cached = PROPS.getProperty('YAHOO_ACCESS_TOKEN');
+  var expiry = Number(PROPS.getProperty('YAHOO_ACCESS_TOKEN_EXPIRY') || '0');
+  if (cached && Date.now() < expiry) return cached;
+
+  // リフレッシュトークンがあれば更新
   var refreshToken = PROPS.getProperty('YAHOO_REFRESH_TOKEN');
   var clientId     = PROPS.getProperty('YAHOO_CLIENT_ID');
   var clientSecret = PROPS.getProperty('YAHOO_CLIENT_SECRET');
-  if (!refreshToken || !clientId) return null;
+  if (!refreshToken || !clientId) {
+    // リフレッシュトークンなし・期限切れの場合でも一旦キャッシュ値を返す（再認証案内）
+    if (cached) { Logger.log('Yahoo: アクセストークンが期限切れです。getYahooAuthUrl() で再認証してください。'); }
+    return cached || null;
+  }
 
   var res = UrlFetchApp.fetch('https://auth.login.yahoo.co.jp/yconnect/v2/token', {
     method:  'POST',
@@ -867,9 +899,14 @@ function getYahooAccessToken_() {
   });
 
   var body = JSON.parse(res.getContentText());
-  if (body.error) { Logger.log('Yahoo トークンリフレッシュエラー: ' + JSON.stringify(body)); return null; }
+  if (body.error) { Logger.log('Yahoo トークンリフレッシュエラー: ' + JSON.stringify(body)); return cached || null; }
   if (body.refresh_token) PROPS.setProperty('YAHOO_REFRESH_TOKEN', body.refresh_token);
-  return body.access_token || null;
+  var newToken = body.access_token || null;
+  if (newToken) {
+    PROPS.setProperty('YAHOO_ACCESS_TOKEN', newToken);
+    PROPS.setProperty('YAHOO_ACCESS_TOKEN_EXPIRY', String(Date.now() + ((body.expires_in || 3600) - 300) * 1000));
+  }
+  return newToken;
 }
 
 function yahooXml_(el, tag) {
