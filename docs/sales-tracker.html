@@ -688,6 +688,9 @@ function fetchGAS() {
 
 function clearGAS() {
   localStorage.removeItem('gas_last');
+  localStorage.removeItem('gas_last_time');
+  localStorage.removeItem('gas_url');
+  document.getElementById('gas-url').value = GAS_DEFAULT;
   SALES.source = 'manual';
   ['total','r','a','y'].forEach(function(k) {
     var el = document.getElementById('badge-' + k);
@@ -718,10 +721,11 @@ function saveManual() {
   sv('updated-at', '保存: ' + new Date().toLocaleString('ja-JP'));
 }
 
+var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKllfA__C8OsDGrNkwVfp2sh6EQGpZKsKMavEtp9B422kq8XGiw/exec';
+
 /* ── 初期ロード ── */
 (function init() {
   /* GAS URL を復元 */
-  var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKllfA__C8OsDGrNkwVfp2sh6EQGpZKsKMavEtp9B422kq8XGiw/exec';
   var savedUrl = localStorage.getItem('gas_url') || GAS_DEFAULT;
   document.getElementById('gas-url').value = savedUrl;
 
