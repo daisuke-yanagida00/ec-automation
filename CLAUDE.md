@@ -86,6 +86,30 @@ ec-automation/
 - **楽天 新商品リサーチ**：楽天市場での新規取り扱い商品候補のリサーチ実施
 - **週次ダッシュボード自動更新システム構築**：Claude APIでサマリー生成・HTML更新・git push・Chatwork通知
 
+## 2026-06-08 作業記録
+
+### 完了
+- **エージェント経営コンテンツ作成**：`docs/agent-management.html` 新規作成。8つのAIエージェント・フロー図・Before/After比較・Phase 1-4ロードマップ付き
+- **月次経営レポート分析**：添付Excelファイルを解析し、各部署（営業・マーケ・EC・管理）の課題と提案を出力
+- **売上目標トラッカー新規作成**：`docs/sales-tracker.html` を新規作成（ダークテーマ、neogate-dashboardスタイル合わせ）
+- **6月目標プリセット設定**：楽天¥274万・Amazon¥420万・Yahoo!¥90万・合計¥784万
+- **GAS Web App連携実装**：`integration/Code.gs` に `doGet()` + `getSalesSummary_()` 関数追加、売上トラッカーからAPIで自動取得
+- **昨日の売上表示追加**：GASが毎朝8時に前日分を取得するため、各モールカードに「昨日」「今日」を並列表示
+- **楽天CTR改善サムネイルガイド作成**：`docs/thumbnail-guide.html` 新規作成
+  - 対象3商品：枕（ライフスタイル型）・電位治療掛け布団（テクノロジー型）・そば殻角枕（白背景プロダクト型）
+  - CSSビジュアルモックアップ・DO/DON'Tルール・チェックリスト（localStorage状態保持）付き
+  - 目標CTR：0.06% → 0.12〜0.15%
+
+### 決定事項
+- GAS Web App URL：`https://script.google.com/macros/s/AKfycbwNT5hZvahJlfK949MLCxmyIz3oZDutOJDseRNA0Qkkk-9zM8okA5M4o13MOxTnWGkcSA/exec`
+- Rakuten注文の売上集計：totalPriceはORDER_IDで重複排除（1注文1回カウント）
+- Amazon注文：itemPriceを直接合算
+- 売上トラッカーはGitHub Pages（`https://daisuke-yanagida00.github.io/ec-automation/sales-tracker.html`）で公開
+
+### システム構成変更
+- `integration/Code.gs` にWebアプリ関数追加（doGet・getSalesSummary_）
+- GitHub Pages公開ページ：agent-management.html / sales-tracker.html / thumbnail-guide.html
+
 ## 運用ルール
 **このプロジェクトのセッション終了時は必ずCLAUDE.mdを更新すること。**
 - セッション終了前に「今日の作業内容をCLAUDE.mdに追記してgit pushして」を実行
