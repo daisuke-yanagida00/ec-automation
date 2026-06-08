@@ -692,10 +692,195 @@ function getSalesSummary_() {
 }
 
 // ================================================================
+// Yahoo! Shopping 注文統合
+// ================================================================
+// 初期設定手順:
+//   1. スクリプトプロパティに設定:
+//      YAHOO_CLIENT_ID     : Client ID（デベロッパーネットワーク）
+//      YAHOO_CLIENT_SECRET : Client Secret
+//      YAHOO_STORE_ID      : ストアID（例: shingman2）
+//   2. Yahoo!デベロッパーネットワークのアプリ設定で
+//      コールバックURL に「https://localhost」を登録
+//   3. GASエディタで getYahooAuthUrl() を実行 → ログのURLをブラウザで開く
+//   4. Yahoo! IDでログイン→認証→localhost にリダイレクト
+//      （画面はエラーでOK）URLバーの code= 以降の値をコピー
+//   5. handleYahooCallback('コピーしたコード') を実行
+//   6. 成功ログが出たら integrateYahooOrders() で動作確認
+// ================================================================
+
+function integrateYahooOrders() {
+  var token = getYahooAccessToken_();
+  if (!token) {
+    Logger.log('Yahoo: 未認証。getYahooAuthUrl() でセットアップしてください。');
+    return;
+  }
+
+  var storeId   = PROPS.getProperty('YAHOO_STORE_ID');
+  var sheet     = getOrCreateSheet_();
+  var existsSet = loadExistingOrderIds_(sheet);
+
+  var now  = new Date();
+  var from = new Date(now.getTime() - 25 * 60 * 60 * 1000);
+  var fromStr   = Utilities.formatDate(from, 'Asia/Tokyo', 'yyyyMMddHHmmss');
+  var toStr     = Utilities.formatDate(now,  'Asia/Tokyo', 'yyyyMMddHHmmss');
+  var fetchedAt = Utilities.formatDate(now,  'Asia/Tokyo', 'yyyy/MM/dd HH:mm:ss');
+
+  var xml = '<?xml version="1.0" encoding="UTF-8"?>' +
+    '<Req><Search>' +
+      '<Result>100</Result><Start>1</Start>' +
+      '<Sort>+order_time</Sort>' +
+      '<Condition>' +
+        '<OrderTimeFrom>' + fromStr + '</OrderTimeFrom>' +
+        '<OrderTimeTo>'   + toStr   + '</OrderTimeTo>' +
+      '</Condition>' +
+    '</Search>' +
+    '<SellerId>' + storeId + '</SellerId></Req>';
+
+  var res = UrlFetchApp.fetch(
+    'https://circus.shopping.yahooapis.jp/ShoppingWebService/V1/orderList',
+    {
+      method:  'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/xml' },
+      payload: xml,
+      muteHttpExceptions: true
+    }
+  );
+
+  Logger.log('Yahoo API: ' + res.getResponseCode());
+  if (res.getResponseCode() !== 200) {
+    Logger.log(res.getContentText());
+    return;
+  }
+
+  var doc         = XmlService.parse(res.getContentText());
+  var root        = doc.getRootElement();
+  var orderListEl = root.getChild('OrderList');
+  if (!orderListEl) { Logger.log('Yahoo: 注文なし（期間内）'); return; }
+
+  var orders  = orderListEl.getChildren('Order');
+  var newRows = [];
+
+  orders.forEach(function(order) {
+    var orderId    = yahooXml_(order, 'OrderId');
+    var orderTime  = yahooXml_(order, 'OrderTime');
+    var status     = yahooXml_(order, 'OrderStatus');
+    var lastName   = yahooXml_(order, 'ShipLastName');
+    var firstName  = yahooXml_(order, 'ShipFirstName');
+    var prefecture = yahooXml_(order, 'ShipPrefecture');
+    var totalPrice = Number(yahooXml_(order, 'TotalPrice')) || 0;
+
+    var ot        = orderTime;
+    var orderDate = ot.slice(0,4)+'/'+ot.slice(4,6)+'/'+ot.slice(6,8)+' '+
+                    ot.slice(8,10)+':'+ot.slice(10,12)+':'+ot.slice(12,14);
+
+    var itemsEl = order.getChild('ItemList');
+    var items   = itemsEl ? itemsEl.getChildren('Item') : [];
+
+    if (items.length === 0) {
+      if (existsSet[orderId]) return;
+      newRows.push([orderDate, 'Yahoo', orderId, lastName+' '+firstName,
+                    '', '', 0, totalPrice, 0, status, prefecture, fetchedAt]);
+      existsSet[orderId] = true;
+    } else {
+      items.forEach(function(item) {
+        var sku    = yahooXml_(item, 'ItemId');
+        var rowKey = orderId + '_' + sku;
+        if (existsSet[rowKey]) return;
+        var qty   = Number(yahooXml_(item, 'Quantity'))  || 1;
+        var unit  = Number(yahooXml_(item, 'UnitPrice')) || 0;
+        newRows.push([
+          orderDate, 'Yahoo', orderId, lastName+' '+firstName,
+          yahooXml_(item, 'Title'), sku, qty, unit * qty,
+          0, status, prefecture, fetchedAt
+        ]);
+        existsSet[rowKey] = true;
+      });
+    }
+  });
+
+  if (newRows.length === 0) { Logger.log('Yahoo: 新規注文なし'); return; }
+  sheet.getRange(sheet.getLastRow()+1, 1, newRows.length, HEADER.length).setValues(newRows);
+  Logger.log('Yahoo: ' + newRows.length + '行を注文統合シートに書き込みました');
+}
+
+function getYahooAuthUrl() {
+  var clientId = PROPS.getProperty('YAHOO_CLIENT_ID');
+  if (!clientId) { Logger.log('スクリプトプロパティに YAHOO_CLIENT_ID を設定してください'); return; }
+
+  var state = Utilities.getUuid();
+  PROPS.setProperty('YAHOO_OAUTH_STATE', state);
+
+  var url = 'https://auth.login.yahoo.co.jp/yconnect/v2/authorization'
+    + '?response_type=code'
+    + '&client_id='    + encodeURIComponent(clientId)
+    + '&redirect_uri=' + encodeURIComponent('https://localhost')
+    + '&scope='        + encodeURIComponent('openid offline_access')
+    + '&state='        + encodeURIComponent(state)
+    + '&bail=1';
+
+  Logger.log('【Yahoo! 認証URL】\n' + url
+    + '\n\n上記URLをブラウザで開いてYahoo! IDでログイン・許可してください。'
+    + '\nlocalhost へリダイレクトされます（エラー画面でOK）。'
+    + '\nURLバーの code= 以降の値をコピーして'
+    + '\nhandleYahooCallback("コード") を実行してください。');
+  return url;
+}
+
+function handleYahooCallback(code) {
+  var clientId     = PROPS.getProperty('YAHOO_CLIENT_ID');
+  var clientSecret = PROPS.getProperty('YAHOO_CLIENT_SECRET');
+
+  var res = UrlFetchApp.fetch('https://auth.login.yahoo.co.jp/yconnect/v2/token', {
+    method:  'POST',
+    payload: {
+      grant_type:    'authorization_code',
+      code:          code,
+      client_id:     clientId,
+      client_secret: clientSecret,
+      redirect_uri:  'https://localhost'
+    },
+    muteHttpExceptions: true
+  });
+
+  var body = JSON.parse(res.getContentText());
+  if (body.error) { Logger.log('Yahoo 認証エラー: ' + JSON.stringify(body)); return; }
+
+  PROPS.setProperty('YAHOO_REFRESH_TOKEN', body.refresh_token || '');
+  Logger.log('Yahoo: 認証成功！integrateYahooOrders() を実行して動作確認してください。');
+}
+
+function getYahooAccessToken_() {
+  var refreshToken = PROPS.getProperty('YAHOO_REFRESH_TOKEN');
+  var clientId     = PROPS.getProperty('YAHOO_CLIENT_ID');
+  var clientSecret = PROPS.getProperty('YAHOO_CLIENT_SECRET');
+  if (!refreshToken || !clientId) return null;
+
+  var res = UrlFetchApp.fetch('https://auth.login.yahoo.co.jp/yconnect/v2/token', {
+    method:  'POST',
+    payload: {
+      grant_type:    'refresh_token',
+      refresh_token: refreshToken,
+      client_id:     clientId,
+      client_secret: clientSecret
+    },
+    muteHttpExceptions: true
+  });
+
+  var body = JSON.parse(res.getContentText());
+  if (body.error) { Logger.log('Yahoo トークンリフレッシュエラー: ' + JSON.stringify(body)); return null; }
+  if (body.refresh_token) PROPS.setProperty('YAHOO_REFRESH_TOKEN', body.refresh_token);
+  return body.access_token || null;
+}
+
+function yahooXml_(el, tag) {
+  try { return el.getChild(tag).getText(); } catch(e) { return ''; }
+}
+
+// ================================================================
 // 日次トリガー設定（初回のみ手動実行）
 // ================================================================
 function setupDailyTrigger() {
-  var targets = ['integrateRakutenOrders', 'integrateAmazonOrders'];
+  var targets = ['integrateRakutenOrders', 'integrateAmazonOrders', 'integrateYahooOrders'];
 
   // 対象関数の既存トリガーを削除
   ScriptApp.getProjectTriggers().forEach(function(t) {
