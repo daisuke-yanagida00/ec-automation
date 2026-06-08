@@ -619,9 +619,16 @@ function weeklyRakutenReport() {
 //   実行ユーザー: 自分、アクセス: 全員
 // ================================================================
 function doGet(e) {
-  var result = getSalesSummary_();
+  var result   = getSalesSummary_();
+  var json     = JSON.stringify(result);
+  var callback = (e && e.parameter && e.parameter.callback) ? e.parameter.callback : null;
+  if (callback) {
+    return ContentService
+      .createTextOutput(callback + '(' + json + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
   return ContentService
-    .createTextOutput(JSON.stringify(result))
+    .createTextOutput(json)
     .setMimeType(ContentService.MimeType.JSON);
 }
 
