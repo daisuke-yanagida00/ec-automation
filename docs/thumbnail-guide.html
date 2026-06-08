@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>楽天サムネイル刷新ガイド ｜ ネオ・ゲート</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+       background: #0d1117; color: #e6edf3; font-size: 14px; }
+
+.header { background: linear-gradient(135deg,#161b22,#1a2332);
+          border-bottom:1px solid #30363d; padding:16px 24px;
+          display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+.header h1 { font-size:17px; font-weight:700; }
+.back-link { color:#58a6ff; text-decoration:none; font-size:12px; }
+.back-link:hover { text-decoration:underline; }
+
+.main { max-width:1100px; margin:0 auto; padding:20px 16px; }
+
+.sec { font-size:11px; font-weight:700; color:#8b949e; letter-spacing:1px;
+       text-transform:uppercase; margin:28px 0 12px;
+       padding-bottom:4px; border-bottom:1px solid #21262d; }
+
+/* ── INSIGHT ── */
+.insight-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+@media(max-width:640px){ .insight-grid{ grid-template-columns:1fr; } }
+.insight-card { background:#161b22; border:1px solid #30363d; border-radius:10px; padding:14px 16px; }
+.insight-card .label { font-size:11px; color:#8b949e; margin-bottom:4px; }
+.insight-card .val   { font-size:22px; font-weight:700; }
+.insight-card .desc  { font-size:12px; color:#8b949e; margin-top:4px; line-height:1.5; }
+
+/* ── PRODUCT SECTION ── */
+.product-block { margin-bottom:48px; }
+.product-header { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+.product-rank { width:40px; height:40px; border-radius:50%; display:flex; align-items:center;
+                justify-content:center; font-size:18px; font-weight:900; flex-shrink:0; }
+.rank-1 { background:linear-gradient(135deg,#b8860b,#ffd700); color:#000; }
+.rank-2 { background:linear-gradient(135deg,#555,#aaa); color:#fff; }
+.rank-3 { background:linear-gradient(135deg,#7a3800,#d2691e); color:#fff; }
+.product-meta h2 { font-size:18px; font-weight:700; }
+.product-meta p  { font-size:12px; color:#8b949e; margin-top:3px; }
+
+.ba-grid { display:grid; grid-template-columns:1fr 40px 1fr; gap:12px; align-items:start; margin-bottom:16px; }
+@media(max-width:700px){ .ba-grid{ grid-template-columns:1fr; } }
+.ba-arrow { display:flex; align-items:center; justify-content:center; font-size:24px; color:#8b949e;
+            padding-top:60px; }
+@media(max-width:700px){ .ba-arrow{ padding-top:0; transform:rotate(90deg); } }
+
+.thumb-wrap { }
+.thumb-label { font-size:11px; font-weight:700; letter-spacing:1px; margin-bottom:8px;
+               padding:4px 10px; border-radius:4px; display:inline-block; }
+.label-before { background:#3a1a1a; color:#f85149; }
+.label-after  { background:#0d2a1f; color:#3fb950; }
+
+/* ── THUMBNAIL MOCKUP ── */
+.thumb {
+  width:100%; aspect-ratio:1/1; border-radius:8px; overflow:hidden;
+  position:relative; display:flex; align-items:center; justify-content:center;
+  font-size:12px; border:1px solid #30363d;
+}
+
+/* BEFORE スタイル（ありがちな低CTR） */
+.thumb-bad {
+  background: linear-gradient(160deg,#f5f0e8 0%,#ede8dc 100%);
+  flex-direction:column; gap:4px; padding:8px;
+}
+.thumb-bad .prod-img-bad {
+  width:55%; aspect-ratio:1/1; background:linear-gradient(135deg,#d4c5a9,#b8a888);
+  border-radius:4px; display:flex; align-items:center; justify-content:center;
+  color:#888; font-size:10px; text-align:center; line-height:1.3;
+}
+.thumb-bad .text-blob { background:rgba(255,255,255,.7); border-radius:3px;
+  padding:3px 6px; font-size:9px; color:#555; text-align:center; line-height:1.4; }
+
+/* AFTER スタイル（高CTR設計） */
+.thumb-good { flex-direction:column; overflow:hidden; }
+
+/* 商品1: 枕ライフスタイル型 */
+.t1-after {
+  background:linear-gradient(160deg,#f8f4ef 0%,#efe8de 100%);
+  justify-content:flex-end; align-items:flex-start;
+}
+.t1-lifestyle {
+  position:absolute; inset:0;
+  background:linear-gradient(160deg,#ddd5c8 0%,#c8bfb0 60%,#a89880 100%);
+  display:flex; align-items:flex-end; justify-content:center;
+}
+.t1-pillow {
+  width:72%; height:45%; background:linear-gradient(135deg,#fff 0%,#f0ece5 50%,#e8e0d4 100%);
+  border-radius:50% 50% 48% 52%/40% 40% 60% 60%; box-shadow:0 8px 24px rgba(0,0,0,.18);
+  margin-bottom:8%;
+  position:relative;
+}
+.t1-pillow::after {
+  content:''; position:absolute; top:15%; left:20%; right:20%; bottom:25%;
+  background:linear-gradient(135deg,rgba(255,255,255,.6) 0%,transparent 60%);
+  border-radius:50%;
+}
+.t1-badge-wrap { position:absolute; top:0; left:0; right:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,transparent 100%);
+  padding:10px 10px 18px; }
+.t1-badge-main { font-size:13px; font-weight:900; color:#fff; line-height:1.2; text-shadow:0 1px 3px rgba(0,0,0,.4); }
+.t1-badge-sub  { font-size:9px; color:rgba(255,255,255,.85); margin-top:2px; }
+.t1-cta { position:absolute; bottom:8px; right:8px;
+  background:#e8341c; color:#fff; font-size:9px; font-weight:700;
+  padding:4px 8px; border-radius:3px; }
+.t1-review { position:absolute; bottom:8px; left:8px;
+  background:rgba(0,0,0,.6); color:#ffd700; font-size:9px;
+  padding:3px 7px; border-radius:3px; }
+
+/* 商品2: 電位治療掛け布団 インフォグラフィック型 */
+.t2-after {
+  background:linear-gradient(160deg,#0a1628 0%,#0d2244 100%);
+}
+.t2-glow { position:absolute; top:30%; left:50%; transform:translate(-50%,-50%);
+  width:55%; height:55%; background:radial-gradient(circle,rgba(80,140,255,.25) 0%,transparent 70%);
+  border-radius:50%; }
+.t2-futon {
+  position:absolute; bottom:0; left:5%; right:5%;
+  height:42%;
+  background:linear-gradient(180deg,#1a3a6e 0%,#0f2244 100%);
+  border-radius:12px 12px 0 0;
+  box-shadow:0 -4px 20px rgba(80,140,255,.3);
+}
+.t2-futon::before {
+  content:''; position:absolute; top:10%; left:10%; right:10%; height:2px;
+  background:linear-gradient(90deg,transparent,rgba(80,160,255,.6),transparent);
+  border-radius:2px;
+}
+.t2-wave { position:absolute; top:15%; left:50%; transform:translateX(-50%);
+  display:flex; gap:8px; align-items:center; }
+.t2-wave-line {
+  width:2px; border-radius:2px; background:linear-gradient(180deg,rgba(80,160,255,.8),transparent);
+}
+.t2-title { position:absolute; top:6%; left:0; right:0; text-align:center; }
+.t2-title-main { font-size:11px; font-weight:900; color:#fff; letter-spacing:.5px; text-shadow:0 0 10px rgba(80,140,255,.8); }
+.t2-title-sub  { font-size:8px; color:#7ab4ff; margin-top:2px; }
+.t2-price-tag { position:absolute; top:6%; right:6%;
+  background:linear-gradient(135deg,#e8341c,#c01e00);
+  color:#fff; font-size:9px; font-weight:700;
+  padding:4px 7px; border-radius:4px; line-height:1.3; text-align:center; }
+.t2-feature { position:absolute; bottom:46%; left:0; right:0;
+  display:flex; justify-content:center; gap:6px; flex-wrap:wrap; padding:0 6px; }
+.t2-feat-pill { background:rgba(80,140,255,.2); border:1px solid rgba(80,140,255,.4);
+  color:#7ab4ff; font-size:8px; padding:2px 7px; border-radius:10px; }
+
+/* 商品3: 角枕 白背景プロダクト型 */
+.t3-after { background:#fff; }
+.t3-bg-circle { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:75%; height:75%; background:radial-gradient(circle,#f0ece5 0%,#e8e2d8 100%);
+  border-radius:50%; }
+.t3-pillow-wrap { position:absolute; top:50%; left:50%; transform:translate(-50%,-52%);
+  width:60%; }
+.t3-square {
+  width:100%; aspect-ratio:1/1;
+  background:linear-gradient(135deg,#fff 0%,#f5f0e8 40%,#e8e0d0 100%);
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,.15), 0 2px 6px rgba(0,0,0,.08);
+  position:relative;
+}
+.t3-square::before {
+  content:''; position:absolute; top:12%; left:12%; right:12%; bottom:12%;
+  background:linear-gradient(135deg,rgba(255,255,255,.8) 0%,transparent 60%);
+  border-radius:8px;
+}
+.t3-soba { position:absolute; bottom:10%; left:50%; transform:translateX(-50%);
+  background:rgba(180,140,80,.15); border:1px solid rgba(180,140,80,.3);
+  color:#7a5c20; font-size:8px; padding:2px 8px; border-radius:10px; white-space:nowrap; }
+.t3-top-band { position:absolute; top:0; left:0; right:0;
+  background:linear-gradient(90deg,#1a3a2e,#2c5f47);
+  padding:7px 10px; }
+.t3-top-text { font-size:10px; font-weight:700; color:#fff; }
+.t3-top-sub  { font-size:8px; color:#9ed4bc; margin-top:1px; }
+.t3-bottom { position:absolute; bottom:0; left:0; right:0;
+  background:rgba(0,0,0,.03); border-top:1px solid #eee;
+  padding:6px 10px; display:flex; justify-content:space-between; align-items:center; }
+.t3-stars { color:#ffd700; font-size:10px; }
+.t3-review-cnt { font-size:9px; color:#888; }
+.t3-new-badge { position:absolute; top:36px; right:8px;
+  background:#e8341c; color:#fff; font-size:8px; font-weight:700;
+  padding:3px 7px; border-radius:3px; }
+
+/* ── RULES ── */
+.rule-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+@media(max-width:640px){ .rule-grid{ grid-template-columns:1fr; } }
+.rule-card { background:#161b22; border:1px solid #30363d; border-radius:10px; padding:14px 16px; }
+.rule-card h3 { font-size:13px; font-weight:700; margin-bottom:10px; }
+.rule-item { display:flex; gap:8px; margin-bottom:7px; font-size:12px; line-height:1.5; }
+.rule-item .icon { flex-shrink:0; width:18px; text-align:center; }
+
+/* ── CHECKLIST ── */
+.checklist { background:#161b22; border:1px solid #30363d; border-radius:10px; padding:16px; }
+.checklist h3 { font-size:14px; font-weight:700; margin-bottom:12px; }
+.check-item { display:flex; gap:10px; align-items:flex-start; padding:7px 0;
+              border-bottom:1px solid #21262d; font-size:13px; line-height:1.5; }
+.check-item:last-child { border-bottom:none; }
+.chk { width:18px; height:18px; border:2px solid #30363d; border-radius:4px;
+       flex-shrink:0; margin-top:1px; cursor:pointer; display:flex; align-items:center;
+       justify-content:center; transition:.2s; }
+.chk:hover { border-color:#3fb950; }
+.chk.done { background:#238636; border-color:#238636; color:#fff; font-size:11px; }
+
+.footer { font-size:11px; color:#484f58; text-align:center; padding:20px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>📸 楽天 サムネイル刷新ガイド</h1>
+    <div style="font-size:11px;color:#8b949e;margin-top:2px">CTR 0.06% → 0.15%+ を目指す 代表3商品 デザイン設計書</div>
+  </div>
+  <a href="index.html" class="back-link">← ダッシュボードへ</a>
+</div>
+
+<div class="main">
+
+  <!-- ── 現状分析 ── -->
+  <div class="sec">現状の課題と目標</div>
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="label">現在のCTR（楽天）</div>
+      <div class="val" style="color:#f85149">0.05〜0.06%</div>
+      <div class="desc">業界目安0.1〜0.2%の半分以下。<br>広告表示されてもクリックされていない状態。</div>
+    </div>
+    <div class="insight-card">
+      <div class="label">目標CTR</div>
+      <div class="val" style="color:#3fb950">0.12〜0.15%</div>
+      <div class="desc">達成できれば広告流入が<strong style="color:#3fb950">2〜2.5倍</strong>に。<br>追加費用ゼロでアクセス数を改善できる最速施策。</div>
+    </div>
+    <div class="insight-card">
+      <div class="label">サムネイル改善の原則</div>
+      <div class="val" style="color:#58a6ff;font-size:16px">0.3秒の勝負</div>
+      <div class="desc">楽天検索結果で目に止まる時間は0.3秒。<br>「何の商品か」「どんな良いことがあるか」が<br>即座に伝わる画像だけがクリックされる。</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       商品1: 枕（メイン商品）
+  ══════════════════════════════════════ -->
+  <div class="product-block">
+    <div class="product-header">
+      <div class="product-rank rank-1">1</div>
+      <div class="product-meta">
+        <h2>枕（メイン商品・Goosely®）</h2>
+        <p>最優先。楽天でCTR改善インパクトが最大。検索ボリューム「枕」「まくら」は年間数百万件。</p>
+      </div>
+    </div>
+
+    <div class="ba-grid">
+      <!-- BEFORE -->
+      <div class="thumb-wrap">
+        <div class="thumb-label label-before">BEFORE（現状・低CTR）</div>
+        <div class="thumb thumb-bad">
+          <div class="prod-img-bad">商品写真<br>（白背景<br>のみ）</div>
+          <div class="text-blob">Goosely 低反発枕<br>ふわふわ 快眠 安眠</div>
+          <div class="text-blob" style="font-size:8px;color:#888">商品名がそのまま<br>ベネフィットが不明</div>
+        </div>
+        <ul style="margin-top:10px;font-size:11px;color:#f85149;line-height:1.8;padding-left:16px">
+          <li>白背景＋商品のみで差別化できない</li>
+          <li>「誰のため」「どんな悩みに」が伝わらない</li>
+          <li>競合と見分けがつかない</li>
+          <li>文字が小さく0.3秒で読めない</li>
+        </ul>
+      </div>
+
+      <div class="ba-arrow">→</div>
+
+      <!-- AFTER -->
+      <div class="thumb-wrap">
+        <div class="thumb-label label-after">AFTER（目標・高CTR設計）</div>
+        <div class="thumb t1-after">
+          <div class="t1-lifestyle">
+            <div class="t1-pillow"></div>
+          </div>
+          <div class="t1-badge-wrap">
+            <div class="t1-badge-main">肩こり・首痛に<br>眠れる枕</div>
+            <div class="t1-badge-sub">▶ 専門家監修 ｜ 3万人以上が実感</div>
+          </div>
+          <div class="t1-review">★4.7（2,381件）</div>
+          <div class="t1-cta">詳しく見る</div>
+        </div>
+        <ul style="margin-top:10px;font-size:11px;color:#3fb950;line-height:1.8;padding-left:16px">
+          <li>悩み解決ワード「肩こり・首痛」を最上部に</li>
+          <li>ライフスタイル感で「使っているシーン」を想起</li>
+          <li>レビュー数で社会的証明を即表示</li>
+          <li>文字は大きく・上半分に集約</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px 16px;font-size:12px;line-height:1.8;color:#c9d1d9">
+      <strong style="color:#fff;font-size:13px">📐 制作指示（デザイナーへ）</strong><br>
+      ① 上部1/3に黒背景グラデーション＋白文字で「肩こり・首痛に眠れる枕」（フォント太め24px以上）<br>
+      ② 中央に枕単体写真（背景は自然な寝室風・ベージュ系）<br>
+      ③ 左下に黄色の星レビュー＋件数（最新数値を使用）<br>
+      ④ 右下に赤背景の「詳しく見る」ボタン風バッジ<br>
+      ⑤ 画像サイズ：628×628px（楽天推奨）<br>
+      ⑥ 参考競合：楽天市場「枕 低反発」1位〜3位のサムネイルを分析して差別化
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       商品2: 電位治療掛け布団
+  ══════════════════════════════════════ -->
+  <div class="product-block">
+    <div class="product-header">
+      <div class="product-rank rank-2">2</div>
+      <div class="product-meta">
+        <h2>電位治療掛け布団</h2>
+        <p>3月キャンペーンで200万円販売の実績商品。高単価・独自性が高く「なんだこれ？」を誘発するサムネイルが有効。</p>
+      </div>
+    </div>
+
+    <div class="ba-grid">
+      <div class="thumb-wrap">
+        <div class="thumb-label label-before">BEFORE（現状・低CTR）</div>
+        <div class="thumb thumb-bad">
+          <div class="prod-img-bad">掛け布団<br>写真<br>（平置き）</div>
+          <div class="text-blob">電位治療掛け布団<br>Goosely</div>
+          <div class="text-blob" style="font-size:8px;color:#888">商品の特性が<br>全く伝わらない</div>
+        </div>
+        <ul style="margin-top:10px;font-size:11px;color:#f85149;line-height:1.8;padding-left:16px">
+          <li>「電位治療」の意味・効果が見えない</li>
+          <li>普通の布団と区別がつかない</li>
+          <li>高単価の価値が伝わらない</li>
+        </ul>
+      </div>
+
+      <div class="ba-arrow">→</div>
+
+      <div class="thumb-wrap">
+        <div class="thumb-label label-after">AFTER（目標・高CTR設計）</div>
+        <div class="thumb t2-after">
+          <div class="t2-glow"></div>
+          <div class="t2-title">
+            <div class="t2-title-main">寝ながら電位治療</div>
+            <div class="t2-title-sub">〜独自技術で睡眠中にケア〜</div>
+          </div>
+          <div class="t2-price-tag">期間限定<br>20%OFF</div>
+          <div class="t2-wave">
+            <div class="t2-wave-line" style="height:24px;animation:wave1 1.5s ease-in-out infinite alternate"></div>
+            <div class="t2-wave-line" style="height:36px"></div>
+            <div class="t2-wave-line" style="height:20px"></div>
+            <div class="t2-wave-line" style="height:32px"></div>
+            <div class="t2-wave-line" style="height:16px"></div>
+            <div class="t2-wave-line" style="height:28px"></div>
+          </div>
+          <div class="t2-feature">
+            <div class="t2-feat-pill">電位エネルギー</div>
+            <div class="t2-feat-pill">寝るだけOK</div>
+            <div class="t2-feat-pill">肩こり・冷え</div>
+          </div>
+          <div class="t2-futon"></div>
+        </div>
+        <ul style="margin-top:10px;font-size:11px;color:#3fb950;line-height:1.8;padding-left:16px">
+          <li>「寝ながら電位治療」で好奇心を刺激</li>
+          <li>ブルーの光で「科学・健康」を視覚的に表現</li>
+          <li>「期間限定」バッジで緊急性を付加</li>
+          <li>機能ワードをタグで3つ以内に絞る</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px 16px;font-size:12px;line-height:1.8;color:#c9d1d9">
+      <strong style="color:#fff;font-size:13px">📐 制作指示（デザイナーへ）</strong><br>
+      ① 背景：深紺〜黒グラデーション（宇宙・テクノロジー感）<br>
+      ② 中央：青白い光の波形・オーラ表現（Photoshopでブラシ or AI生成）で「電気・エネルギー」を視覚化<br>
+      ③ 手前：布団の商品写真（斜め・立体的に配置）<br>
+      ④ 上部大文字：「寝ながら電位治療」（白文字・ネオン風グロー効果）<br>
+      ⑤ 右上：赤バッジ「キャンペーン中」or「20%OFF」<br>
+      ⑥ 下部：「電位エネルギー」「寝るだけOK」「肩こり・冷え対策」の3タグ<br>
+      ⑦ 参考：医療機器・健康器具のサムネイルスタイルを参照（楽天「電位治療器」検索）
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       商品3: そば殻角枕（新商品）
+  ══════════════════════════════════════ -->
+  <div class="product-block">
+    <div class="product-header">
+      <div class="product-rank rank-3">3</div>
+      <div class="product-meta">
+        <h2>そば殻角枕（新商品）</h2>
+        <p>2026年3月販売開始の差別化商品。「角枕」という珍しさ＋「そば殻」という素材の安心感が武器。白背景プロダクト型が最適。</p>
+      </div>
+    </div>
+
+    <div class="ba-grid">
+      <div class="thumb-wrap">
+        <div class="thumb-label label-before">BEFORE（現状・低CTR）</div>
+        <div class="thumb thumb-bad">
+          <div class="prod-img-bad">正方形の<br>枕写真<br>（斜め）</div>
+          <div class="text-blob">そば殻角枕<br>日本製</div>
+          <div class="text-blob" style="font-size:8px;color:#888">丸枕との違いが<br>伝わらない</div>
+        </div>
+        <ul style="margin-top:10px;font-size:11px;color:#f85149;line-height:1.8;padding-left:16px">
+          <li>「なぜ四角なのか」が伝わらない</li>
+          <li>そば殻の良さ（通気性・高さ調節）が見えない</li>
+          <li>「新商品」の訴求がない</li>
+        </ul>
+      </div>
+
+      <div class="ba-arrow">→</div>
+
+      <div class="thumb-wrap">
+        <div class="thumb-label label-after">AFTER（目標・高CTR設計）</div>
+        <div class="thumb t3-after">
+          <div class="t3-bg-circle"></div>
+          <div class="t3-top-band">
+            <div class="t3-top-text">高さ自由に調整できる枕</div>
+            <div class="t3-top-sub">そば殻100%｜蒸れない｜洗える</div>
+          </div>
+          <div class="t3-pillow-wrap">
+            <div class="t3-square">
+              <div class="t3-soba">そば殻 100%使用</div>
+            </div>
+          </div>
+          <div class="t3-new-badge">NEW</div>
+          <div class="t3-bottom">
+            <div>
+              <div class="t3-stars">★★★★★</div>
+              <div class="t3-review-cnt" style="color:#888">新着・レビュー募集中</div>
+            </div>
+            <div style="font-size:9px;color:#888;text-align:right">日本製<br>Goosely®</div>
+          </div>
+        </div>
+        <ul style="margin-top:10px;font-size:11px;color:#3fb950;line-height:1.8;padding-left:16px">
+          <li>「高さを自由に調整」→ 購入障壁を最大の訴求に</li>
+          <li>白背景で商品の「形の珍しさ」を際立たせる</li>
+          <li>素材（そば殻100%）を商品上に直接記載</li>
+          <li>「NEW」バッジで新鮮さをアピール</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px 16px;font-size:12px;line-height:1.8;color:#c9d1d9">
+      <strong style="color:#fff;font-size:13px">📐 制作指示（デザイナーへ）</strong><br>
+      ① 背景：純白＋中央に薄いベージュの円（商品を浮かせる）<br>
+      ② 商品：角枕を真上から撮影し、中央に大きく配置（商品の「四角さ」を最大限に見せる）<br>
+      ③ 上部バンド：深緑背景に「高さ自由に調整できる枕」（白文字・16px相当）<br>
+      ④ 上部サブ：「そば殻100%｜蒸れない｜洗える」（10px・緑系文字）<br>
+      ⑤ 商品上に「そば殻 100%使用」ラベル貼り付け（実物撮影 or 合成）<br>
+      ⑥ 右上に「NEW」赤バッジ<br>
+      ⑦ 下部にブランドロゴ「Goosely®」＋「日本製」を小さく
+    </div>
+  </div>
+
+  <!-- ── 共通ルール ── -->
+  <div class="sec">共通デザインルール</div>
+  <div class="rule-grid">
+    <div class="rule-card">
+      <h3 style="color:#3fb950">✅ 必ずやること（DO）</h3>
+      <div class="rule-item"><span class="icon">📝</span>悩み解決ワードを上部1/3に大きく配置（「肩こり」「眠れない」「蒸れない」）</div>
+      <div class="rule-item"><span class="icon">⭐</span>レビュー数・星評価を左下に常に表示</div>
+      <div class="rule-item"><span class="icon">🔴</span>キャンペーン時は右上に赤バッジ（OFF率 or 限定）</div>
+      <div class="rule-item"><span class="icon">📐</span>文字は「上半分」に集約。下半分は商品画像</div>
+      <div class="rule-item"><span class="icon">🖼</span>628×628px以上（楽天推奨サイズ）</div>
+      <div class="rule-item"><span class="icon">🔤</span>フォントは太め（Bold/Black）。検索結果での視認性優先</div>
+    </div>
+    <div class="rule-card">
+      <h3 style="color:#f85149">❌ やってはいけないこと（DON'T）</h3>
+      <div class="rule-item"><span class="icon">🚫</span>商品写真だけの白背景（競合と区別不可）</div>
+      <div class="rule-item"><span class="icon">🚫</span>文字を詰め込みすぎる（3行以上は読まれない）</div>
+      <div class="rule-item"><span class="icon">🚫</span>薄い色・淡いグラデーションのみ（目立たない）</div>
+      <div class="rule-item"><span class="icon">🚫</span>商品名をそのままテキストに使う（「Goosely 低反発枕」）</div>
+      <div class="rule-item"><span class="icon">🚫</span>余白が多すぎる（商品が小さく見える）</div>
+      <div class="rule-item"><span class="icon">🚫</span>競合と同じカラーパレット・構図</div>
+    </div>
+  </div>
+
+  <!-- ── 実施チェックリスト ── -->
+  <div class="sec">6月 実施チェックリスト</div>
+  <div class="checklist">
+    <h3>サムネイル刷新 タスク</h3>
+    <div class="check-item">
+      <div class="chk" onclick="toggle(this)"></div>
+      <div><strong>楽天検索で「枕」「低反発枕」「まくら 肩こり」を検索し、1〜5位のサムネイルを画像保存して分析する</strong><br>
+      <span style="color:#8b949e;font-size:11px">→ 差別化ポイントを特定してデザイナーに共有</span></div>
+    </div>
+    <div class="check-item">
+      <div class="chk" onclick="toggle(this)"></div>
+      <div><strong>枕・電位布団・角枕の商品写真を各3パターン以上撮影（白背景・ライフスタイル・アップ）</strong><br>
+      <span style="color:#8b949e;font-size:11px">→ デザイナーに素材として渡す</span></div>
+    </div>
+    <div class="check-item">
+      <div class="chk" onclick="toggle(this)"></div>
+      <div><strong>枕メイン商品のサムネイルをAFTER設計書に基づき制作・アップロード（最優先）</strong><br>
+      <span style="color:#8b949e;font-size:11px">→ 1週間後のCTRを必ず確認する</span></div>
+    </div>
+    <div class="check-item">
+      <div class="chk" onclick="toggle(this)"></div>
+      <div><strong>電位治療掛け布団のサムネイルを制作・差替え</strong><br>
+      <span style="color:#8b949e;font-size:11px">→ 「寝ながら電位治療」コピーでABテスト実施（旧画像も残す）</span></div>
+    </div>
+    <div class="check-item">
+      <div class="chk" onclick="toggle(this)"></div>
+      <div><strong>そば殻角枕のサムネイルを制作・差替え（白背景プロダクト型）</strong></div>
+    </div>
+    <div class="check-item">
+      <div class="chk" onclick="toggle(this)"></div>
+      <div><strong>差替え2週間後に楽天RMSでCTR・アクセス数を計測しこのガイドに追記する</strong><br>
+      <span style="color:#8b949e;font-size:11px">→ 目標: CTR 0.06% → 0.12%以上</span></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+<div class="footer">株式会社ネオ・ゲート ｜ 楽天CTR改善プロジェクト ｜ 2026年6月</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('done');
+  if (el.classList.contains('done')) el.textContent = '✓';
+  else el.textContent = '';
+  // 状態保存
+  var items = document.querySelectorAll('.chk');
+  var state = [];
+  items.forEach(function(e){ state.push(e.classList.contains('done')); });
+  localStorage.setItem('thumb_checklist', JSON.stringify(state));
+}
+// 状態復元
+(function(){
+  var s = JSON.parse(localStorage.getItem('thumb_checklist') || '[]');
+  var items = document.querySelectorAll('.chk');
+  items.forEach(function(e,i){ if(s[i]){ e.classList.add('done'); e.textContent='✓'; } });
+})();
+</script>
+</body>
+</html>
