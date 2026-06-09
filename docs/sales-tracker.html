@@ -895,6 +895,17 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
   var lastTime = localStorage.getItem('gas_last_time');
   var today    = new Date().toLocaleDateString('ja-JP');
 
+  /* 手動入力を先に復元（setAutoSales が gv('in-y-monthly') を読むため必ず先に実行） */
+  var ms = JSON.parse(localStorage.getItem('manual_sales') || '{}');
+  ['r','a','y','total'].forEach(function(k) {
+    var m = ms[k === 'total' ? 'tm' : k + 'm'];
+    var t = ms[k === 'total' ? 'tt' : k + 't'];
+    if (m) document.getElementById('in-' + k + '-monthly').value = m;
+    if (t) document.getElementById('in-' + k + '-today').value   = t;
+  });
+  var mts = localStorage.getItem('manual_updated');
+  if (mts) sv('updated-at', '前回保存: ' + mts);
+
   if (last) {
     try {
       var data = JSON.parse(last);
@@ -916,17 +927,7 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
   setStatus('ing', 'データを自動取得中...');
   fetchGAS();
 
-  /* 手動入力を復元 */
-  var ms = JSON.parse(localStorage.getItem('manual_sales') || '{}');
-  if (ms.rm || ms.am) {
-    ['r','a','y','total'].forEach(function(k) {
-      var m = ms[k === 'total' ? 'tm' : k + 'm'];
-      var t = ms[k === 'total' ? 'tt' : k + 't'];
-      if (m) document.getElementById('in-' + k + '-monthly').value = m;
-      if (t) document.getElementById('in-' + k + '-today').value   = t;
-    });
-    var ts = localStorage.getItem('manual_updated');
-    if (ts) sv('updated-at', '前回保存: ' + ts);
+  if (ms.rm || ms.am || ms.ym) {
     setManualSales();
   } else {
     recalc(); // 目標だけで初期描画
