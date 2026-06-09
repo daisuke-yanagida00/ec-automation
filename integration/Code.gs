@@ -638,24 +638,23 @@ function getSalesSummary_() {
   if (!sheet) return { error: 'シートが存在しません' };
 
   var lastRow = sheet.getLastRow();
-  if (lastRow <= 1) return { date: '', today: {}, yesterday: {}, monthly: {} };
+  if (lastRow <= 1) return { date: '', today: {}, yesterday: {}, monthly: {}, daily: [] };
 
   var data = sheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
 
   var now         = new Date();
   var today       = Utilities.formatDate(now, 'Asia/Tokyo', 'yyyy/MM/dd');
-  var monthPrefix = today.slice(0, 7); // 'yyyy/MM'
+  var monthPrefix = today.slice(0, 7);
 
-  // 昨日の日付
-  var yd = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  var yd        = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   var yesterday = Utilities.formatDate(yd, 'Asia/Tokyo', 'yyyy/MM/dd');
 
   var todayM     = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
   var yesterdayM = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
   var monthlyM   = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
 
-  // 楽天は ORDER_ID 単位で重複排除（totalPrice が行ごとに繰り返されるため）
   var r_today = {}, r_yesterday = {}, r_monthly = {};
+  var dailyMap = {}, r_daily = {};
 
   data.forEach(function(row) {
     var orderDate = row[COL.ORDER_DATE];
@@ -677,17 +676,35 @@ function getSalesSummary_() {
       }
     }
 
-    if (dateStr.slice(0, 7) === monthPrefix) add(monthlyM,   r_monthly);
-    if (dateStr === today)                    add(todayM,     r_today);
-    if (dateStr === yesterday)                add(yesterdayM, r_yesterday);
+    if (dateStr.slice(0, 7) === monthPrefix) {
+      add(monthlyM, r_monthly);
+      // 日別集計
+      if (!dailyMap[dateStr]) dailyMap[dateStr] = { r: 0, a: 0, y: 0 };
+      if (mall === '楽天') {
+        if (!r_daily[dateStr]) r_daily[dateStr] = {};
+        if (!r_daily[dateStr][orderId]) { r_daily[dateStr][orderId] = true; dailyMap[dateStr].r += price; }
+      } else if (mall === 'Amazon') {
+        dailyMap[dateStr].a += price;
+      } else if (mall === 'Yahoo') {
+        dailyMap[dateStr].y += price;
+      }
+    }
+    if (dateStr === today)     add(todayM,     r_today);
+    if (dateStr === yesterday) add(yesterdayM, r_yesterday);
+  });
+
+  var daily = Object.keys(dailyMap).sort().map(function(d) {
+    var v = dailyMap[d];
+    return { date: d.slice(5), r: Math.round(v.r), a: Math.round(v.a), y: Math.round(v.y) };
   });
 
   return {
-    date:      today,
-    yesterday: yesterday,
-    today:     todayM,
+    date:       today,
+    yesterday:  yesterday,
+    today:      todayM,
     yesterdayS: yesterdayM,
-    monthly:   monthlyM
+    monthly:    monthlyM,
+    daily:      daily
   };
 }
 

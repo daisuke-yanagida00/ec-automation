@@ -148,6 +148,44 @@ body {
 .store-bar-fill { height: 8px; border-radius: 4px; transition: width .6s; }
 .store-bar-foot { display: flex; justify-content: space-between; font-size: 10px; color: #8b949e; margin-top: 4px; }
 
+/* ── DAILY CHART ── */
+.chart-card {
+  background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+  padding: 16px 18px; margin-bottom: 14px;
+}
+.chart-legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #8b949e; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.chart-scroll { overflow-x: auto; padding-bottom: 4px; }
+.chart-inner {
+  display: flex; align-items: flex-end; gap: 3px;
+  height: 180px; position: relative; min-width: 0;
+}
+.chart-target-line {
+  position: absolute; left: 0; right: 0; height: 0;
+  border-top: 2px dashed #484f58; z-index: 2; pointer-events: none;
+}
+.chart-target-label {
+  position: absolute; right: 0; font-size: 9px; color: #8b949e;
+  background: #161b22; padding: 0 3px; transform: translateY(-100%);
+}
+.day-col {
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1; min-width: 26px; max-width: 48px; height: 100%;
+  justify-content: flex-end;
+}
+.day-bars { width: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+.bar-seg { width: 100%; min-height: 0; transition: height .4s cubic-bezier(.4,0,.2,1); }
+.bar-seg.seg-r { background: #d29922; border-radius: 0; }
+.bar-seg.seg-a { background: #58a6ff; border-radius: 0; }
+.bar-seg.seg-y { background: #f0883e; border-radius: 3px 3px 0 0; }
+.bar-seg:last-child { border-radius: 3px 3px 0 0; }
+.day-col.is-today .day-bars { outline: 2px solid #58a6ff; outline-offset: 1px; border-radius: 3px; }
+.day-label { font-size: 9px; color: #8b949e; margin-top: 4px; white-space: nowrap; text-align: center; }
+.day-col.is-today .day-label { color: #58a6ff; font-weight: 700; }
+.day-amt { font-size: 9px; color: #c9d1d9; font-weight: 600; text-align: center; margin-top: 1px; white-space: nowrap; }
+.chart-empty { text-align: center; color: #484f58; font-size: 12px; padding: 40px 0; }
+
 /* ── REMAINING BOX ── */
 .remaining-box {
   background: #161b22; border: 1px solid #30363d; border-radius: 10px;
@@ -448,6 +486,23 @@ body {
     </div>
   </div>
 
+  <!-- ── 日次売上グラフ ── -->
+  <div class="sec" style="margin-top:20px">日次売上グラフ（当月）</div>
+  <div class="chart-card">
+    <div class="chart-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#d29922"></div>楽天</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div>Amazon</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f0883e"></div>Yahoo!</div>
+      <div class="legend-item"><div style="width:18px;height:0;border-top:2px dashed #484f58"></div>日次目標</div>
+      <div class="legend-item" style="margin-left:auto;color:#58a6ff;font-weight:700">■ 今日</div>
+    </div>
+    <div class="chart-scroll">
+      <div class="chart-inner" id="daily-chart">
+        <div class="chart-empty">売上を自動取得すると表示されます</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── 残り必要額 ── -->
   <div class="remaining-box" id="remaining-box" style="display:none">
     <div class="remaining-main">
@@ -531,6 +586,7 @@ function setAutoSales(data) {
   SALES.total.yesterday   = SALES.gasBase.yesterday;
   renderSalesDisplay('live');
   recalc();
+  renderDailyChart(data.daily || [], gv('in-y-monthly'));
 }
 
 function updateYahooManual() {
@@ -681,6 +737,70 @@ function recalcStore(id, target, monthly, today) {
   sv('sk-' + id + '-today',   fy(today));
   sv('sk-' + id + '-pct',     target > 0 ? pct.toFixed(1) + '%' : '—%');
   sv('sfoot-' + id, '目標: ' + fy(target));
+}
+
+/* ── 日次棒グラフ描画 ── */
+function renderDailyChart(dailyArr, yahooMonthly) {
+  var container = document.getElementById('daily-chart');
+  if (!dailyArr || dailyArr.length === 0) {
+    container.innerHTML = '<div class="chart-empty">当月データなし</div>';
+    return;
+  }
+
+  var dailyTarget = gv('t-total') > 0 ? Math.round(gv('t-total') / DAYS) : 0;
+  var todayStr    = TODAY_LABEL; // 'M/D'
+
+  // Yahoo!手動値を日数で按分（GASにYahoo!データがない場合の補完）
+  var yahooPerDay = 0;
+  if (yahooMonthly > 0) {
+    var daysWithData = dailyArr.length || 1;
+    yahooPerDay = Math.round(yahooMonthly / daysWithData);
+  }
+
+  // 各日の合計（Yahoo!はGASに入っていないため手動値を加算）
+  var maxVal = dailyTarget * 1.5;
+  dailyArr.forEach(function(d) {
+    var tot = d.r + d.a + d.y + yahooPerDay;
+    if (tot > maxVal) maxVal = tot;
+  });
+  if (maxVal === 0) maxVal = 1;
+
+  var chartH = 160; // px
+
+  var html = '';
+
+  // 目標ライン（高さ %）
+  var targetPct = Math.min(100, (dailyTarget / maxVal) * 100);
+
+  if (dailyTarget > 0) {
+    html += '<div class="chart-target-line" style="bottom:' + targetPct + '%">'
+          + '<span class="chart-target-label">' + Math.round(dailyTarget/10000) + '万</span>'
+          + '</div>';
+  }
+
+  dailyArr.forEach(function(d) {
+    var yVal  = d.y + yahooPerDay;
+    var total = d.r + d.a + yVal;
+    var isToday = (d.date === todayStr);
+
+    var rH = maxVal > 0 ? (d.r  / maxVal * chartH) : 0;
+    var aH = maxVal > 0 ? (d.a  / maxVal * chartH) : 0;
+    var yH = maxVal > 0 ? (yVal / maxVal * chartH) : 0;
+
+    var amtLabel = total >= 10000 ? Math.round(total/10000) + '万' : total > 0 ? Math.round(total/1000) + '千' : '0';
+
+    html += '<div class="day-col' + (isToday ? ' is-today' : '') + '">'
+          +   '<div class="day-amt">' + amtLabel + '</div>'
+          +   '<div class="day-bars" style="height:' + chartH + 'px">'
+          +     (yH > 0 ? '<div class="bar-seg seg-y" style="height:' + yH.toFixed(1) + 'px"></div>' : '')
+          +     (aH > 0 ? '<div class="bar-seg seg-a" style="height:' + aH.toFixed(1) + 'px"></div>' : '')
+          +     (rH > 0 ? '<div class="bar-seg seg-r" style="height:' + rH.toFixed(1) + 'px"></div>' : '')
+          +   '</div>'
+          +   '<div class="day-label">' + d.date + '</div>'
+          + '</div>';
+  });
+
+  container.innerHTML = html;
 }
 
 /* ── GAS 自動取得（JSONP でCORSを回避） ── */
