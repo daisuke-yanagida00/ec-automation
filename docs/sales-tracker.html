@@ -304,9 +304,11 @@ body {
           <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-r-td">今日</div>
         </div>
       </div>
-      <div style="display:flex;gap:4px;margin-top:8px">
-        <input type="number" id="in-r-monthly" placeholder="累計（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
+      <div style="display:flex;gap:4px;margin-top:8px;align-items:stretch">
+        <div style="flex:1;text-align:center;background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:4px 6px;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-size:13px;font-weight:700;color:#d29922" id="daily-target-r">—</div>
+          <div style="font-size:9px;color:#8b949e;margin-top:2px">日次目標</div>
+        </div>
         <input type="number" id="in-r-today" placeholder="今日（手動）"
                style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
@@ -327,9 +329,11 @@ body {
           <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-a-td">今日</div>
         </div>
       </div>
-      <div style="display:flex;gap:4px;margin-top:8px">
-        <input type="number" id="in-a-monthly" placeholder="累計（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
+      <div style="display:flex;gap:4px;margin-top:8px;align-items:stretch">
+        <div style="flex:1;text-align:center;background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:4px 6px;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-size:13px;font-weight:700;color:#58a6ff" id="daily-target-a">—</div>
+          <div style="font-size:9px;color:#8b949e;margin-top:2px">日次目標</div>
+        </div>
         <input type="number" id="in-a-today" placeholder="今日（手動）"
                style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
@@ -350,11 +354,12 @@ body {
           <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-y-td">今日</div>
         </div>
       </div>
-      <div style="display:flex;gap:4px;margin-top:8px">
+      <div style="display:flex;gap:4px;margin-top:8px;align-items:stretch">
+        <div style="flex:1;text-align:center;background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:4px 6px;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-size:13px;font-weight:700;color:#f0883e" id="daily-target-y">—</div>
+          <div style="font-size:9px;color:#8b949e;margin-top:2px">日次目標</div>
+        </div>
         <input type="number" id="in-y-monthly" placeholder="今月累計"
-               oninput="updateYahooManual();saveManual()"
-               style="flex:1;background:#0d1117;border:1px solid #f0883e;border-radius:5px;color:#f0883e;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
-        <input type="number" id="in-y-today" placeholder="今日"
                oninput="updateYahooManual();saveManual()"
                style="flex:1;background:#0d1117;border:1px solid #f0883e;border-radius:5px;color:#f0883e;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
@@ -552,7 +557,7 @@ function fy(n) {
 }
 function fp(r) { return isNaN(r) ? '—%' : (r*100).toFixed(1) + '%'; }
 function cl(v) { return Math.min(100, Math.max(0, isNaN(v) ? 0 : v)); }
-function gv(id) { return parseInt(document.getElementById(id).value) || 0; }
+function gv(id) { var el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; }
 function sv(id, v) { document.getElementById(id).textContent = v; }
 
 /* ── 現在の実績値（GAS自動 or 手動） ── */
@@ -578,9 +583,9 @@ function setAutoSales(data) {
   SALES.gasBase.monthly   = (data.monthly   || {}).total   || 0;
   SALES.gasBase.today     = (data.today     || {}).total   || 0;
   SALES.gasBase.yesterday = (ys).total   || 0;
-  // Yahoo! は常に手動入力を使用
+  // Yahoo! は常に手動入力（月次累計のみ）
   SALES.yahoo.monthly     = gv('in-y-monthly');
-  SALES.yahoo.today       = gv('in-y-today');
+  SALES.yahoo.today       = 0;
   SALES.yahoo.yesterday   = 0;
   // 合計 = GAS（楽天+Amazon）+ Yahoo!手動
   SALES.total.monthly     = SALES.gasBase.monthly   + SALES.yahoo.monthly;
@@ -593,12 +598,11 @@ function setAutoSales(data) {
 
 function updateYahooManual() {
   SALES.yahoo.monthly = gv('in-y-monthly');
-  SALES.yahoo.today   = gv('in-y-today');
+  SALES.yahoo.today   = 0;
   if (SALES.source === 'auto') {
     SALES.total.monthly = SALES.gasBase.monthly + SALES.yahoo.monthly;
-    SALES.total.today   = SALES.gasBase.today   + SALES.yahoo.today;
-    sv('av-y-monthly', fy(SALES.yahoo.monthly));
-    sv('av-y-today',   fy(SALES.yahoo.today));
+    SALES.total.today   = SALES.gasBase.today;
+    sv('av-y-monthly',     fy(SALES.yahoo.monthly));
     sv('av-total-monthly', fy(SALES.total.monthly));
     sv('av-total-today',   fy(SALES.total.today));
   }
@@ -607,14 +611,12 @@ function updateYahooManual() {
 
 function setManualSales() {
   SALES.source          = 'manual';
-  SALES.rakuten.monthly = gv('in-r-monthly');
   SALES.rakuten.today   = gv('in-r-today');
-  SALES.amazon.monthly  = gv('in-a-monthly');
   SALES.amazon.today    = gv('in-a-today');
   SALES.yahoo.monthly   = gv('in-y-monthly');
-  SALES.yahoo.today     = gv('in-y-today');
-  var tt = gv('in-total-today');
+  SALES.yahoo.today     = 0;
   SALES.total.monthly = SALES.rakuten.monthly + SALES.amazon.monthly + SALES.yahoo.monthly;
+  var tt = gv('in-total-today');
   SALES.total.today   = tt || (SALES.rakuten.today + SALES.amazon.today + SALES.yahoo.today);
   renderSalesDisplay('manual');
   recalc();
@@ -652,9 +654,16 @@ function recalc() {
   var needed      = Math.max(0, monthly - cum);
   var reqDaily    = REMAIN_DAYS > 0 ? needed / REMAIN_DAYS : 0;
 
-  /* 日次目標表示を更新 */
+  /* 日次目標表示を更新（合計・各モール） */
   var dtEl = document.getElementById('daily-target-display');
   if (dtEl) dtEl.textContent = dailyTarget > 0 ? fy(Math.round(dailyTarget)) : '—';
+  var rdt = gv('t-rakuten'), adt = gv('t-amazon'), ydt = gv('t-yahoo');
+  var drEl = document.getElementById('daily-target-r');
+  if (drEl) drEl.textContent = rdt > 0 ? fy(Math.round(rdt / DAYS)) : '—';
+  var daEl = document.getElementById('daily-target-a');
+  if (daEl) daEl.textContent = adt > 0 ? fy(Math.round(adt / DAYS)) : '—';
+  var dyEl = document.getElementById('daily-target-y');
+  if (dyEl) dyEl.textContent = ydt > 0 ? fy(Math.round(ydt / DAYS)) : '—';
 
   /* 月次バー */
   var mPct   = cl(mRatio * 100);
@@ -870,9 +879,9 @@ function setStatus(cls, msg) {
 function saveManual() {
   setManualSales();
   var s = {
-    rm: gv('in-r-monthly'), rt: gv('in-r-today'),
-    am: gv('in-a-monthly'), at: gv('in-a-today'),
-    ym: gv('in-y-monthly'), yt: gv('in-y-today'),
+    rt: gv('in-r-today'),
+    at: gv('in-a-today'),
+    ym: gv('in-y-monthly'),
     tt: gv('in-total-today')
   };
   localStorage.setItem('manual_sales', JSON.stringify(s));
@@ -909,10 +918,9 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
 
   /* 手動入力を先に復元（setAutoSales が gv('in-y-monthly') を読むため必ず先に実行） */
   var ms = JSON.parse(localStorage.getItem('manual_sales') || '{}');
-  ['r','a','y'].forEach(function(k) {
-    if (ms[k + 'm']) document.getElementById('in-' + k + '-monthly').value = ms[k + 'm'];
-    if (ms[k + 't']) document.getElementById('in-' + k + '-today').value   = ms[k + 't'];
-  });
+  if (ms.rt) document.getElementById('in-r-today').value    = ms.rt;
+  if (ms.at) document.getElementById('in-a-today').value    = ms.at;
+  if (ms.ym) document.getElementById('in-y-monthly').value  = ms.ym;
   if (ms.tt) document.getElementById('in-total-today').value = ms.tt;
   var mts = localStorage.getItem('manual_updated');
   if (mts) sv('updated-at', '前回保存: ' + mts);
