@@ -950,9 +950,12 @@ function integrateAmazonOrdersForMonth_(year, month) {
   var sheet     = getOrCreateSheet_();
   var existsSet = loadExistingOrderIds_(sheet);
 
-  var jstOffset = 9 * 60 * 60 * 1000;
-  var startUtc  = new Date(Date.UTC(year, month - 1, 1,  0,  0,  0) - jstOffset);
-  var endUtc    = new Date(Date.UTC(year, month,     0, 23, 59, 59) - jstOffset);
+  var jstOffset   = 9 * 60 * 60 * 1000;
+  var startUtc    = new Date(Date.UTC(year, month - 1, 1,  0,  0,  0) - jstOffset);
+  var monthEndUtc = new Date(Date.UTC(year, month,     0, 23, 59, 59) - jstOffset);
+  var nowMinus5   = new Date(Date.now() - 5 * 60 * 1000);
+  // 月末が未来の場合（今月）は「現在-5分」を上限にする
+  var endUtc = monthEndUtc < nowMinus5 ? monthEndUtc : nowMinus5;
 
   var orders = fetchAllAmazonOrders_(token, startUtc.toISOString(), endUtc.toISOString());
   Logger.log('Amazon ' + year + '/' + month + ': ' + orders.length + '件取得');
@@ -985,4 +988,12 @@ function backfillAmazonMayJune() {
   var cnt6 = integrateAmazonOrdersForMonth_(2026, 6);
   Logger.log('6月完了: ' + cnt6 + '行追記');
   Logger.log('=== バックフィル完了: 合計 ' + (cnt5 + cnt6) + '行 ===');
+}
+
+// 6月のみ再実行用（5月は完了済み）
+function backfillAmazonJune() {
+  Logger.log('=== Amazon バックフィル開始（2026年6月）===');
+  var cnt = integrateAmazonOrdersForMonth_(2026, 6);
+  Logger.log('6月完了: ' + cnt + '行追記');
+  Logger.log('=== バックフィル完了 ===');
 }
