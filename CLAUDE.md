@@ -110,6 +110,32 @@ ec-automation/
 - `integration/Code.gs` にWebアプリ関数追加（doGet・getSalesSummary_）
 - GitHub Pages公開ページ：agent-management.html / sales-tracker.html / thumbnail-guide.html
 
+## 2026-06-09 作業記録
+
+### 完了
+- **売上ダッシュボード大幅改善**：`docs/sales-tracker.html` をデバッグ・機能追加
+  - 金額表示を `¥1.56M` 形式 → `万円` 形式に変更（例：274万円）
+  - 「今日」「昨日」の表示 → 実際の日付ラベル（例：6/9, 6/8）に変更
+  - Yahoo! 売上をAPI（IP制限でブロック）から手動入力方式に変更（オレンジ枠のinputフィールド）
+  - 日別売上棒グラフ追加：楽天（金）・Amazon（青）・Yahoo!（オレンジ）の積み上げバー、目標ライン（破線）付き
+- **Amazon注文バックフィル実装**：5月9日〜6月のトリガー停止期間中の未取得注文を補完
+  - `backfillAmazonMayJune()` 関数作成：5月551行・6月129行追加
+  - Amazon SP-API の `CreatedBefore` は現在時刻より過去である必要があるため、`now - 5分` でキャップする修正
+- **GAS `getSalesSummary_()` に日別データ追加**：`daily` 配列を返すよう拡張（棒グラフ用）
+- **Yahoo! OAuth調査（結果：断念）**：GASサーバーIPがYahoo! Shopping Order APIでブロック（px-04306エラー）。手動入力に切り替え済み
+
+### 決定事項
+- **GAS Web App URL（更新版）**：`https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKllfA__C8OsDGrNkwVfp2sh6EQGpZKsKMavEtp9B422kq8XGiw/exec`
+  - 旧URL（AKfycbwN...）は廃止、新URL（AKfycbzn...）を sales-tracker.html に設定済み
+- **GASデプロイ運用ルール確定**：「新しいデプロイ」ではなく「デプロイを管理→鉛筆→新しいバージョン→デプロイ」でURLを維持しながら更新
+- **Yahoo! Shopping Order API**：Googleサーバー（GAS）からのアクセスはIP制限により永続的にブロック。Yahoo! 売上は手動入力で運用
+- **Amazon売上差異（~15-18%）**：SP-API（発送済みのみ）vs Seller Central（全ステータス）の仕様差として許容。ダッシュボードはSP-API基準
+
+### システム構成変更
+- `integration/Code.gs`：`getSalesSummary_()` に `daily` 配列追加、`backfillAmazonMayJune()` / `backfillAmazonJune()` 関数追加
+- `docs/sales-tracker.html`：Yahoo!手動入力・日別棒グラフ・万円表示・日付ラベル対応
+- GAS再デプロイ要（ユーザーが手動で「デプロイを管理→鉛筆→新しいバージョン→デプロイ」を実施）
+
 ## 運用ルール
 **このプロジェクトのセッション終了時は必ずCLAUDE.mdを更新すること。**
 - セッション終了前に「今日の作業内容をCLAUDE.mdに追記してgit pushして」を実行
