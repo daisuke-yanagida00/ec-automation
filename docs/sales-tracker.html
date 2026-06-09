@@ -296,7 +296,7 @@ body {
     </div>
 
     <div class="auto-card">
-      <span class="auto-badge" id="badge-y">手動</span>
+      <span class="auto-badge" id="badge-y" style="background:#271f00;color:#f0883e">手動入力</span>
       <div class="mall-label c-amber">Yahoo!</div>
       <div class="auto-val c-amber" id="av-y-monthly">—</div>
       <div class="auto-sub c-muted">今月累計</div>
@@ -311,11 +311,14 @@ body {
         </div>
       </div>
       <div style="display:flex;gap:4px;margin-top:8px">
-        <input type="number" id="in-y-monthly" placeholder="累計（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
-        <input type="number" id="in-y-today" placeholder="今日（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
+        <input type="number" id="in-y-monthly" placeholder="今月累計"
+               oninput="updateYahooManual();saveManual()"
+               style="flex:1;background:#0d1117;border:1px solid #f0883e;border-radius:5px;color:#f0883e;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
+        <input type="number" id="in-y-today" placeholder="今日"
+               oninput="updateYahooManual();saveManual()"
+               style="flex:1;background:#0d1117;border:1px solid #f0883e;border-radius:5px;color:#f0883e;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
+      <div style="font-size:9px;color:#8b949e;margin-top:4px;text-align:center">ストアクリエイターPro から入力</div>
     </div>
 
   </div>
@@ -491,7 +494,8 @@ var SALES = {
   rakuten: { monthly: 0, today: 0, yesterday: 0 },
   amazon:  { monthly: 0, today: 0, yesterday: 0 },
   yahoo:   { monthly: 0, today: 0, yesterday: 0 },
-  source:  'manual'
+  source:  'manual',
+  gasBase: { monthly: 0, today: 0, yesterday: 0 }  // GAS取得のRakuten+Amazon合計
 };
 
 function setAutoSales(data) {
@@ -503,13 +507,33 @@ function setAutoSales(data) {
   SALES.amazon.monthly    = (data.monthly   || {}).amazon  || 0;
   SALES.amazon.today      = (data.today     || {}).amazon  || 0;
   SALES.amazon.yesterday  = (ys).amazon  || 0;
-  SALES.yahoo.monthly     = (data.monthly   || {}).yahoo   || 0;
-  SALES.yahoo.today       = (data.today     || {}).yahoo   || 0;
-  SALES.yahoo.yesterday   = (ys).yahoo   || 0;
-  SALES.total.monthly     = (data.monthly   || {}).total   || 0;
-  SALES.total.today       = (data.today     || {}).total   || 0;
-  SALES.total.yesterday   = (ys).total   || 0;
+  // GASのRakuten+Amazon合計を保存（Yahoo!は含まない）
+  SALES.gasBase.monthly   = (data.monthly   || {}).total   || 0;
+  SALES.gasBase.today     = (data.today     || {}).total   || 0;
+  SALES.gasBase.yesterday = (ys).total   || 0;
+  // Yahoo! は常に手動入力を使用
+  SALES.yahoo.monthly     = gv('in-y-monthly');
+  SALES.yahoo.today       = gv('in-y-today');
+  SALES.yahoo.yesterday   = 0;
+  // 合計 = GAS（楽天+Amazon）+ Yahoo!手動
+  SALES.total.monthly     = SALES.gasBase.monthly   + SALES.yahoo.monthly;
+  SALES.total.today       = SALES.gasBase.today     + SALES.yahoo.today;
+  SALES.total.yesterday   = SALES.gasBase.yesterday;
   renderSalesDisplay('live');
+  recalc();
+}
+
+function updateYahooManual() {
+  SALES.yahoo.monthly = gv('in-y-monthly');
+  SALES.yahoo.today   = gv('in-y-today');
+  if (SALES.source === 'auto') {
+    SALES.total.monthly = SALES.gasBase.monthly + SALES.yahoo.monthly;
+    SALES.total.today   = SALES.gasBase.today   + SALES.yahoo.today;
+    sv('av-y-monthly', fy(SALES.yahoo.monthly));
+    sv('av-y-today',   fy(SALES.yahoo.today));
+    sv('av-total-monthly', fy(SALES.total.monthly));
+    sv('av-total-today',   fy(SALES.total.today));
+  }
   recalc();
 }
 
