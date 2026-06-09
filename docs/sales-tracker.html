@@ -279,9 +279,11 @@ body {
           <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-total-td">今日</div>
         </div>
       </div>
-      <div style="display:flex;gap:4px;margin-top:8px">
-        <input type="number" id="in-total-monthly" placeholder="累計（手動）"
-               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
+      <div style="display:flex;gap:4px;margin-top:8px;align-items:stretch">
+        <div style="flex:1;text-align:center;background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:4px 6px;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-size:13px;font-weight:700;color:#d29922" id="daily-target-display">—</div>
+          <div style="font-size:9px;color:#8b949e;margin-top:2px">日次目標</div>
+        </div>
         <input type="number" id="in-total-today" placeholder="今日（手動）"
                style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
@@ -611,10 +613,9 @@ function setManualSales() {
   SALES.amazon.today    = gv('in-a-today');
   SALES.yahoo.monthly   = gv('in-y-monthly');
   SALES.yahoo.today     = gv('in-y-today');
-  var tm = gv('in-total-monthly');
   var tt = gv('in-total-today');
-  SALES.total.monthly = tm || (SALES.rakuten.monthly + SALES.amazon.monthly + SALES.yahoo.monthly);
-  SALES.total.today   = tt || (SALES.rakuten.today   + SALES.amazon.today   + SALES.yahoo.today);
+  SALES.total.monthly = SALES.rakuten.monthly + SALES.amazon.monthly + SALES.yahoo.monthly;
+  SALES.total.today   = tt || (SALES.rakuten.today + SALES.amazon.today + SALES.yahoo.today);
   renderSalesDisplay('manual');
   recalc();
 }
@@ -650,6 +651,10 @@ function recalc() {
   var paceRatio   = paceTarget > 0 ? cum / paceTarget : 0;
   var needed      = Math.max(0, monthly - cum);
   var reqDaily    = REMAIN_DAYS > 0 ? needed / REMAIN_DAYS : 0;
+
+  /* 日次目標表示を更新 */
+  var dtEl = document.getElementById('daily-target-display');
+  if (dtEl) dtEl.textContent = dailyTarget > 0 ? fy(Math.round(dailyTarget)) : '—';
 
   /* 月次バー */
   var mPct   = cl(mRatio * 100);
@@ -868,7 +873,7 @@ function saveManual() {
     rm: gv('in-r-monthly'), rt: gv('in-r-today'),
     am: gv('in-a-monthly'), at: gv('in-a-today'),
     ym: gv('in-y-monthly'), yt: gv('in-y-today'),
-    tm: gv('in-total-monthly'), tt: gv('in-total-today')
+    tt: gv('in-total-today')
   };
   localStorage.setItem('manual_sales', JSON.stringify(s));
   localStorage.setItem('manual_updated', new Date().toLocaleString('ja-JP'));
@@ -904,12 +909,11 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
 
   /* 手動入力を先に復元（setAutoSales が gv('in-y-monthly') を読むため必ず先に実行） */
   var ms = JSON.parse(localStorage.getItem('manual_sales') || '{}');
-  ['r','a','y','total'].forEach(function(k) {
-    var m = ms[k === 'total' ? 'tm' : k + 'm'];
-    var t = ms[k === 'total' ? 'tt' : k + 't'];
-    if (m) document.getElementById('in-' + k + '-monthly').value = m;
-    if (t) document.getElementById('in-' + k + '-today').value   = t;
+  ['r','a','y'].forEach(function(k) {
+    if (ms[k + 'm']) document.getElementById('in-' + k + '-monthly').value = ms[k + 'm'];
+    if (ms[k + 't']) document.getElementById('in-' + k + '-today').value   = ms[k + 't'];
   });
+  if (ms.tt) document.getElementById('in-total-today').value = ms.tt;
   var mts = localStorage.getItem('manual_updated');
   if (mts) sv('updated-at', '前回保存: ' + mts);
 
