@@ -241,22 +241,22 @@ body {
     <div class="t-card">
       <div class="t-header c-blue">合計（3モール）</div>
       <label>月次目標</label>
-      <input type="number" id="t-total" value="7840000" oninput="recalc()">
+      <input type="number" id="t-total" value="7840000" oninput="recalc();saveTargets()">
     </div>
     <div class="t-card">
       <div class="t-header" style="color:#d29922">楽天市場</div>
       <label>月次目標</label>
-      <input type="number" id="t-rakuten" value="2740000" oninput="recalcStore('r')">
+      <input type="number" id="t-rakuten" value="2740000" oninput="recalc();saveTargets()">
     </div>
     <div class="t-card">
       <div class="t-header c-blue">Amazon</div>
       <label>月次目標</label>
-      <input type="number" id="t-amazon" value="4200000" oninput="recalcStore('a')">
+      <input type="number" id="t-amazon" value="4200000" oninput="recalc();saveTargets()">
     </div>
     <div class="t-card">
       <div class="t-header c-amber">Yahoo!</div>
       <label>月次目標</label>
-      <input type="number" id="t-yahoo" value="900000" oninput="recalcStore('y')">
+      <input type="number" id="t-yahoo" value="900000" oninput="recalc();saveTargets()">
     </div>
   </div>
 
@@ -875,6 +875,13 @@ function saveManual() {
   sv('updated-at', '保存: ' + new Date().toLocaleString('ja-JP'));
 }
 
+function saveTargets() {
+  localStorage.setItem('tracker_targets', JSON.stringify({
+    total: gv('t-total'), rakuten: gv('t-rakuten'),
+    amazon: gv('t-amazon'), yahoo: gv('t-yahoo')
+  }));
+}
+
 var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKllfA__C8OsDGrNkwVfp2sh6EQGpZKsKMavEtp9B422kq8XGiw/exec';
 
 /* ── 初期ロード ── */
@@ -932,18 +939,6 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
   } else {
     recalc(); // 目標だけで初期描画
   }
-
-  /* 目標保存（入力変更時） */
-  ['t-total','t-rakuten','t-amazon','t-yahoo'].forEach(function(id) {
-    document.getElementById(id).addEventListener('change', function() {
-      var t = {
-        total:   gv('t-total'), rakuten: gv('t-rakuten'),
-        amazon:  gv('t-amazon'), yahoo:  gv('t-yahoo')
-      };
-      localStorage.setItem('tracker_targets', JSON.stringify(t));
-      recalc();
-    });
-  });
 })();
 </script>
 </body>
