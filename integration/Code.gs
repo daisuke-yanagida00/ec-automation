@@ -937,3 +937,52 @@ function setupDailyTrigger() {
 
   Logger.log('日次トリガーを設定しました（毎朝8時）: ' + targets.join(', '));
 }
+
+// ================================================================
+// Amazon バックフィル（欠損期間の注文を一括補完）
+// ================================================================
+
+// 指定した月の全注文を取得してシートに書き込む（重複は自動スキップ）
+function integrateAmazonOrdersForMonth_(year, month) {
+  var token = getAmazonAccessToken_();
+  if (!token) { Logger.log('Amazon: トークン取得失敗'); return 0; }
+
+  var sheet     = getOrCreateSheet_();
+  var existsSet = loadExistingOrderIds_(sheet);
+
+  var jstOffset = 9 * 60 * 60 * 1000;
+  var startUtc  = new Date(Date.UTC(year, month - 1, 1,  0,  0,  0) - jstOffset);
+  var endUtc    = new Date(Date.UTC(year, month,     0, 23, 59, 59) - jstOffset);
+
+  var orders = fetchAllAmazonOrders_(token, startUtc.toISOString(), endUtc.toISOString());
+  Logger.log('Amazon ' + year + '/' + month + ': ' + orders.length + '件取得');
+  if (orders.length === 0) return 0;
+
+  var newRows = [], fetchedAt = new Date();
+  orders.forEach(function(order) {
+    var orderId = order.AmazonOrderId;
+    if (existsSet[orderId]) return;
+    var items = fetchAmazonOrderItems_(token, orderId);
+    buildAmazonRows_(order, items, fetchedAt).forEach(function(row) { newRows.push(row); });
+    existsSet[orderId] = true;
+  });
+
+  if (newRows.length > 0) {
+    appendRows_(sheet, newRows);
+    Logger.log('Amazon ' + year + '/' + month + ': ' + newRows.length + '行を追記しました');
+  } else {
+    Logger.log('Amazon ' + year + '/' + month + ': 新規なし（全件既存）');
+  }
+  return newRows.length;
+}
+
+// 2026年5月・6月の欠損データを一括補完
+// GASエディタのドロップダウンから実行してください（5〜10分かかる場合あり）
+function backfillAmazonMayJune() {
+  Logger.log('=== Amazon バックフィル開始（2026年5月・6月）===');
+  var cnt5 = integrateAmazonOrdersForMonth_(2026, 5);
+  Logger.log('5月完了: ' + cnt5 + '行追記');
+  var cnt6 = integrateAmazonOrdersForMonth_(2026, 6);
+  Logger.log('6月完了: ' + cnt6 + '行追記');
+  Logger.log('=== バックフィル完了: 合計 ' + (cnt5 + cnt6) + '行 ===');
+}
