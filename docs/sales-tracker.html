@@ -234,11 +234,11 @@ body {
       <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
         <div style="flex:1;text-align:center">
           <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-total-yesterday">—</div>
-          <div style="font-size:10px;color:#8b949e;margin-top:2px">昨日</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-total-yd">昨日</div>
         </div>
         <div style="flex:1;text-align:center">
           <div style="font-size:15px;font-weight:700;color:#58a6ff" id="av-total-today">—</div>
-          <div style="font-size:10px;color:#8b949e;margin-top:2px">今日</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-total-td">今日</div>
         </div>
       </div>
       <div style="display:flex;gap:4px;margin-top:8px">
@@ -257,11 +257,11 @@ body {
       <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
         <div style="flex:1;text-align:center">
           <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-r-yesterday">—</div>
-          <div style="font-size:10px;color:#8b949e;margin-top:2px">昨日</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-r-yd">昨日</div>
         </div>
         <div style="flex:1;text-align:center">
           <div style="font-size:15px;font-weight:700;color:#58a6ff" id="av-r-today">—</div>
-          <div style="font-size:10px;color:#8b949e;margin-top:2px">今日</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-r-td">今日</div>
         </div>
       </div>
       <div style="display:flex;gap:4px;margin-top:8px">
@@ -280,11 +280,11 @@ body {
       <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
         <div style="flex:1;text-align:center">
           <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-a-yesterday">—</div>
-          <div style="font-size:10px;color:#8b949e;margin-top:2px">昨日</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-a-yd">昨日</div>
         </div>
         <div style="flex:1;text-align:center">
           <div style="font-size:15px;font-weight:700;color:#58a6ff" id="av-a-today">—</div>
-          <div style="font-size:10px;color:#8b949e;margin-top:2px">今日</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-a-td">今日</div>
         </div>
       </div>
       <div style="display:flex;gap:4px;margin-top:8px">
@@ -303,11 +303,11 @@ body {
       <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
         <div style="flex:1;text-align:center">
           <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-y-yesterday">—</div>
-          <div style="font-size:10px;color:#8b949e;margin-top:2px">昨日</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-y-yd">昨日</div>
         </div>
         <div style="flex:1;text-align:center">
           <div style="font-size:15px;font-weight:700;color:#58a6ff" id="av-y-today">—</div>
-          <div style="font-size:10px;color:#8b949e;margin-top:2px">今日</div>
+          <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-y-td">今日</div>
         </div>
       </div>
       <div style="display:flex;gap:4px;margin-top:8px">
@@ -470,18 +470,28 @@ var now         = new Date();
 var DOM         = now.getDate();
 var DAYS        = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 var REMAIN_DAYS = DAYS - DOM;
+var yd          = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+var TODAY_LABEL = (now.getMonth()+1) + '/' + now.getDate();
+var YD_LABEL    = (yd.getMonth()+1) + '/' + yd.getDate();
 
 document.getElementById('today-label').textContent =
   now.getFullYear() + '年' + (now.getMonth()+1) + '月' + DOM + '日';
 document.getElementById('month-progress-label').textContent =
   DOM + '日目 / ' + DAYS + '日';
 
+// 今日・昨日ラベルを実際の日付に置き換え
+['total','r','a','y'].forEach(function(k) {
+  var tdEl = document.getElementById('lbl-' + k + '-td');
+  var ydEl = document.getElementById('lbl-' + k + '-yd');
+  if (tdEl) tdEl.textContent = TODAY_LABEL;
+  if (ydEl) ydEl.textContent = YD_LABEL;
+});
+
 /* ── utils ── */
 function fy(n) {
   if (!n || isNaN(n) || n === 0) return '—';
-  if (n >= 1000000) return '¥' + (n/1000000).toFixed(2) + 'M';
-  if (n >= 10000)   return '¥' + Math.round(n/10000) + '万';
-  return '¥' + Math.round(n).toLocaleString('ja-JP');
+  if (n >= 10000) return Math.round(n / 10000) + '万円';
+  return Math.round(n).toLocaleString('ja-JP') + '円';
 }
 function fp(r) { return isNaN(r) ? '—%' : (r*100).toFixed(1) + '%'; }
 function cl(v) { return Math.min(100, Math.max(0, isNaN(v) ? 0 : v)); }
