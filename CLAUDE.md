@@ -136,6 +136,37 @@ ec-automation/
 - `docs/sales-tracker.html`：Yahoo!手動入力・日別棒グラフ・万円表示・日付ラベル対応
 - GAS再デプロイ要（ユーザーが手動で「デプロイを管理→鉛筆→新しいバージョン→デプロイ」を実施）
 
+## 2026-06-10 作業記録
+
+### 完了
+- **売上ダッシュボード追加改善**：`docs/sales-tracker.html`
+  - Yahoo!手動入力値がリロード後に消える問題を修正（manual_sales復元をsetAutoSalesより先に実行）
+  - 売上目標の手入力が反映・保存されない問題を修正（saveTargets()関数追加、earlyReturnバグ解消）
+  - 合計カードの「累計（手動）」→「日次目標」表示に変更
+  - 楽天・Amazon・Yahoo!カードも同様に変更（各モールの日次目標を自動計算表示）
+  - 昨日・今日ラベルを「昨日 (6/9)」「今日 (6/10)」形式に変更
+  - Yahoo!入力を「今月累計」→「昨日の売上」日次ログ式に変更（yahoo_daily_logで月次累計を自動加算）
+- **売上集計精度改善**：`integration/Code.gs`
+  - 楽天：totalPrice（税込）÷1.1 → 税抜き表示（RMSと合わせる）
+  - Amazon：OrderStatuses に Pending/Unshipped を追加（SC売上と合わせる）
+- **clasp 自動化設定**：GitHub Actions ワークフロー追加
+  - `.github/workflows/clasp-push.yml` 作成
+  - `integration/rakuten/yahoo` の .gs 変更時に自動で `clasp push` 実行
+  - GitHub Secret `CLASPRC_JSON` に認証情報を登録済み
+  - 動作確認済み（integration push に成功）
+
+### 決定事項
+- **GASデプロイ自動化**: git push → GitHub Actions → clasp push → GAS自動反映
+  - ただし「デプロイを管理→新しいバージョン→デプロイ」はWeb App URL更新のため引き続き手動
+- **楽天売上**: totalPrice（税込）÷1.1でRMS税抜き表示に統一
+- **Amazon売上**: Pending/Unshipped含む全ステータスでSC売上に近似
+- **Yahoo!売上**: 昨日の売上を毎日入力→yahoo_daily_logに日付キーで蓄積→当月合計を表示
+
+### システム構成変更
+- `docs/sales-tracker.html`：多数のUI修正・Yahoo!日次ログ方式
+- `integration/Code.gs`：楽天税抜き変換・Amazon全ステータス対応
+- `.github/workflows/clasp-push.yml`：GAS自動デプロイワークフロー追加
+
 ## 運用ルール
 **このプロジェクトのセッション終了時は必ずCLAUDE.mdを更新すること。**
 - セッション終了前に「今日の作業内容をCLAUDE.mdに追記してgit pushして」を実行
