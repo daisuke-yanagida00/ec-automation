@@ -386,7 +386,7 @@ function fetchAmazonOrderPage_(token, createdAfter, createdBefore, nextToken) {
   } else {
     url += '&CreatedAfter='    + encodeURIComponent(createdAfter)
         +  '&CreatedBefore='   + encodeURIComponent(createdBefore)
-        +  '&OrderStatuses=Shipped,PartiallyShipped'  // 発送済みのみ（セラーセントラルの売上計上に合わせる）
+        +  '&OrderStatuses=Pending,Unshipped,PartiallyShipped,Shipped'  // SC売上に合わせて未発送含む全注文を集計
         +  '&MaxResultsPerPage=100';
   }
 
@@ -665,10 +665,12 @@ function getSalesSummary_() {
     var mall    = String(row[COL.MALL]);
     var orderId = String(row[COL.ORDER_ID]);
     var price   = Number(row[COL.PRICE]) || 0;
+    // 楽天: totalPriceは税込み、RMSは税抜き表示のため ÷1.1 で合わせる
+    var netPrice = mall === '楽天' ? Math.round(price / 1.1) : price;
 
     function add(bucket, rakutenSet) {
       if (mall === '楽天') {
-        if (!rakutenSet[orderId]) { rakutenSet[orderId] = true; bucket.rakuten += price; bucket.total += price; }
+        if (!rakutenSet[orderId]) { rakutenSet[orderId] = true; bucket.rakuten += netPrice; bucket.total += netPrice; }
       } else if (mall === 'Amazon') {
         bucket.amazon += price; bucket.total += price;
       } else if (mall === 'Yahoo') {
@@ -682,7 +684,7 @@ function getSalesSummary_() {
       if (!dailyMap[dateStr]) dailyMap[dateStr] = { r: 0, a: 0, y: 0 };
       if (mall === '楽天') {
         if (!r_daily[dateStr]) r_daily[dateStr] = {};
-        if (!r_daily[dateStr][orderId]) { r_daily[dateStr][orderId] = true; dailyMap[dateStr].r += price; }
+        if (!r_daily[dateStr][orderId]) { r_daily[dateStr][orderId] = true; dailyMap[dateStr].r += netPrice; }
       } else if (mall === 'Amazon') {
         dailyMap[dateStr].a += price;
       } else if (mall === 'Yahoo') {
