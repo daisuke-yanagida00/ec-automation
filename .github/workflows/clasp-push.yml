@@ -1,0 +1,47 @@
+name: Push to Google Apps Script
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'integration/**'
+      - 'rakuten/**'
+      - 'yahoo/**'
+
+jobs:
+  clasp-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      - name: Write clasp credentials
+        run: echo '${{ secrets.CLASPRC_JSON }}' > ~/.clasprc.json
+
+      - name: Detect changed GAS folders
+        id: changes
+        run: |
+          CHANGED=$(git diff --name-only HEAD^ HEAD)
+          echo "integration=$(echo "$CHANGED" | grep -q '^integration/' && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "rakuten=$(echo "$CHANGED" | grep -q '^rakuten/' && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "yahoo=$(echo "$CHANGED" | grep -q '^yahoo/' && echo true || echo false)" >> $GITHUB_OUTPUT
+
+      - name: Push integration
+        if: steps.changes.outputs.integration == 'true'
+        run: cd integration && clasp push --force
+
+      - name: Push rakuten
+        if: steps.changes.outputs.rakuten == 'true'
+        run: cd rakuten && clasp push --force
+
+      - name: Push yahoo
+        if: steps.changes.outputs.yahoo == 'true'
+        run: cd yahoo && clasp push --force
