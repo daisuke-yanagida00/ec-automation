@@ -321,7 +321,9 @@ body {
       <div class="auto-sub c-muted">今月累計</div>
       <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
         <div style="flex:1;text-align:center">
-          <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-a-yesterday">—</div>
+          <input type="number" id="in-a-yesterday" placeholder="昨日の売上"
+                 oninput="updateAmazonManual()"
+                 style="width:100%;background:#0d1117;border:1px solid #58a6ff;border-radius:5px;color:#58a6ff;font-size:10px;padding:4px 6px;font-family:inherit;text-align:center">
           <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-a-yd">昨日</div>
         </div>
         <div style="flex:1;text-align:center">
@@ -337,6 +339,7 @@ body {
         <input type="number" id="in-a-today" placeholder="今日（手動）"
                style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
+      <div style="font-size:9px;color:#8b949e;margin-top:4px;text-align:center">昨日分をSCから入力</div>
     </div>
 
     <div class="auto-card">
@@ -556,6 +559,19 @@ function saveYahooYesterday(amount) {
   localStorage.setItem('yahoo_daily_log', JSON.stringify(log));
 }
 
+/* ── Amazon 昨日 手動ログ（localStorage） ── */
+function getAmazonLog() {
+  return JSON.parse(localStorage.getItem('amazon_daily_log') || '{}');
+}
+function getAmazonYesterdayAmount() {
+  return getAmazonLog()[YD_KEY] || 0;
+}
+function saveAmazonYesterday(amount) {
+  var log = getAmazonLog();
+  if (amount > 0) { log[YD_KEY] = amount; } else { delete log[YD_KEY]; }
+  localStorage.setItem('amazon_daily_log', JSON.stringify(log));
+}
+
 document.getElementById('today-label').textContent =
   now.getFullYear() + '年' + (now.getMonth()+1) + '月' + DOM + '日';
 document.getElementById('month-progress-label').textContent =
@@ -578,7 +594,7 @@ function fy(n) {
 function fp(r) { return isNaN(r) ? '—%' : (r*100).toFixed(1) + '%'; }
 function cl(v) { return Math.min(100, Math.max(0, isNaN(v) ? 0 : v)); }
 function gv(id) { var el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; }
-function sv(id, v) { document.getElementById(id).textContent = v; }
+function sv(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
 
 /* ── 現在の実績値（GAS自動 or 手動） ── */
 var SALES = {
@@ -607,13 +623,27 @@ function setAutoSales(data) {
   SALES.yahoo.monthly   = getYahooMonthlyTotal();
   SALES.yahoo.yesterday = getYahooYesterdayAmount();
   SALES.yahoo.today     = 0;
+  // Amazon 昨日は手動入力があればそちらを優先
+  var manualAyd = getAmazonYesterdayAmount();
+  if (manualAyd > 0) SALES.amazon.yesterday = manualAyd;
   // 合計 = GAS（楽天+Amazon）+ Yahoo!月次ログ合計
   SALES.total.monthly   = SALES.gasBase.monthly   + SALES.yahoo.monthly;
   SALES.total.today     = SALES.gasBase.today;
-  SALES.total.yesterday = SALES.gasBase.yesterday + SALES.yahoo.yesterday;
+  SALES.total.yesterday = SALES.rakuten.yesterday + SALES.amazon.yesterday + SALES.yahoo.yesterday;
   renderSalesDisplay('live');
   recalc();
   renderDailyChart(data.daily || [], gv('in-y-monthly'));
+}
+
+function updateAmazonManual() {
+  var ydAmt = gv('in-a-yesterday');
+  saveAmazonYesterday(ydAmt);
+  SALES.amazon.yesterday = ydAmt;
+  if (SALES.source === 'auto') {
+    SALES.total.yesterday = SALES.rakuten.yesterday + ydAmt + SALES.yahoo.yesterday;
+    sv('av-total-yesterday', fy(SALES.total.yesterday));
+  }
+  recalc();
 }
 
 function updateYahooManual() {
@@ -949,6 +979,9 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
   // Yahoo! 昨日の売上をログから復元
   var ydAmt = getYahooYesterdayAmount();
   if (ydAmt) document.getElementById('in-y-yesterday').value = ydAmt;
+  // Amazon 昨日の売上をログから復元
+  var aydAmt = getAmazonYesterdayAmount();
+  if (aydAmt) document.getElementById('in-a-yesterday').value = aydAmt;
   var mts = localStorage.getItem('manual_updated');
   if (mts) sv('updated-at', '前回保存: ' + mts);
 
