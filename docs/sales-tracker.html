@@ -359,11 +359,11 @@ body {
           <div style="font-size:13px;font-weight:700;color:#f0883e" id="daily-target-y">—</div>
           <div style="font-size:9px;color:#8b949e;margin-top:2px">日次目標</div>
         </div>
-        <input type="number" id="in-y-monthly" placeholder="今月累計"
-               oninput="updateYahooManual();saveManual()"
+        <input type="number" id="in-y-yesterday" placeholder="昨日の売上"
+               oninput="updateYahooManual()"
                style="flex:1;background:#0d1117;border:1px solid #f0883e;border-radius:5px;color:#f0883e;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
-      <div style="font-size:9px;color:#8b949e;margin-top:4px;text-align:center">ストアクリエイターPro から入力</div>
+      <div style="font-size:9px;color:#8b949e;margin-top:4px;text-align:center">昨日分を入力 → 月次累計に自動加算</div>
     </div>
 
   </div>
@@ -535,6 +535,26 @@ var REMAIN_DAYS = DAYS - DOM;
 var yd          = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 var TODAY_LABEL = (now.getMonth()+1) + '/' + now.getDate();
 var YD_LABEL    = (yd.getMonth()+1) + '/' + yd.getDate();
+var YD_KEY      = yd.getFullYear() + '-' + String(yd.getMonth()+1).padStart(2,'0') + '-' + String(yd.getDate()).padStart(2,'0');
+var MONTH_PFX   = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+
+/* ── Yahoo! 日次ログ（localStorage） ── */
+function getYahooLog() {
+  return JSON.parse(localStorage.getItem('yahoo_daily_log') || '{}');
+}
+function getYahooMonthlyTotal() {
+  var log = getYahooLog(), total = 0;
+  Object.keys(log).forEach(function(d) { if (d.startsWith(MONTH_PFX)) total += log[d] || 0; });
+  return total;
+}
+function getYahooYesterdayAmount() {
+  return getYahooLog()[YD_KEY] || 0;
+}
+function saveYahooYesterday(amount) {
+  var log = getYahooLog();
+  if (amount > 0) { log[YD_KEY] = amount; } else { delete log[YD_KEY]; }
+  localStorage.setItem('yahoo_daily_log', JSON.stringify(log));
+}
 
 document.getElementById('today-label').textContent =
   now.getFullYear() + '年' + (now.getMonth()+1) + '月' + DOM + '日';
@@ -583,28 +603,33 @@ function setAutoSales(data) {
   SALES.gasBase.monthly   = (data.monthly   || {}).total   || 0;
   SALES.gasBase.today     = (data.today     || {}).total   || 0;
   SALES.gasBase.yesterday = (ys).total   || 0;
-  // Yahoo! は常に手動入力（月次累計のみ）
-  SALES.yahoo.monthly     = gv('in-y-monthly');
-  SALES.yahoo.today       = 0;
-  SALES.yahoo.yesterday   = 0;
-  // 合計 = GAS（楽天+Amazon）+ Yahoo!手動
-  SALES.total.monthly     = SALES.gasBase.monthly   + SALES.yahoo.monthly;
-  SALES.total.today       = SALES.gasBase.today     + SALES.yahoo.today;
-  SALES.total.yesterday   = SALES.gasBase.yesterday;
+  // Yahoo! は昨日入力の日次ログから月次累計を計算
+  SALES.yahoo.monthly   = getYahooMonthlyTotal();
+  SALES.yahoo.yesterday = getYahooYesterdayAmount();
+  SALES.yahoo.today     = 0;
+  // 合計 = GAS（楽天+Amazon）+ Yahoo!月次ログ合計
+  SALES.total.monthly   = SALES.gasBase.monthly   + SALES.yahoo.monthly;
+  SALES.total.today     = SALES.gasBase.today;
+  SALES.total.yesterday = SALES.gasBase.yesterday + SALES.yahoo.yesterday;
   renderSalesDisplay('live');
   recalc();
   renderDailyChart(data.daily || [], gv('in-y-monthly'));
 }
 
 function updateYahooManual() {
-  SALES.yahoo.monthly = gv('in-y-monthly');
-  SALES.yahoo.today   = 0;
+  var ydAmt = gv('in-y-yesterday');
+  saveYahooYesterday(ydAmt);
+  SALES.yahoo.monthly   = getYahooMonthlyTotal();
+  SALES.yahoo.yesterday = ydAmt;
+  SALES.yahoo.today     = 0;
   if (SALES.source === 'auto') {
-    SALES.total.monthly = SALES.gasBase.monthly + SALES.yahoo.monthly;
-    SALES.total.today   = SALES.gasBase.today;
+    SALES.total.monthly   = SALES.gasBase.monthly + SALES.yahoo.monthly;
+    SALES.total.today     = SALES.gasBase.today;
+    SALES.total.yesterday = SALES.gasBase.yesterday + SALES.yahoo.yesterday;
     sv('av-y-monthly',     fy(SALES.yahoo.monthly));
+    sv('av-y-yesterday',   fy(SALES.yahoo.yesterday));
     sv('av-total-monthly', fy(SALES.total.monthly));
-    sv('av-total-today',   fy(SALES.total.today));
+    sv('av-total-yesterday', fy(SALES.total.yesterday));
   }
   recalc();
 }
@@ -613,7 +638,8 @@ function setManualSales() {
   SALES.source          = 'manual';
   SALES.rakuten.today   = gv('in-r-today');
   SALES.amazon.today    = gv('in-a-today');
-  SALES.yahoo.monthly   = gv('in-y-monthly');
+  SALES.yahoo.monthly   = getYahooMonthlyTotal();
+  SALES.yahoo.yesterday = getYahooYesterdayAmount();
   SALES.yahoo.today     = 0;
   SALES.total.monthly = SALES.rakuten.monthly + SALES.amazon.monthly + SALES.yahoo.monthly;
   var tt = gv('in-total-today');
@@ -881,7 +907,6 @@ function saveManual() {
   var s = {
     rt: gv('in-r-today'),
     at: gv('in-a-today'),
-    ym: gv('in-y-monthly'),
     tt: gv('in-total-today')
   };
   localStorage.setItem('manual_sales', JSON.stringify(s));
@@ -918,10 +943,12 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
 
   /* 手動入力を先に復元（setAutoSales が gv('in-y-monthly') を読むため必ず先に実行） */
   var ms = JSON.parse(localStorage.getItem('manual_sales') || '{}');
-  if (ms.rt) document.getElementById('in-r-today').value    = ms.rt;
-  if (ms.at) document.getElementById('in-a-today').value    = ms.at;
-  if (ms.ym) document.getElementById('in-y-monthly').value  = ms.ym;
+  if (ms.rt) document.getElementById('in-r-today').value     = ms.rt;
+  if (ms.at) document.getElementById('in-a-today').value     = ms.at;
   if (ms.tt) document.getElementById('in-total-today').value = ms.tt;
+  // Yahoo! 昨日の売上をログから復元
+  var ydAmt = getYahooYesterdayAmount();
+  if (ydAmt) document.getElementById('in-y-yesterday').value = ydAmt;
   var mts = localStorage.getItem('manual_updated');
   if (mts) sv('updated-at', '前回保存: ' + mts);
 
