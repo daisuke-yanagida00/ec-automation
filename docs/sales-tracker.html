@@ -541,12 +541,12 @@ document.getElementById('today-label').textContent =
 document.getElementById('month-progress-label').textContent =
   DOM + '日目 / ' + DAYS + '日';
 
-// 今日・昨日ラベルを実際の日付に置き換え
+// 今日・昨日ラベル（日付をサブテキストで付与）
 ['total','r','a','y'].forEach(function(k) {
   var tdEl = document.getElementById('lbl-' + k + '-td');
   var ydEl = document.getElementById('lbl-' + k + '-yd');
-  if (tdEl) tdEl.textContent = TODAY_LABEL;
-  if (ydEl) ydEl.textContent = YD_LABEL;
+  if (tdEl) tdEl.innerHTML = '今日 <span style="color:#484f58;font-weight:400">(' + TODAY_LABEL + ')</span>';
+  if (ydEl) ydEl.innerHTML = '昨日 <span style="color:#484f58;font-weight:400">(' + YD_LABEL + ')</span>';
 });
 
 /* ── utils ── */
