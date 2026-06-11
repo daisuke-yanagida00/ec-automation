@@ -349,7 +349,9 @@ body {
       <div class="auto-sub c-muted">今月累計</div>
       <div style="margin-top:8px;border-top:1px solid #21262d;padding-top:8px;display:flex;gap:8px">
         <div style="flex:1;text-align:center">
-          <div style="font-size:15px;font-weight:700;color:#e6edf3" id="av-y-yesterday">—</div>
+          <input type="number" id="in-y-yesterday" placeholder="昨日の売上"
+                 oninput="updateYahooManual()"
+                 style="width:100%;background:#0d1117;border:1px solid #f0883e;border-radius:5px;color:#f0883e;font-size:10px;padding:4px 6px;font-family:inherit;text-align:center">
           <div style="font-size:10px;color:#8b949e;margin-top:2px" id="lbl-y-yd">昨日</div>
         </div>
         <div style="flex:1;text-align:center">
@@ -362,9 +364,8 @@ body {
           <div style="font-size:13px;font-weight:700;color:#f0883e" id="daily-target-y">—</div>
           <div style="font-size:9px;color:#8b949e;margin-top:2px">日次目標</div>
         </div>
-        <input type="number" id="in-y-yesterday" placeholder="昨日の売上"
-               oninput="updateYahooManual()"
-               style="flex:1;background:#0d1117;border:1px solid #f0883e;border-radius:5px;color:#f0883e;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
+        <input type="number" id="in-y-today" placeholder="今日（手動）"
+               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:10px;padding:4px 6px;font-family:inherit;min-width:0">
       </div>
       <div style="font-size:9px;color:#8b949e;margin-top:4px;text-align:center">昨日分を入力 → 月次累計に自動加算</div>
     </div>
