@@ -620,7 +620,8 @@ function weeklyRakutenReport() {
 //   実行ユーザー: 自分、アクセス: 全員
 // ================================================================
 function doGet(e) {
-  var result   = getSalesSummary_();
+  var type     = (e && e.parameter && e.parameter.type) ? e.parameter.type : '';
+  var result   = (type === 'weekly') ? getWeeklyReport_() : getSalesSummary_();
   var json     = JSON.stringify(result);
   var callback = (e && e.parameter && e.parameter.callback) ? e.parameter.callback : null;
   if (callback) {
@@ -631,6 +632,96 @@ function doGet(e) {
   return ContentService
     .createTextOutput(json)
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ================================================================
+// 楽天 週次データを JSON で返す（?type=weekly）
+// メルマガ作成・分析用：直近28日の日別・週次・商品ランキング
+// ================================================================
+function getWeeklyReport_() {
+  var ss    = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  if (!sheet) return { error: 'シートが存在しません' };
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { daily: [], weeks: [], topItems: [] };
+
+  var data = sheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
+  var now  = new Date();
+
+  // 直近28日の楽天行を抽出
+  var cutoff = new Date(now.getTime() - 27 * 24 * 60 * 60 * 1000);
+  cutoff.setHours(0, 0, 0, 0);
+
+  var rows = data.filter(function(row) {
+    if (String(row[COL.MALL]) !== '楽天') return false;
+    var d = new Date(row[COL.ORDER_DATE]);
+    return !isNaN(d.getTime()) && d >= cutoff;
+  });
+
+  // 日別集計（ORDER_IDで重複排除）
+  var dayMap = {}, addedOrders = {};
+  rows.forEach(function(row) {
+    var d       = new Date(row[COL.ORDER_DATE]);
+    var dateStr = Utilities.formatDate(d, 'Asia/Tokyo', 'yyyy/MM/dd');
+    var orderId = String(row[COL.ORDER_ID]);
+    var key     = dateStr + '\x00' + orderId;
+    if (!dayMap[dateStr]) dayMap[dateStr] = { sales: 0, orders: {} };
+    if (!addedOrders[key]) {
+      dayMap[dateStr].sales += Number(row[COL.PRICE]) || 0;
+      dayMap[dateStr].orders[orderId] = true;
+      addedOrders[key] = true;
+    }
+  });
+
+  // 週次集計（week0=直近7日, week1=前週, week2=2週前, week3=3週前）
+  var weekTotals = [
+    { label: '直近7日',  sales: 0, orderCount: 0 },
+    { label: '前週',     sales: 0, orderCount: 0 },
+    { label: '2週前',    sales: 0, orderCount: 0 },
+    { label: '3週前',    sales: 0, orderCount: 0 }
+  ];
+  Object.keys(dayMap).forEach(function(dateStr) {
+    var d       = new Date(dateStr);
+    var daysAgo = Math.floor((now - d) / (24 * 60 * 60 * 1000));
+    var idx     = Math.min(3, Math.floor(daysAgo / 7));
+    weekTotals[idx].sales      += dayMap[dateStr].sales;
+    weekTotals[idx].orderCount += Object.keys(dayMap[dateStr].orders).length;
+  });
+
+  // 直近7日の商品別販売数ランキング
+  var itemMap = {};
+  rows.forEach(function(row) {
+    var d       = new Date(row[COL.ORDER_DATE]);
+    var daysAgo = Math.floor((now - d) / (24 * 60 * 60 * 1000));
+    if (daysAgo > 6) return;
+    var name = String(row[COL.ITEM_NAME]) || '（商品名なし）';
+    if (!itemMap[name]) itemMap[name] = 0;
+    itemMap[name] += Number(row[COL.QTY]) || 0;
+  });
+  var topItems = Object.keys(itemMap)
+    .map(function(n) { return { name: n, qty: itemMap[n] }; })
+    .sort(function(a, b) { return b.qty - a.qty; })
+    .slice(0, 10);
+
+  // 直近7日の日別配列
+  var daily = [];
+  for (var i = 6; i >= 0; i--) {
+    var d    = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+    var dStr = Utilities.formatDate(d, 'Asia/Tokyo', 'yyyy/MM/dd');
+    daily.push({
+      date:       dStr.slice(5),
+      sales:      dayMap[dStr] ? dayMap[dStr].sales : 0,
+      orderCount: dayMap[dStr] ? Object.keys(dayMap[dStr].orders).length : 0
+    });
+  }
+
+  return {
+    generatedAt: Utilities.formatDate(now, 'Asia/Tokyo', 'yyyy/MM/dd HH:mm'),
+    daily:    daily,
+    weeks:    weekTotals,
+    topItems: topItems
+  };
 }
 
 function getSalesSummary_() {
