@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>インフルエンサー施策 履歴・分析レポート | 株式会社ネオ・ゲート</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d2e;
+      --card2: #222538;
+      --border: #2d3156;
+      --accent: #6c63ff;
+      --green: #00d084;
+      --red: #ff4d6d;
+      --yellow: #ffd166;
+      --orange: #ff9f43;
+      --blue: #4ecdc4;
+      --text: #e0e0f0;
+      --text2: #8888aa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; font-size: 14px; }
+
+    header {
+      background: linear-gradient(135deg, #1a1d2e 0%, #2d1b69 100%);
+      padding: 32px 24px 24px;
+      border-bottom: 2px solid var(--accent);
+    }
+    header h1 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    header p { color: var(--text2); font-size: 13px; }
+    .meta-bar {
+      display: flex; gap: 24px; margin-top: 12px; flex-wrap: wrap;
+    }
+    .meta-chip {
+      background: rgba(108,99,255,0.2); border: 1px solid var(--accent);
+      border-radius: 20px; padding: 4px 14px; font-size: 12px; color: #b0a8ff;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    /* Alert */
+    .alert {
+      border-left: 4px solid var(--yellow);
+      background: rgba(255,209,102,0.08);
+      padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; color: var(--yellow);
+    }
+    .alert.red { border-color: var(--red); background: rgba(255,77,109,0.08); color: var(--red); }
+    .alert.green { border-color: var(--green); background: rgba(0,208,132,0.08); color: var(--green); }
+    .alert.blue { border-color: var(--blue); background: rgba(78,205,196,0.08); color: var(--blue); }
+
+    /* Section */
+    h2 { font-size: 16px; font-weight: 700; color: #c8c0ff; margin: 32px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    h3 { font-size: 14px; font-weight: 600; color: var(--text); margin: 16px 0 8px; }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .kpi-card {
+      background: var(--card2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center;
+    }
+    .kpi-label { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+    .kpi-value { font-size: 24px; font-weight: 700; }
+    .kpi-value.red { color: var(--red); }
+    .kpi-value.green { color: var(--green); }
+    .kpi-value.yellow { color: var(--yellow); }
+    .kpi-value.blue { color: var(--blue); }
+    .kpi-sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: rgba(108,99,255,0.15); padding: 8px 10px; text-align: left; color: #b0a8ff; font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--border); }
+    td { padding: 8px 10px; border-bottom: 1px solid rgba(45,49,86,0.5); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(108,99,255,0.05); }
+    .tag {
+      display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+    }
+    .tag.green { background: rgba(0,208,132,0.15); color: var(--green); }
+    .tag.red { background: rgba(255,77,109,0.15); color: var(--red); }
+    .tag.yellow { background: rgba(255,209,102,0.15); color: var(--yellow); }
+    .tag.blue { background: rgba(78,205,196,0.15); color: var(--blue); }
+    .tag.gray { background: rgba(136,136,170,0.15); color: var(--text2); }
+
+    /* Progress bar */
+    .progress-wrap { background: var(--border); border-radius: 4px; height: 8px; overflow: hidden; margin-top: 6px; }
+    .progress-bar { height: 100%; border-radius: 4px; }
+
+    /* Verdict */
+    .verdict-box {
+      border: 2px solid; border-radius: 12px; padding: 20px; margin: 20px 0;
+    }
+    .verdict-box.continue { border-color: var(--yellow); background: rgba(255,209,102,0.05); }
+    .verdict-box.stop { border-color: var(--red); background: rgba(255,77,109,0.05); }
+    .verdict-box.pivot { border-color: var(--blue); background: rgba(78,205,196,0.05); }
+    .verdict-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .verdict-box.continue .verdict-title { color: var(--yellow); }
+    .verdict-box.stop .verdict-title { color: var(--red); }
+    .verdict-box.pivot .verdict-title { color: var(--blue); }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+    .tl-item { position: relative; margin-bottom: 20px; }
+    .tl-dot {
+      position: absolute; left: -20px; top: 4px; width: 12px; height: 12px;
+      border-radius: 50%; border: 2px solid var(--accent); background: var(--bg);
+    }
+    .tl-dot.green { border-color: var(--green); }
+    .tl-dot.red { border-color: var(--red); }
+    .tl-dot.yellow { border-color: var(--yellow); }
+    .tl-date { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+    .tl-title { font-weight: 600; margin-bottom: 4px; }
+    .tl-body { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+    /* Score */
+    .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .score-item { background: var(--card2); border-radius: 8px; padding: 12px 14px; }
+    .score-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+    .score-bar-wrap { background: var(--border); border-radius: 4px; height: 10px; overflow: hidden; }
+    .score-bar { height: 100%; border-radius: 4px; }
+    .score-num { font-size: 11px; text-align: right; margin-top: 4px; color: var(--text2); }
+
+    /* Two col */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } .score-grid { grid-template-columns: 1fr; } }
+
+    .note { font-size: 11px; color: var(--text2); margin-top: 8px; font-style: italic; }
+
+    footer {
+      text-align: center; padding: 24px; color: var(--text2); font-size: 12px;
+      border-top: 1px solid var(--border); margin-top: 40px;
+    }
+
+    .print-btn {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--accent); color: #fff; border: none; border-radius: 8px;
+      padding: 10px 18px; cursor: pointer; font-size: 13px; font-weight: 600;
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      .card, .kpi-card, .score-item { background: #f5f5f5; border-color: #ddd; }
+      header { background: #2d1b69; }
+      .print-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📊 インフルエンサー施策 履歴・分析レポート</h1>
+  <p>株式会社ネオ・ゲート ／ 全部署共有用ドキュメント</p>
+  <div class="meta-bar">
+    <span class="meta-chip">作成日：2026-06-18</span>
+    <span class="meta-chip">対象期間：2025年10月〜2026年5月</span>
+    <span class="meta-chip">プラットフォーム：Instagram × Woomy</span>
+    <span class="meta-chip">担当：EC部門 / マーケティング部門</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== ALERT ===== -->
+  <div class="alert red">
+    ⚠️ 緊急共有：4月の商品ページ流入数が前月比 -83% と急落。継続可否を部門横断で協議が必要。
+  </div>
+
+  <!-- ===== 1. 概要・目的 ===== -->
+  <h2>1. 施策概要</h2>
+  <div class="card">
+    <div class="two-col">
+      <div>
+        <h3>施策の目的</h3>
+        <ul style="line-height:2; padding-left:16px; font-size:13px; color:var(--text2);">
+          <li>Instagram経由の商品ページ流入数を <strong style="color:var(--text)">毎月10%増</strong></li>
+          <li>インフルエンサー経由の購入者 <strong style="color:var(--text)">2名/月</strong> を達成</li>
+          <li>枕・掛け布団カテゴリのブランド認知拡大</li>
+          <li>楽天・Amazonでは届かない新規顧客層へのリーチ</li>
+        </ul>
+      </div>
+      <div>
+        <h3>運用体制</h3>
+        <ul style="line-height:2; padding-left:16px; font-size:13px; color:var(--text2);">
+          <li>プラットフォーム：<strong style="color:var(--text)">Woomy</strong>（インフルエンサーマッチング）</li>
+          <li>計測：<strong style="color:var(--text)">Google Analytics 4</strong>（UTMパラメータ）</li>
+          <li>施策商品：マットレス・掛け布団・枕</li>
+          <li>投稿形式：フィード投稿 ＋ ストーリーズ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 2. 月別実績 ===== -->
+  <h2>2. 月別実績サマリー</h2>
+
+  <div class="alert blue">
+    📌 下記の数値は、Trelloカード記録・社内報告データを基に集計。4月・5月の詳細はGoogleドキュメント（施策レポート）参照。
+  </div>
+
+  <div class="card" style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>月</th>
+          <th>起用人数</th>
+          <th>投稿数</th>
+          <th>商品ページ流入（GA4）</th>
+          <th>前月比</th>
+          <th>購入者数</th>
+          <th>主な商品</th>
+          <th>ステータス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2025年10月</td>
+          <td>2名</td>
+          <td>4投稿</td>
+          <td>約30件</td>
+          <td><span class="tag gray">開始月</span></td>
+          <td>0名</td>
+          <td>マットレス</td>
+          <td><span class="tag green">通常</span></td>
+        </tr>
+        <tr>
+          <td>2025年11月</td>
+          <td>3名</td>
+          <td>6投稿</td>
+          <td>約45件</td>
+          <td><span class="tag green">+50%</span></td>
+          <td>1名</td>
+          <td>マットレス・掛け布団</td>
+          <td><span class="tag green">好調</span></td>
+        </tr>
+        <tr>
+          <td>2025年12月</td>
+          <td>3名</td>
+          <td>5投稿</td>
+          <td>約58件</td>
+          <td><span class="tag green">+29%</span></td>
+          <td>1名</td>
+          <td>マットレス・掛け布団</td>
+          <td><span class="tag green">好調</span></td>
+        </tr>
+        <tr>
+          <td>2026年1月</td>
+          <td>2名</td>
+          <td>4投稿</td>
+          <td>約40件</td>
+          <td><span class="tag red">-31%</span></td>
+          <td>0名</td>
+          <td>枕</td>
+          <td><span class="tag yellow">要注意</span></td>
+        </tr>
+        <tr>
+          <td>2026年2月</td>
+          <td>2名</td>
+          <td>4投稿</td>
+          <td>約38件</td>
+          <td><span class="tag red">-5%</span></td>
+          <td>0名</td>
+          <td>枕</td>
+          <td><span class="tag yellow">低調</span></td>
+        </tr>
+        <tr>
+          <td>2026年3月</td>
+          <td>1名</td>
+          <td>2投稿</td>
+          <td>約35件</td>
+          <td><span class="tag red">-8%</span></td>
+          <td>0名</td>
+          <td>枕</td>
+          <td><span class="tag yellow">施策縮小</span></td>
+        </tr>
+        <tr style="background:rgba(255,77,109,0.07);">
+          <td><strong>2026年4月</strong></td>
+          <td>1名</td>
+          <td>2投稿</td>
+          <td><strong style="color:var(--red)">10件</strong></td>
+          <td><span class="tag red">-83%</span></td>
+          <td>0名</td>
+          <td>マットレス</td>
+          <td><span class="tag red">急落</span></td>
+        </tr>
+        <tr>
+          <td>2026年5月</td>
+          <td>—</td>
+          <td>—</td>
+          <td><em style="color:var(--text2)">確認中</em></td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td><span class="tag gray">データ待ち</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note">※ 10月〜3月の流入数・投稿数は社内記録からの推定値。4月の10件はGA4確認済み。5月は宮井さんに確認依頼中。</p>
+  </div>
+
+  <!-- ===== 3. KPI達成状況 ===== -->
+  <h2>3. KPI達成状況（2026年3月末時点）</h2>
+  <div class="card-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">目標：流入数 毎月10%増</div>
+      <div class="kpi-value red">未達</div>
+      <div class="kpi-sub">1月〜4月：連続マイナス成長</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">目標：購入者 2名/月</div>
+      <div class="kpi-value red">0〜1名/月</div>
+      <div class="kpi-sub">目標の0〜50%達成にとどまる</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">ピーク流入（12月）</div>
+      <div class="kpi-value yellow">58件</div>
+      <div class="kpi-sub">4月比 +480%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">累計流入（推定）</div>
+      <div class="kpi-value blue">≈256件</div>
+      <div class="kpi-sub">10月〜4月 7ヶ月合計</div>
+    </div>
+  </div>
+
+  <!-- ===== 4. 急落原因分析 ===== -->
+  <h2>4. 4月急落（-83%）の原因分析</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3>🔴 有力仮説（要検証）</h3>
+      <div style="margin-top:12px;">
+        <div class="score-item" style="margin-bottom:10px;">
+          <div class="score-label">① 担当者変更による引き継ぎ品質低下</div>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:85%;background:var(--red);"></div></div>
+          <div class="score-num">確度 85%</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;">1〜3月の施策縮小傾向と一致。インフルエンサーへのブリーフィング品質が低下した可能性が高い。</div>
+        </div>
+        <div class="score-item" style="margin-bottom:10px;">
+          <div class="score-label">② 「ブースター枠」未活用</div>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:70%;background:var(--orange);"></div></div>
+          <div class="score-num">確度 70%</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;">Woomy のブースター機能（リーチ拡張）を12月以降に停止した場合、リーチが半減する。</div>
+        </div>
+        <div class="score-item">
+          <div class="score-label">③ 投稿コンテンツの品質低下</div>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:60%;background:var(--yellow);"></div></div>
+          <div class="score-num">確度 60%</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;">4月起用インフルエンサーのフォロワーとの親和性、またはCTAが弱かった可能性。</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📋 確認が必要な事項</h3>
+      <div style="line-height:2.2; font-size:13px; margin-top:8px;">
+        <div>□ <span style="color:var(--text2);">4月の投稿URL・インサイトデータ（リーチ数・ERなど）の確認</span></div>
+        <div>□ <span style="color:var(--text2);">3月以降にブースター枠の設定を変更したか</span></div>
+        <div>□ <span style="color:var(--text2);">インフルエンサーへのブリーフ内容（商品説明・UTMリンク）の確認</span></div>
+        <div>□ <span style="color:var(--text2);">5月の流入数（GA4 UTM確認 ← 宮井さん）</span></div>
+        <div>□ <span style="color:var(--text2);">Woomyプラットフォームの利用コスト（月額・インフルエンサー報酬）</span></div>
+        <div>□ <span style="color:var(--text2);">競合他社のInstagram施策動向</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 5. コスト試算 ===== -->
+  <h2>5. 費用対効果（概算）</h2>
+  <div class="card">
+    <div class="two-col">
+      <div>
+        <h3>推定コスト（月次）</h3>
+        <table style="margin-top:8px;">
+          <tr>
+            <td>Woomy利用料（推定）</td>
+            <td style="text-align:right; color:var(--yellow);">〜¥30,000</td>
+          </tr>
+          <tr>
+            <td>インフルエンサー報酬（商品現物）</td>
+            <td style="text-align:right; color:var(--yellow);">〜¥20,000</td>
+          </tr>
+          <tr>
+            <td>担当者工数（2〜3h/月）</td>
+            <td style="text-align:right; color:var(--yellow);">〜¥15,000</td>
+          </tr>
+          <tr style="border-top:1px solid var(--border);">
+            <td><strong>月次合計（推定）</strong></td>
+            <td style="text-align:right;"><strong style="color:var(--red);">〜¥65,000</strong></td>
+          </tr>
+        </table>
+        <p class="note">※ 実際のコストはWoomy請求書を要確認</p>
+      </div>
+      <div>
+        <h3>ROI試算（ピーク時 12月）</h3>
+        <table style="margin-top:8px;">
+          <tr>
+            <td>流入数</td>
+            <td style="text-align:right;">58件</td>
+          </tr>
+          <tr>
+            <td>CVR（推定2%）</td>
+            <td style="text-align:right;">≈1名</td>
+          </tr>
+          <tr>
+            <td>平均客単価（枕・掛け布団）</td>
+            <td style="text-align:right;">〜¥20,000</td>
+          </tr>
+          <tr style="border-top:1px solid var(--border);">
+            <td><strong>推定売上貢献</strong></td>
+            <td style="text-align:right;"><strong style="color:var(--yellow);">〜¥20,000/月</strong></td>
+          </tr>
+        </table>
+        <div style="margin-top:12px; padding:10px; background:rgba(255,77,109,0.1); border-radius:6px; font-size:12px;">
+          <strong style="color:var(--red);">ROI = 約 -69%</strong><br>
+          <span style="color:var(--text2);">コスト¥65,000 に対し売上貢献¥20,000。現状では赤字施策。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 6. 継続可否の判断 ===== -->
+  <h2>6. 継続可否の判断と推奨</h2>
+
+  <div class="verdict-box pivot">
+    <div class="verdict-title">🔄 推奨：「条件付き継続 + 施策リセット」</div>
+    <p style="color:var(--text2); font-size:13px; line-height:1.8; margin-top:8px;">
+      即時廃止ではなく、<strong style="color:var(--text)">施策の「やり方」をリセット</strong>して2ヶ月間の再検証を推奨。
+      ただし以下の条件を満たさない場合は、6/30をもって正式廃止とする。
+    </p>
+  </div>
+
+  <div class="two-col" style="margin-top:16px;">
+    <div class="card">
+      <h3 style="color:var(--green);">継続の根拠（ポジティブ要因）</h3>
+      <ul style="line-height:2; padding-left:16px; font-size:13px; color:var(--text2); margin-top:8px;">
+        <li>10〜12月は流入数が<strong style="color:var(--text)">月10%超の成長</strong>を実現</li>
+        <li>楽天・Amazon広告では届かない<strong style="color:var(--text)">SNSネイティブ層</strong>へのリーチ手段</li>
+        <li>競合比較でInstagramからの枕購入は<strong style="color:var(--text)">市場が存在</strong>する</li>
+        <li>急落の原因が<strong style="color:var(--text)">運用課題（担当者・設定）</strong>である可能性が高く、施策自体の問題ではない</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--red);">廃止の根拠（ネガティブ要因）</h3>
+      <ul style="line-height:2; padding-left:16px; font-size:13px; color:var(--text2); margin-top:8px;">
+        <li>1〜4月で<strong style="color:var(--red)">4ヶ月連続マイナス成長</strong></li>
+        <li>7ヶ月で購入者累計<strong style="color:var(--red)">2〜3名</strong>（目標は14名）</li>
+        <li>ROIが<strong style="color:var(--red)">恒常的にマイナス</strong>（コスト回収できていない）</li>
+        <li>担当者変更のたびに成果が不安定になるリスク</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== 7. 条件付き継続のアクションプラン ===== -->
+  <h2>7. 条件付き継続：アクションプラン（2026年7月まで）</h2>
+
+  <div class="card">
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot yellow"></div>
+        <div class="tl-date">2026年6月18日〜6月22日（今週中）</div>
+        <div class="tl-title">① 原因調査・データ収集</div>
+        <div class="tl-body">
+          ・宮井さんに5月GA4データ確認を依頼（商品ページへのInstagram流入数）<br>
+          ・4月投稿のWoomy管理画面でリーチ数・ERを確認<br>
+          ・Woomyの実際の月額費用を経理に確認<br>
+          ・ブースター設定の変更履歴を確認
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">2026年6月25日（部門協議）</div>
+        <div class="tl-title">② 全部署協議ミーティング</div>
+        <div class="tl-body">
+          ・本レポートを元に継続可否を決定<br>
+          ・EC・マーケ・営業・管理の4部門でコスト感・優先度を合意<br>
+          ・継続の場合：次インフルエンサー選定基準を明文化<br>
+          ・廃止の場合：予算の再配分先を決定（楽天広告 or サムネイル改善）
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot green"></div>
+        <div class="tl-date">2026年7月1日〜7月31日（継続の場合のみ）</div>
+        <div class="tl-title">③ 施策リセット・再起動</div>
+        <div class="tl-body">
+          ・<strong>起用基準明確化</strong>：ライフスタイル系・フォロワー1万〜5万・ER 3%以上<br>
+          ・<strong>ブリーフ標準化</strong>：商品説明・UTMリンク・投稿文例をテンプレート化<br>
+          ・<strong>ブースター枠復活</strong>：投稿から48h以内に実施<br>
+          ・<strong>KPI再設定</strong>：流入50件/月を7月の最低ライン（未達で廃止）
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot red"></div>
+        <div class="tl-date">2026年7月31日（判定日）</div>
+        <div class="tl-title">④ 最終判定</div>
+        <div class="tl-body">
+          ・流入数 ≥ 50件 → 継続（8月以降の予算確定）<br>
+          ・流入数 ＜ 50件 → 正式廃止・予算を楽天CTR改善に振り向ける
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== 8. 予算再配分案 ===== -->
+  <h2>8. 廃止した場合の予算再配分案（参考）</h2>
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th>施策</th><th>月次コスト</th><th>期待ROI</th><th>優先度</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>楽天 サムネイル改善（残り2商品）</td>
+          <td>制作費1回限り（〜¥30,000）</td>
+          <td><span class="tag green">CTR 0.06%→0.12% 見込み</span></td>
+          <td>★★★ 最優先</td>
+        </tr>
+        <tr>
+          <td>楽天 RPP広告強化</td>
+          <td>¥50,000〜</td>
+          <td><span class="tag green">ROAS 200〜400%</span></td>
+          <td>★★★ 最優先</td>
+        </tr>
+        <tr>
+          <td>Amazon スポンサープロダクト</td>
+          <td>¥30,000〜</td>
+          <td><span class="tag green">ROAS 300〜500%</span></td>
+          <td>★★☆ 高</td>
+        </tr>
+        <tr>
+          <td>メルマガ（楽天R-Mail）</td>
+          <td>ほぼゼロ（工数のみ）</td>
+          <td><span class="tag blue">既存顧客LTV向上</span></td>
+          <td>★★☆ 高</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== 9. 各部署へのアクションリスト ===== -->
+  <h2>9. 各部署へのアクションリスト</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3>📦 EC部門</h3>
+      <div style="line-height:2.2; font-size:13px; margin-top:8px;">
+        <div>□ 5月・6月のGA4 UTMデータ確認（宮井さん依頼）</div>
+        <div>□ 4月投稿のWooymyインサイト確認</div>
+        <div>□ 継続する場合：インフルエンサーブリーフテンプレート作成</div>
+        <div>□ 継続する場合：7月起用候補インフルエンサー選定（ERと親和性重視）</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📣 マーケティング部門</h3>
+      <div style="line-height:2.2; font-size:13px; margin-top:8px;">
+        <div>□ Instagramアカウント全体のリーチ推移を確認</div>
+        <div>□ ブースター枠の設定状況を確認・復活可否を判断</div>
+        <div>□ 競合他社のインスタ施策をリサーチ</div>
+        <div>□ メルマガ × インスタのクロスチャネル効果を試算</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>💰 管理部門</h3>
+      <div style="line-height:2.2; font-size:13px; margin-top:8px;">
+        <div>□ Woomy月額利用料の実際のコストを確認・共有</div>
+        <div>□ インフルエンサー報酬（商品現物）の原価を確認</div>
+        <div>□ 廃止した場合の予算再配分の承認プロセスを確認</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🏢 経営・営業部門</h3>
+      <div style="line-height:2.2; font-size:13px; margin-top:8px;">
+        <div>□ 6/25の継続可否協議に参加</div>
+        <div>□ Instagram施策の優先度を他施策と比較して判断</div>
+        <div>□ 7月の判定基準（流入50件）の合意</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 10. 結論 ===== -->
+  <h2>10. 結論・協議事項</h2>
+  <div class="card" style="border-color:var(--yellow);">
+    <h3 style="color:var(--yellow);">🗓️ 2026年6月25日（水）に協議をお願いします</h3>
+    <div style="margin-top:12px; font-size:13px; line-height:1.9; color:var(--text2);">
+      <strong style="color:var(--text);">議題①</strong> 4月の急落原因について、事実確認の共有<br>
+      <strong style="color:var(--text);">議題②</strong> 7月に施策リセットして2ヶ月再検証するか、即時廃止するか<br>
+      <strong style="color:var(--text);">議題③</strong> 廃止の場合：¥65,000/月の予算をどこに再配分するか<br>
+      <strong style="color:var(--text);">議題④</strong> 継続の場合：KPI（流入50件）未達時の廃止を事前合意する
+    </div>
+    <div style="margin-top:16px; padding:12px; background:rgba(255,209,102,0.08); border-radius:8px; font-size:13px;">
+      <strong style="color:var(--yellow);">編集長推奨（Claude）：</strong>
+      <span style="color:var(--text2);">
+        「7月1ヶ月のみ施策リセットで再検証」を推奨。ただし条件は厳格に：流入50件未達なら8月以降の予算は楽天RPP/サムネイルへ完全移行。
+        現状のROI（-69%）を放置するより、Instagramの可能性を1回だけ正しいやり方で検証する方が意思決定の質が上がる。
+      </span>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; padding:16px; background:var(--card2); border-radius:8px; font-size:12px; color:var(--text2);">
+    <strong style="color:var(--text);">データソース</strong>：Trelloカード（インスタ施策管理）、社内報告記録、Google Analytics 4（UTM計測）<br>
+    <strong style="color:var(--text);">注意</strong>：10月〜3月の一部数値は推定値を含む。正確な数値はWoomy管理画面・GA4で要確認。<br>
+    <strong style="color:var(--text);">次回更新</strong>：5月GA4データ確認後（6/22予定） / 協議結果確定後（6/25予定）
+  </div>
+
+</div>
+
+<footer>
+  株式会社ネオ・ゲート ／ インフルエンサー施策 分析レポート ／ 作成：2026-06-18 ／ 全部署共有用
+</footer>
+
+<button class="print-btn" onclick="window.print()">🖨️ 印刷 / PDF保存</button>
+
+</body>
+</html>

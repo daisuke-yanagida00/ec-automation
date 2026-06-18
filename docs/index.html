@@ -173,6 +173,7 @@
 <div class="alert-box info"><strong>ℹ️ 完了</strong>GAS自動デプロイ：GitHub Actions + clasp push 設定完了（2026-06-10）。integration/rakuten/yahoo への git push で自動反映。</div>
 <div class="alert-box info"><strong>ℹ️ 完了</strong>Yahoo注文API：取り下げ済み（2026-05-25）。手動CSV運用 + 売上トラッカーで手動入力方式に確定。</div>
 <div class="alert-box info"><strong>ℹ️ 完了</strong>楽天RPP広告：100クリック未満KWへの停止提案は禁止ルール（2026-06-04確定）。RPP広告データは手動CSVアップロードのみ正データ。</div>
+<div class="alert-box error"><strong>⚠️ 要協議（6/25）</strong>インスタインフルエンサー施策：4月に流入数が前月比-83%（10件）と急落。ROI -69%（コスト¥65,000/月 vs 売上貢献¥20,000）。継続可否を全部署で協議。<a href="influencer-analysis.html" style="color:#6e1010;font-weight:700;margin-left:6px;">→ 分析レポートを見る</a></div>
 </div>
 
 <div class="section-title" style="background:linear-gradient(135deg,#0f2d22,#1a3a5e);margin-top:4px">売上目標 vs 実績ダッシュボード <a href="sales-tracker.html" style="font-size:11px;font-weight:400;color:#9ed4bc;margin-left:12px;text-decoration:none;">→ 専用ページで開く</a></div>
@@ -333,6 +334,7 @@
   <div class="ct-project">マーケティング</div>
   <div class="ct-item">SS後続メルマガ分析：GASデータ（SS期間楽天103万・SS後25万）から本文ドラフト作成</div>
   <div class="ct-item">Yahoo! OAuth調査・断念確定（GASサーバーIPがpx-04306でブロック）→手動入力方式で確定</div>
+  <div class="ct-item">インスタインフルエンサー施策 履歴・分析レポート作成（docs/influencer-analysis.html）—全部署共有・継続可否協議資料</div>
 </div>
 
 <div class="section-title">楽天自動化（rakuten-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
@@ -428,6 +430,8 @@
   <div class="todo-item"><span class="badge b-now">今すぐ</span>GAS Web App 再デプロイ：?type=weekly を有効化（デプロイを管理→鉛筆→新しいバージョン→デプロイ）</div>
   <div class="todo-item"><span class="badge b-now">今すぐ</span>SS後続メルマガ入稿（R-Mail）：件名「SSは終わりました。でも…」/ クーポン内容・商品リンクを確定して入稿</div>
   <div class="todo-item"><span class="badge b-now">今すぐ</span>楽天サムネイル改善：makura-sobaS（そば殻角枕）完了済み ✅ → 残り2商品（枕・電位治療掛け布団）の画像差し替えを実施</div>
+  <div class="todo-item"><span class="badge b-now" style="background:#f7c1c1;color:#6e1010">6/22</span>インスタ5月GA4データ確認：宮井さんに商品ページへのInstagram流入数（UTM）を確認依頼</div>
+  <div class="todo-item"><span class="badge b-now" style="background:#f7c1c1;color:#6e1010">6/25</span>インフルエンサー施策 全部署協議：継続 or 廃止を決定。<a href="influencer-analysis.html" style="color:#6e1010">分析レポート参照</a></div>
   <div class="todo-item"><span class="badge b-next">次回</span>EC受注統合：自社ショップ・グースリーのCSVメール転送設定を完了（注文データ完全統合）</div>
   <div class="todo-item"><span class="badge b-next">次回</span>楽天RPP広告：週次CSVを手動DL → node weekly.js 実行</div>
   <div class="todo-item"><span class="badge b-next">次回</span>音声教育化：Vimeo動画・lessons.jsonを投入し、Whisper文字起こし → Claude API概念抽出パイプラインを初回実行する</div>
@@ -448,7 +452,15 @@
 </div>
 
 </div><!-- /content -->
-<p class="footer">最終更新: 2026-06-15 ｜ 全10プロジェクト管理中 ｜ 自動生成 by Claude Code</p>
+<div class="todo" style="margin-top:12px;border-left:4px solid #7F77DD">
+  <h2>📄 関連ドキュメント（GitHub Pages公開）</h2>
+  <div class="todo-item"><span class="badge" style="background:#e8e6ff;color:#2c2480">分析</span><a href="influencer-analysis.html" style="color:#1e1e1c;font-weight:600">インスタインフルエンサー施策 履歴・分析レポート</a>（全部署共有・2026-06-18作成）</div>
+  <div class="todo-item"><span class="badge" style="background:#e8e6ff;color:#2c2480">戦略</span><a href="agent-management.html" style="color:#1e1e1c;font-weight:600">エージェント経営 コンテンツ</a>（AIエージェント8種・フロー図・Phase 1-4ロードマップ）</div>
+  <div class="todo-item"><span class="badge" style="background:#d6f2e6;color:#065035">ツール</span><a href="sales-tracker.html" style="color:#1e1e1c;font-weight:600">売上目標トラッカー</a>（楽天・Amazon・Yahoo!日次集計・棒グラフ）</div>
+  <div class="todo-item"><span class="badge" style="background:#fff0cc;color:#5a3300">ガイド</span><a href="thumbnail-guide.html" style="color:#1e1e1c;font-weight:600">楽天CTR改善 サムネイルガイド</a>（3商品・DO/DON'Tルール・チェックリスト）</div>
+</div>
+
+<p class="footer">最終更新: 2026-06-18 ｜ 全10プロジェクト管理中 ｜ 自動生成 by Claude Code</p>
 <script>
 function fmtYen(n) {
   if (isNaN(n) || n === 0) return '—';
