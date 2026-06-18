@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>インフルエンサーコラボ商品開発 実行計画 | 株式会社ネオ・ゲート</title>
+  <style>
+    :root {
+      --bg: #0f1117; --card: #1a1d2e; --card2: #222538; --border: #2d3156;
+      --accent: #6c63ff; --green: #00d084; --red: #ff4d6d; --yellow: #ffd166;
+      --orange: #ff9f43; --blue: #4ecdc4; --pink: #ff6eb4; --text: #e0e0f0; --text2: #8888aa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; font-size: 14px; }
+
+    header {
+      background: linear-gradient(135deg, #1a1d2e 0%, #2d1b69 50%, #1a3a2e 100%);
+      padding: 32px 24px 24px; border-bottom: 2px solid var(--accent);
+    }
+    header h1 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    header p { color: var(--text2); font-size: 13px; }
+    .meta-bar { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+    .meta-chip { background: rgba(108,99,255,0.2); border: 1px solid var(--accent); border-radius: 20px; padding: 4px 14px; font-size: 12px; color: #b0a8ff; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    h2 { font-size: 16px; font-weight: 700; color: #c8c0ff; margin: 32px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    h3 { font-size: 14px; font-weight: 600; color: var(--text); margin: 14px 0 8px; }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+    .card2 { background: var(--card2); border-radius: 8px; padding: 14px; }
+
+    /* Phase cards */
+    .phase {
+      border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; overflow: hidden;
+    }
+    .phase-header {
+      padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+    }
+    .phase-num {
+      width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; font-weight: 800; flex-shrink: 0;
+    }
+    .phase-title { font-size: 16px; font-weight: 700; }
+    .phase-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .phase-duration { margin-left: auto; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+    .phase-body { padding: 0 20px 20px; }
+
+    /* Phase colors */
+    .p0 .phase-header { background: rgba(136,136,170,0.1); } .p0 .phase-num { background: rgba(136,136,170,0.2); color: var(--text2); }
+    .p1 .phase-header { background: rgba(78,205,196,0.1); }  .p1 .phase-num { background: rgba(78,205,196,0.2); color: var(--blue); }
+    .p2 .phase-header { background: rgba(108,99,255,0.1); }  .p2 .phase-num { background: rgba(108,99,255,0.2); color: var(--accent); }
+    .p3 .phase-header { background: rgba(255,159,67,0.1); }  .p3 .phase-num { background: rgba(255,159,67,0.2); color: var(--orange); }
+    .p4 .phase-header { background: rgba(255,209,102,0.1); } .p4 .phase-num { background: rgba(255,209,102,0.2); color: var(--yellow); }
+    .p5 .phase-header { background: rgba(0,208,132,0.1); }   .p5 .phase-num { background: rgba(0,208,132,0.2); color: var(--green); }
+    .p0 .phase-duration { background: rgba(136,136,170,0.2); color: var(--text2); }
+    .p1 .phase-duration { background: rgba(78,205,196,0.15); color: var(--blue); }
+    .p2 .phase-duration { background: rgba(108,99,255,0.15); color: var(--accent); }
+    .p3 .phase-duration { background: rgba(255,159,67,0.15); color: var(--orange); }
+    .p4 .phase-duration { background: rgba(255,209,102,0.15); color: var(--yellow); }
+    .p5 .phase-duration { background: rgba(0,208,132,0.15); color: var(--green); }
+
+    /* Task table */
+    .task-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+    .task-table th { padding: 8px 10px; text-align: left; font-size: 11px; color: var(--text2); font-weight: 600; border-bottom: 1px solid var(--border); }
+    .task-table td { padding: 10px; border-bottom: 1px solid rgba(45,49,86,0.4); vertical-align: top; line-height: 1.6; }
+    .task-table tr:last-child td { border-bottom: none; }
+    .task-table tr:hover td { background: rgba(108,99,255,0.05); }
+
+    /* Dept badges */
+    .dept {
+      display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; margin: 2px 2px 2px 0;
+    }
+    .d-ec     { background: rgba(0,208,132,0.15); color: var(--green); border: 1px solid rgba(0,208,132,0.3); }
+    .d-mkt    { background: rgba(108,99,255,0.15); color: #b0a8ff; border: 1px solid rgba(108,99,255,0.3); }
+    .d-mgmt   { background: rgba(255,159,67,0.15); color: var(--orange); border: 1px solid rgba(255,159,67,0.3); }
+    .d-sales  { background: rgba(78,205,196,0.15); color: var(--blue); border: 1px solid rgba(78,205,196,0.3); }
+    .d-ceo    { background: rgba(255,77,109,0.15); color: var(--red); border: 1px solid rgba(255,77,109,0.3); }
+
+    /* Auto/Manual tags */
+    .auto   { background: rgba(0,208,132,0.15); color: var(--green); border: 1px solid rgba(0,208,132,0.3); border-radius: 8px; padding: 2px 8px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .manual { background: rgba(255,209,102,0.15); color: var(--yellow); border: 1px solid rgba(255,209,102,0.3); border-radius: 8px; padding: 2px 8px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .semi   { background: rgba(78,205,196,0.15); color: var(--blue); border: 1px solid rgba(78,205,196,0.3); border-radius: 8px; padding: 2px 8px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+
+    /* Gantt */
+    .gantt { overflow-x: auto; margin: 16px 0; }
+    .gantt-table { border-collapse: collapse; font-size: 12px; min-width: 700px; }
+    .gantt-table th { padding: 6px 10px; background: var(--card2); border: 1px solid var(--border); font-weight: 600; color: var(--text2); text-align: center; }
+    .gantt-table td { border: 1px solid var(--border); padding: 6px 10px; }
+    .gantt-table .label { background: var(--card); color: var(--text); font-weight: 600; white-space: nowrap; min-width: 180px; }
+    .g-bar { height: 20px; border-radius: 4px; }
+
+    /* Automation matrix */
+    .auto-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:700px) { .auto-matrix { grid-template-columns: 1fr; } }
+    .auto-col { background: var(--card); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+    .auto-col h3 { font-size: 13px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .auto-item { display: flex; gap: 8px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(45,49,86,0.3); font-size: 13px; }
+    .auto-item:last-child { border-bottom: none; }
+    .auto-item-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* Dept role cards */
+    .dept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .dept-card { background: var(--card); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+    .dept-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .dept-task { font-size: 13px; padding: 5px 0; border-bottom: 1px solid rgba(45,49,86,0.3); display: flex; gap: 8px; align-items: flex-start; line-height: 1.5; }
+    .dept-task:last-child { border-bottom: none; }
+
+    /* KPI */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 12px 0; }
+    .kpi-box { background: var(--card2); border-radius: 8px; padding: 14px; text-align: center; border: 1px solid var(--border); }
+    .kpi-num { font-size: 22px; font-weight: 800; }
+    .kpi-label { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+    .warn { background: rgba(255,209,102,0.08); border: 1px solid rgba(255,209,102,0.3); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--yellow); margin: 12px 0; }
+    .info { background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.3); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--blue); margin: 12px 0; }
+
+    footer { text-align: center; padding: 24px; color: var(--text2); font-size: 12px; border-top: 1px solid var(--border); margin-top: 40px; }
+    @media print { body { background: #fff; color: #111; } .card, .phase, .dept-card, .auto-col, .kpi-box { background: #f5f5f5; border-color: #ddd; } header { background: #2d1b69 !important; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🤝 インフルエンサーコラボ商品開発 完全実行計画</h1>
+  <p>株式会社ネオ・ゲート ／ 全部署協議・担当割り当て・自動化マップ付き</p>
+  <div class="meta-bar">
+    <span class="meta-chip">作成日：2026-06-18</span>
+    <span class="meta-chip">総期間：約8ヶ月（準備〜発売後計測）</span>
+    <span class="meta-chip">Phase 0〜5の6段階</span>
+    <span class="meta-chip">参考事例：VALX・ReZARD・しまむら×プチプラのあや</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- KPI -->
+  <h2>目標KPI</h2>
+  <div class="kpi-grid">
+    <div class="kpi-box">
+      <div class="kpi-num" style="color:var(--yellow)">3ヶ月</div>
+      <div class="kpi-label">発売後3ヶ月で損益分岐点達成</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-num" style="color:var(--green)">月50件+</div>
+      <div class="kpi-label">Instagram経由 商品ページ流入</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-num" style="color:var(--blue)">月5名+</div>
+      <div class="kpi-label">コラボ経由 購入者数</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-num" style="color:var(--accent)">ROI+</div>
+      <div class="kpi-label">現行施策ROI-69% → プラスへ</div>
+    </div>
+  </div>
+
+  <!-- TIMELINE GANTT -->
+  <h2>全体スケジュール（約8ヶ月）</h2>
+  <div class="gantt">
+    <table class="gantt-table">
+      <thead>
+        <tr>
+          <th>フェーズ</th>
+          <th>7月</th><th>8月</th><th>9月</th><th>10月</th><th>11月</th><th>12月</th><th>1月</th><th>2月〜</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label">Phase 0｜準備・体制構築</td>
+          <td style="background:rgba(136,136,170,0.4);border-radius:4px"></td>
+          <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td class="label">Phase 1｜インフルエンサー選定・関係構築</td>
+          <td style="background:rgba(78,205,196,0.4);border-radius:4px"></td>
+          <td style="background:rgba(78,205,196,0.4)"></td>
+          <td></td><td></td><td></td><td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td class="label">Phase 2｜フィードバック収集・商品コンセプト確定</td>
+          <td></td>
+          <td style="background:rgba(108,99,255,0.4)"></td>
+          <td style="background:rgba(108,99,255,0.4);border-radius:4px"></td>
+          <td></td><td></td><td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td class="label">Phase 3｜商品開発・サンプル制作</td>
+          <td></td><td></td>
+          <td style="background:rgba(255,159,67,0.4)"></td>
+          <td style="background:rgba(255,159,67,0.4)"></td>
+          <td style="background:rgba(255,159,67,0.4)"></td>
+          <td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td class="label">Phase 4｜発売準備・プレローンチ</td>
+          <td></td><td></td><td></td><td></td>
+          <td style="background:rgba(255,209,102,0.4)"></td>
+          <td style="background:rgba(255,209,102,0.4)"></td>
+          <td></td><td></td>
+        </tr>
+        <tr>
+          <td class="label">Phase 5｜発売・計測・改善</td>
+          <td></td><td></td><td></td><td></td><td></td>
+          <td style="background:rgba(0,208,132,0.3)"></td>
+          <td style="background:rgba(0,208,132,0.4)"></td>
+          <td style="background:rgba(0,208,132,0.4);border-radius:4px"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== PHASES ===== -->
+  <h2>フェーズ別 詳細タスク・担当・自動化</h2>
+
+  <!-- PHASE 0 -->
+  <div class="phase p0">
+    <div class="phase-header">
+      <div class="phase-num">0</div>
+      <div>
+        <div class="phase-title">準備・体制構築</div>
+        <div class="phase-sub">プロジェクト立ち上げ・予算確定・ツール整備</div>
+      </div>
+      <div class="phase-duration">7月1週〜2週（2週間）</div>
+    </div>
+    <div class="phase-body">
+      <table class="task-table">
+        <thead><tr><th width="30%">タスク</th><th width="20%">担当部署</th><th width="15%">方式</th><th>詳細・ツール</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>予算確定・承認</td>
+            <td><span class="dept d-mgmt">管理</span><span class="dept d-ceo">経営</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>初期予算目安：OEM費用 ¥30〜50万、インフルエンサー謝礼（現物+少額） ¥5〜10万、ツール費用 ¥0〜3万。承認フローを文書化。</td>
+          </tr>
+          <tr>
+            <td>プロジェクト担当者アサイン</td>
+            <td><span class="dept d-ceo">経営</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>各フェーズのPM（責任者）を1名決定。全フェーズ通じて窓口を一本化する。</td>
+          </tr>
+          <tr>
+            <td>インフルエンサー選定基準を文書化</td>
+            <td><span class="dept d-mkt">マーケ</span><span class="dept d-ec">EC</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>基準：フォロワー1〜10万、ER 3%以上、睡眠・ライフスタイル・インテリア系、過去投稿に炎上歴なし、楽天ROOMアカウント保有が望ましい</td>
+          </tr>
+          <tr>
+            <td>計測環境整備（GA4 UTM）</td>
+            <td><span class="dept d-ec">EC</span><span class="dept d-mkt">マーケ</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>UTMパラメータ設計テンプレートをスプレッドシートで管理。GASでUTMリンク生成を自動化可能。</td>
+          </tr>
+          <tr>
+            <td>OEMメーカーリサーチ・問い合わせ</td>
+            <td><span class="dept d-ec">EC</span><span class="dept d-mgmt">管理</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>枕・布団のOEMメーカー3社以上に問い合わせ。最小ロット・単価・リードタイムを確認。目安：最小ロット50〜200個。</td>
+          </tr>
+          <tr>
+            <td>契約書テンプレート準備</td>
+            <td><span class="dept d-mgmt">管理</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>インフルエンサーとの業務委託契約（秘密保持・権利帰属・PR表示義務・炎上時対応条項を含む）。Claude APIでテンプレート生成可能。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase p1">
+    <div class="phase-header">
+      <div class="phase-num">1</div>
+      <div>
+        <div class="phase-title">インフルエンサー選定・関係構築</div>
+        <div class="phase-sub">候補発掘 → スクリーニング → アプローチ → モニター提供</div>
+      </div>
+      <div class="phase-duration">7月〜8月（2ヶ月）</div>
+    </div>
+    <div class="phase-body">
+      <table class="task-table">
+        <thead><tr><th width="30%">タスク</th><th width="20%">担当部署</th><th width="15%">方式</th><th>詳細・ツール</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>候補インフルエンサーリストアップ（20〜30名）</td>
+            <td><span class="dept d-mkt">マーケ</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>Instagramで #睡眠 #枕 #寝室インテリア #ライフスタイル のハッシュタグ検索。Woomy・Find Modelでもリサーチ。Claude APIにリストを渡して選定スコアリングを半自動化可能。</td>
+          </tr>
+          <tr>
+            <td>スクリーニング（ER・フォロワー質・投稿親和性）</td>
+            <td><span class="dept d-mkt">マーケ</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>ER = (いいね+コメント) / フォロワー × 100。目標3%以上。Phlanx・HypeAuditor（無料版）でフォロワー品質確認。スプレッドシートでスコア管理。</td>
+          </tr>
+          <tr>
+            <td>上位5名に初回DM・メールアプローチ</td>
+            <td><span class="dept d-mkt">マーケ</span><span class="dept d-ec">EC</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>テンプレート文面はClaude APIで生成しカスタマイズ。「商品モニター（無料提供）」として最初は軽いオファーから入る。報酬は後から設計。</td>
+          </tr>
+          <tr>
+            <td>商品モニター提供（無料サンプル）</td>
+            <td><span class="dept d-ec">EC</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>枕・掛け布団を現物で2〜3名に提供。使用感レポートを依頼（フォロワーへの投稿は任意）。契約前は「PR義務なし」で関係構築優先。</td>
+          </tr>
+          <tr>
+            <td>レポート内容・反応の記録</td>
+            <td><span class="dept d-mkt">マーケ</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>スプレッドシートでインフルエンサーごとの反応を記録。GASで定期集計。</td>
+          </tr>
+          <tr>
+            <td>最終候補2〜3名を選定・契約</td>
+            <td><span class="dept d-ceo">経営</span><span class="dept d-mgmt">管理</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>モニター期間の反応・親和性を確認後、業務委託契約を締結。PR表示義務・権利帰属・炎上時対応を明記。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase p2">
+    <div class="phase-header">
+      <div class="phase-num">2</div>
+      <div>
+        <div class="phase-title">フィードバック収集・商品コンセプト確定</div>
+        <div class="phase-sub">フォロワーニーズを吸い上げ → 商品仕様を決定する</div>
+      </div>
+      <div class="phase-duration">8月〜9月（1.5ヶ月）</div>
+    </div>
+    <div class="phase-body">
+      <div class="info">💡 この段階がP2C成功の鍵。インフルエンサーが「作った感」を持てるかどうかで、後の発信熱量が変わる。</div>
+      <table class="task-table">
+        <thead><tr><th width="30%">タスク</th><th width="20%">担当部署</th><th width="15%">方式</th><th>詳細・ツール</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>インスタストーリーズアンケート実施（インフルエンサー投稿）</td>
+            <td><span class="dept d-mkt">マーケ</span> + インフルエンサー</td>
+            <td><span class="manual">手動</span></td>
+            <td>インフルエンサーが自分のアカウントで「どんな枕が欲しい？」「価格帯は？」「色は？」等のアンケートを投稿。回答はスクショでエビデンス化。</td>
+          </tr>
+          <tr>
+            <td>アンケート結果の集計・分析</td>
+            <td><span class="dept d-ec">EC</span><span class="dept d-mkt">マーケ</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>スプレッドシートに入力後、Claude APIでニーズサマリーを自動生成。「ユーザーが望む商品像」を1ページでまとめる。</td>
+          </tr>
+          <tr>
+            <td>商品コンセプトシート作成</td>
+            <td><span class="dept d-ec">EC</span><span class="dept d-mkt">マーケ</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>①商品名（仮） ②ターゲット ③価格帯 ④差別化ポイント ⑤素材・仕様 を1枚に整理。Claude APIでドラフト生成→人間が確認・修正。</td>
+          </tr>
+          <tr>
+            <td>OEMメーカーに仕様を提示・見積もり取得</td>
+            <td><span class="dept d-ec">EC</span><span class="dept d-mgmt">管理</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>Phase 0でリストアップした3社以上に仕様書を送付。最小ロット・単価・納期を比較。目標原価は販売価格の30〜40%以内。</td>
+          </tr>
+          <tr>
+            <td>インフルエンサーとのコンセプト合意</td>
+            <td><span class="dept d-ec">EC</span> + インフルエンサー</td>
+            <td><span class="manual">手動</span></td>
+            <td>オンラインMTGでコンセプトシートを共有・合意。インフルエンサーの意見を仕様に反映させることで「共同開発者」意識を醸成。</td>
+          </tr>
+          <tr>
+            <td>発売前のティザー投稿計画を設計</td>
+            <td><span class="dept d-mkt">マーケ</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>「開発中です」投稿→「サンプルできた！」投稿→「もうすぐ発売」投稿の3段階ティザー。投稿文案はClaude APIで生成。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase p3">
+    <div class="phase-header">
+      <div class="phase-num">3</div>
+      <div>
+        <div class="phase-title">商品開発・サンプル制作・量産</div>
+        <div class="phase-sub">OEMメーカーと連携してコラボ商品を完成させる</div>
+      </div>
+      <div class="phase-duration">9月〜11月（3ヶ月）</div>
+    </div>
+    <div class="phase-body">
+      <div class="warn">⚠️ リスク：在庫を抱えすぎない。初回ロットは需要予測の70%（例：100個見込みなら70個）。売れ行き確認後に追加発注。</div>
+      <table class="task-table">
+        <thead><tr><th width="30%">タスク</th><th width="20%">担当部署</th><th width="15%">方式</th><th>詳細・ツール</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>OEMメーカー発注・サンプル依頼</td>
+            <td><span class="dept d-ec">EC</span><span class="dept d-mgmt">管理</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>仕様書・コンセプトシートをメーカーに提出。サンプル1〜3個を発注。費用：¥1〜5万（サンプル代）。リードタイム4〜6週間。</td>
+          </tr>
+          <tr>
+            <td>サンプル確認（社内 + インフルエンサー）</td>
+            <td><span class="dept d-ec">EC</span> + インフルエンサー</td>
+            <td><span class="manual">手動</span></td>
+            <td>インフルエンサーにサンプルを使ってもらいフィードバック取得。修正点をメーカーにフィードバック。最大2回まで。3回目は追加費用発生に注意。</td>
+          </tr>
+          <tr>
+            <td>最終仕様承認・量産発注</td>
+            <td><span class="dept d-ec">EC</span><span class="dept d-mgmt">管理</span><span class="dept d-ceo">経営</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>初回ロット数・単価・納期を最終確認。発注書を正式送付。入金スケジュール（前払い50%・納品時50%が一般的）を管理部門が管理。</td>
+          </tr>
+          <tr>
+            <td>楽天・Amazon商品ページ作成</td>
+            <td><span class="dept d-ec">EC</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>商品説明文・タイトル・特徴ポイントをClaude APIで初稿生成→EC担当が最終調整。サムネイルはインフルエンサー撮影素材を活用。</td>
+          </tr>
+          <tr>
+            <td>インフルエンサーによる開発ストーリー投稿（ティザー）</td>
+            <td><span class="dept d-mkt">マーケ</span> + インフルエンサー</td>
+            <td><span class="semi">半自動</span></td>
+            <td>「サンプルが届いた！」投稿（PR表示あり）。投稿タイミング・文面をマーケが管理。投稿スケジュールはNotionまたはスプレッドシートで管理。</td>
+          </tr>
+          <tr>
+            <td>自社ECサイト（必要なら）のセットアップ</td>
+            <td><span class="dept d-ec">EC</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>楽天・AmazonでまずテストしてOKなら後で自社EC追加。Shopify活用が最速。SEO・OGP設定はClaude APIで補助。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase p4">
+    <div class="phase-header">
+      <div class="phase-num">4</div>
+      <div>
+        <div class="phase-title">発売準備・プレローンチ</div>
+        <div class="phase-sub">「一緒に作った」ストーリーで発売前から熱量を高める</div>
+      </div>
+      <div class="phase-duration">11月〜12月初旬（1.5ヶ月）</div>
+    </div>
+    <div class="phase-body">
+      <table class="task-table">
+        <thead><tr><th width="30%">タスク</th><th width="20%">担当部署</th><th width="15%">方式</th><th>詳細・ツール</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>発売日・価格の最終決定</td>
+            <td><span class="dept d-ceo">経営</span><span class="dept d-mgmt">管理</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>年末ギフト需要（12月）に合わせた発売が理想。価格は原価×2.5〜3倍を目安。楽天スーパーセール・Amazonタイムセールとの兼ね合いも確認。</td>
+          </tr>
+          <tr>
+            <td>発売前告知投稿（7〜10日前）</td>
+            <td><span class="dept d-mkt">マーケ</span> + インフルエンサー</td>
+            <td><span class="semi">半自動</span></td>
+            <td>「〇日後に発売！」投稿を2〜3回。カウントダウン形式で期待感を高める。投稿文はClaude APIで案出し→インフルエンサーが自分の言葉に調整。</td>
+          </tr>
+          <tr>
+            <td>楽天クーポン・Amazon Coupon設定</td>
+            <td><span class="dept d-ec">EC</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>発売記念クーポン（10〜15%OFF・数量限定）を設定。GASで発行・管理できるよう設計。</td>
+          </tr>
+          <tr>
+            <td>メルマガ（楽天R-Mail）配信準備</td>
+            <td><span class="dept d-mkt">マーケ</span><span class="dept d-ec">EC</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>「〇〇さんと一緒に作りました！」訴求のメルマガ。Claude APIで文面生成→EC担当が確認→R-Mailで配信。</td>
+          </tr>
+          <tr>
+            <td>在庫・物流体制確認</td>
+            <td><span class="dept d-ec">EC</span><span class="dept d-mgmt">管理</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>入荷確認・梱包・発送体制を整備。楽天はRSL（楽天物流）、AmazonはFBAへの入庫手順を事前確認。</td>
+          </tr>
+          <tr>
+            <td>インフルエンサーへのコラボ商品提供（告知用）</td>
+            <td><span class="dept d-ec">EC</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>発売日の告知投稿用に完成品を事前提供。撮影・動画素材を確保してもらう。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase p5">
+    <div class="phase-header">
+      <div class="phase-num">5</div>
+      <div>
+        <div class="phase-title">発売・計測・改善（継続）</div>
+        <div class="phase-sub">売上・流入・ROIを毎週モニタリングし次の打ち手を判断</div>
+      </div>
+      <div class="phase-duration">12月〜（発売後3ヶ月以上）</div>
+    </div>
+    <div class="phase-body">
+      <table class="task-table">
+        <thead><tr><th width="30%">タスク</th><th width="20%">担当部署</th><th width="15%">方式</th><th>詳細・ツール</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>発売日：インフルエンサー一斉投稿</td>
+            <td>インフルエンサー + <span class="dept d-mkt">マーケ</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>フィード投稿・ストーリーズ・リールを同日に複数投稿。UTMパラメータ付きリンクでGA4計測。</td>
+          </tr>
+          <tr>
+            <td>売上・流入数の日次モニタリング</td>
+            <td><span class="dept d-ec">EC</span></td>
+            <td><span class="auto">自動</span></td>
+            <td>既存GAS（integration/Code.gs）の売上トラッカーに商品別集計を追加。楽天・Amazon注文データから自動集計。GA4 UTMデータをGASで取得。</td>
+          </tr>
+          <tr>
+            <td>週次レポート自動生成</td>
+            <td><span class="dept d-ec">EC</span></td>
+            <td><span class="auto">自動</span></td>
+            <td>GAS週次実行 + Claude APIでサマリー生成 + Chatwork通知（現行の週次ダッシュボードを拡張）。</td>
+          </tr>
+          <tr>
+            <td>インフルエンサーへの実績フィードバック</td>
+            <td><span class="dept d-mkt">マーケ</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>週次で「流入数○件・購入○名・売上¥○万」を報告。インフルエンサーの追加投稿モチベーションを維持。GASレポートから自動抜粋。</td>
+          </tr>
+          <tr>
+            <td>発売1ヶ月後：KPI評価・追加発注判断</td>
+            <td><span class="dept d-ceo">経営</span><span class="dept d-ec">EC</span><span class="dept d-mgmt">管理</span></td>
+            <td><span class="manual">手動</span></td>
+            <td>流入50件/月 or 購入5名/月を達成していれば追加発注。未達なら改善策（価格・投稿内容・チャネル追加）を協議。</td>
+          </tr>
+          <tr>
+            <td>レビュー収集・商品ページ改善</td>
+            <td><span class="dept d-ec">EC</span></td>
+            <td><span class="semi">半自動</span></td>
+            <td>楽天・Amazonレビューをスクレイピング or 手動収集。Claude APIで分析→商品説明・Q&A・画像を改善。</td>
+          </tr>
+          <tr>
+            <td>発売3ヶ月後：継続・第2弾企画を判断</td>
+            <td><span class="dept d-ceo">経営</span>全部署</td>
+            <td><span class="manual">手動</span></td>
+            <td>ROI・売上・在庫消化率を評価。第2弾（別色・派生商品）orコラボインフルエンサー追加 or 終了を決定。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== 部署別役割 ===== -->
+  <h2>各部署の役割まとめ</h2>
+  <div class="dept-grid">
+    <div class="dept-card">
+      <h3 style="color:var(--green)">📦 EC部門</h3>
+      <div class="dept-task"><span>🔵</span><span>インフルエンサー候補の実務スクリーニング</span></div>
+      <div class="dept-task"><span>🔵</span><span>OEMメーカーとの仕様調整・発注管理</span></div>
+      <div class="dept-task"><span>🔵</span><span>楽天・Amazon商品ページ作成・最適化</span></div>
+      <div class="dept-task"><span>🔵</span><span>在庫・物流（FBA・RSL）管理</span></div>
+      <div class="dept-task"><span>🔵</span><span>売上・流入数のGA4・GAS計測管理</span></div>
+      <div class="dept-task"><span>🔵</span><span>週次売上レポートの確認・判断</span></div>
+    </div>
+    <div class="dept-card">
+      <h3 style="color:#b0a8ff">📣 マーケティング部門</h3>
+      <div class="dept-task"><span>🔵</span><span>インフルエンサー候補リストアップ（ハッシュタグ検索・Woomy）</span></div>
+      <div class="dept-task"><span>🔵</span><span>初回アプローチDM・メール送付</span></div>
+      <div class="dept-task"><span>🔵</span><span>ストーリーズアンケート設計・投稿管理</span></div>
+      <div class="dept-task"><span>🔵</span><span>ティザー〜発売日の投稿スケジュール管理</span></div>
+      <div class="dept-task"><span>🔵</span><span>楽天R-Mailメルマガ制作・配信</span></div>
+      <div class="dept-task"><span>🔵</span><span>インフルエンサーへの週次実績フィードバック</span></div>
+    </div>
+    <div class="dept-card">
+      <h3 style="color:var(--orange)">💰 管理部門</h3>
+      <div class="dept-task"><span>🔵</span><span>予算承認・支払い管理（OEM・インフルエンサー謝礼）</span></div>
+      <div class="dept-task"><span>🔵</span><span>業務委託契約書の作成・締結管理</span></div>
+      <div class="dept-task"><span>🔵</span><span>OEMメーカーへの発注書・入金管理</span></div>
+      <div class="dept-task"><span>🔵</span><span>ROI計算・費用対効果の月次報告</span></div>
+    </div>
+    <div class="dept-card">
+      <h3 style="color:var(--red)">🏢 経営・意思決定</h3>
+      <div class="dept-task"><span>🔵</span><span>Phase 0：予算承認</span></div>
+      <div class="dept-task"><span>🔵</span><span>Phase 1：最終インフルエンサー選定・契約承認</span></div>
+      <div class="dept-task"><span>🔵</span><span>Phase 3：量産発注最終承認</span></div>
+      <div class="dept-task"><span>🔵</span><span>Phase 5：KPI評価・継続 or 終了判断</span></div>
+    </div>
+  </div>
+
+  <!-- ===== 自動化マップ ===== -->
+  <h2>自動化 vs 手動 完全マップ</h2>
+  <div class="auto-matrix">
+    <div class="auto-col" style="border-color:rgba(0,208,132,0.3)">
+      <h3 style="color:var(--green)">🤖 自動化できる業務</h3>
+      <div class="auto-item">
+        <div class="auto-item-icon">📊</div>
+        <div>
+          <strong>売上・流入数の日次集計</strong><br>
+          <span style="font-size:12px;color:var(--text2)">GAS（既存integration/Code.gs拡張）で楽天・Amazon注文から商品別売上を自動集計。毎朝8時実行。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">📧</div>
+        <div>
+          <strong>週次レポート生成・通知</strong><br>
+          <span style="font-size:12px;color:var(--text2)">GAS + Claude API：売上・流入・購入者数を自動まとめ → Chatwork通知（現行ダッシュボードを拡張）</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">🔗</div>
+        <div>
+          <strong>UTMリンク生成</strong><br>
+          <span style="font-size:12px;color:var(--text2)">GASでインフルエンサー別UTMパラメータ付きリンクを一括生成。スプレッドシートで管理。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">✍️</div>
+        <div>
+          <strong>商品ページ文章の初稿生成</strong><br>
+          <span style="font-size:12px;color:var(--text2)">コンセプトシートをClaude APIに渡して、楽天・Amazon向け商品説明文・タイトル・ポイントを自動生成。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">📝</div>
+        <div>
+          <strong>投稿文案の生成</strong><br>
+          <span style="font-size:12px;color:var(--text2)">ティザー・発売告知・DM初稿をClaude APIで生成。インフルエンサーが自分の言葉に調整するだけ。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">⭐</div>
+        <div>
+          <strong>レビュー収集・分析</strong><br>
+          <span style="font-size:12px;color:var(--text2)">楽天・Amazonのレビューを定期収集 → Claude APIで「改善点サマリー」を自動生成 → EC担当が確認。</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="auto-col" style="border-color:rgba(255,209,102,0.3)">
+      <h3 style="color:var(--yellow)">👤 手動が必要な業務</h3>
+      <div class="auto-item">
+        <div class="auto-item-icon">🤝</div>
+        <div>
+          <strong>インフルエンサーとの関係構築・交渉</strong><br>
+          <span style="font-size:12px;color:var(--text2)">初回DM・オファー提示・コンセプト合意MTGは人間が行う。信頼関係は自動化できない。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">🏭</div>
+        <div>
+          <strong>OEMメーカーとの交渉・発注</strong><br>
+          <span style="font-size:12px;color:var(--text2)">見積もり比較・品質交渉・発注書確認は人間が判断。金額・仕様変更の最終決定は手動。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">🔍</div>
+        <div>
+          <strong>サンプル品質チェック</strong><br>
+          <span style="font-size:12px;color:var(--text2)">実際に商品を手に取って触感・縫製・パッケージを確認する作業は自動化不可。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">📸</div>
+        <div>
+          <strong>インフルエンサーの実際の投稿</strong><br>
+          <span style="font-size:12px;color:var(--text2)">実際の写真撮影・動画撮影・投稿はインフルエンサー本人が行う。スケジュール管理は担当者。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">⚖️</div>
+        <div>
+          <strong>法務・契約書の確認・押印</strong><br>
+          <span style="font-size:12px;color:var(--text2)">業務委託契約書の内容確認・修正・押印は管理部門が手動で実施。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">💡</div>
+        <div>
+          <strong>KPI評価・次フェーズの意思決定</strong><br>
+          <span style="font-size:12px;color:var(--text2)">継続・追加発注・第2弾企画・終了の判断は経営・EC・管理の協議による手動決定。</span>
+        </div>
+      </div>
+      <div class="auto-item">
+        <div class="auto-item-icon">📦</div>
+        <div>
+          <strong>入荷検品・FBA/RSL入庫作業</strong><br>
+          <span style="font-size:12px;color:var(--text2)">商品入荷時の検品・梱包・FBAへの入庫ラベル貼りは手動。量が増えたら3PLに外注。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 初期費用概算 ===== -->
+  <h2>初期費用概算</h2>
+  <div class="card" style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border)">
+          <th style="padding:8px;text-align:left;color:var(--text2)">項目</th>
+          <th style="padding:8px;text-align:right;color:var(--text2)">金額（目安）</th>
+          <th style="padding:8px;text-align:left;color:var(--text2)">備考</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(45,49,86,0.4)">
+          <td style="padding:8px">OEMサンプル費用</td>
+          <td style="padding:8px;text-align:right;color:var(--yellow)">¥1〜5万</td>
+          <td style="padding:8px;color:var(--text2)">2〜3回分込み</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(45,49,86,0.4)">
+          <td style="padding:8px">初回量産費用（50〜100個）</td>
+          <td style="padding:8px;text-align:right;color:var(--yellow)">¥30〜60万</td>
+          <td style="padding:8px;color:var(--text2)">原価¥3,000〜6,000/個 × 100個</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(45,49,86,0.4)">
+          <td style="padding:8px">インフルエンサー謝礼</td>
+          <td style="padding:8px;text-align:right;color:var(--yellow)">¥5〜10万</td>
+          <td style="padding:8px;color:var(--text2)">現物提供（原価）+ 少額キャッシュ</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(45,49,86,0.4)">
+          <td style="padding:8px">Woomyプラットフォーム（継続の場合）</td>
+          <td style="padding:8px;text-align:right;color:var(--yellow)">¥0〜3万</td>
+          <td style="padding:8px;color:var(--text2)">直接交渉なら不要</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(45,49,86,0.4)">
+          <td style="padding:8px">工数（社内人件費換算）</td>
+          <td style="padding:8px;text-align:right;color:var(--yellow)">¥15〜30万</td>
+          <td style="padding:8px;color:var(--text2)">8ヶ月間の担当者工数</td>
+        </tr>
+        <tr style="border-top:2px solid var(--border)">
+          <td style="padding:8px;font-weight:700">合計</td>
+          <td style="padding:8px;text-align:right;font-weight:700;color:var(--red)">¥51〜108万</td>
+          <td style="padding:8px;color:var(--text2)">現行施策¥65,000/月×8ヶ月=¥52万と同水準</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:12px;padding:10px;background:rgba(0,208,132,0.08);border-radius:6px;font-size:12px;color:var(--green)">
+      ✅ 現行インフルエンサー施策を廃止し、その予算（¥65,000/月）をこのプロジェクトに充てると、8ヶ月で¥52万の財源が確保できる。追加投資は最小限で済む。
+    </div>
+  </div>
+
+  <!-- ===== 次のアクション ===== -->
+  <h2>今すぐ動ける次のアクション（Phase 0 開始）</h2>
+  <div class="card" style="border-color:var(--green)">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="background:rgba(0,208,132,0.2);color:var(--green);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap">今週中</div>
+        <div><strong>予算承認</strong>：初期費用¥50〜100万の予算枠を経営・管理で確認・承認する</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="background:rgba(0,208,132,0.2);color:var(--green);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap">今週中</div>
+        <div><strong>PM決定</strong>：このプロジェクトを推進する担当者1名をアサインする（EC or マーケ）</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="background:rgba(78,205,196,0.2);color:var(--blue);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap">7月第1週</div>
+        <div><strong>インフルエンサー候補リスト作成</strong>：#睡眠 #枕 #寝室インテリア でInstagram検索 → 20〜30名リストアップ</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="background:rgba(78,205,196,0.2);color:var(--blue);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap">7月第1週</div>
+        <div><strong>OEMメーカーリサーチ</strong>：「枕 OEM 小ロット」でリサーチ → 3社以上に問い合わせ</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0">
+        <div style="background:rgba(108,99,255,0.2);color:var(--accent);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap">7月第2週</div>
+        <div><strong>現行Woomy施策の廃止</strong>：継続と判断しない場合、7月末を目処に解約 → 予算をこのプロジェクトへ</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<footer>株式会社ネオ・ゲート ／ インフルエンサーコラボ商品開発 実行計画 ／ 作成：2026-06-18 ／ 全部署共有用</footer>
+</body>
+</html>
