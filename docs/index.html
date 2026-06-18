@@ -160,19 +160,19 @@
 
 <div class="header">
   <h1>🚀 自動化プロジェクト ダッシュボード</h1>
-  <p class="subtitle">2026年06月05週（2026-06-05）更新 ｜ 株式会社エフェクト ｜ 全9プロジェクト</p>
+  <p class="subtitle">2026年06月15週（2026-06-15）更新 ｜ 株式会社エフェクト ｜ 全9プロジェクト</p>
 </div>
 
 <div class="content">
 
 <div class="alert-grid">
 <div class="alert-box warning"><strong>⚠️ アラート</strong>楽天RPP広告自動化：DRY_RUN=true 状態が継続中の可能性あり。本番適用前に動作確認と承認が必要。</div>
-<div class="alert-box warning"><strong>⚠️ アラート</strong>rakuten-rpp-auto：Playwrightセッション有効期限は約20時間。セッション切れ時の自動ログイン（channel: 'chrome' + headless: true）の成否を次回確認すること。</div>
 <div class="alert-box warning"><strong>⚠️ アラート</strong>EC受注統合：自社ショップ・グースリーのCSVメール転送設定が未完了。注文データの完全統合ができていない状態。</div>
+<div class="alert-box warning"><strong>⚠️ アラート</strong>GAS Web App：?type=weekly 有効化には再デプロイが必要（デプロイを管理→鉛筆→新しいバージョン→デプロイ）。</div>
 <div class="alert-box warning"><strong>⚠️ アラート</strong>音声教育化（writing-concepts）：Vimeo動画・lessons.jsonが未投入のままパイプライン実行待ち状態。着手優先度を上げること。</div>
-<div class="alert-box info"><strong>ℹ️ アラート</strong>Yahoo注文API申請は取り下げ済み（2026-05-25）。手動CSVダウンロード運用に方針変更済み。</div>
-<div class="alert-box info"><strong>ℹ️ アラート</strong>楽天RPP広告：100クリック未満のキーワードへの停止提案は禁止ルール（2026-06-04確定）。RPP広告データは手動CSVアップロードのみ正データ（2026-06-03確定）。</div>
-<div class="alert-box info"><strong>ℹ️ アラート</strong>amazon-gas-automation：今週のgitコミットなし。SP-APIデバッグセッションの内容がCLAUDE.mdに反映されているか確認推奨。</div>
+<div class="alert-box info"><strong>ℹ️ 完了</strong>GAS自動デプロイ：GitHub Actions + clasp push 設定完了（2026-06-10）。integration/rakuten/yahoo への git push で自動反映。</div>
+<div class="alert-box info"><strong>ℹ️ 完了</strong>Yahoo注文API：取り下げ済み（2026-05-25）。手動CSV運用 + 売上トラッカーで手動入力方式に確定。</div>
+<div class="alert-box info"><strong>ℹ️ 完了</strong>楽天RPP広告：100クリック未満KWへの停止提案は禁止ルール（2026-06-04確定）。RPP広告データは手動CSVアップロードのみ正データ。</div>
 </div>
 
 <div class="section-title" style="background:linear-gradient(135deg,#0f2d22,#1a3a5e);margin-top:4px">売上目標 vs 実績ダッシュボード <a href="sales-tracker.html" style="font-size:11px;font-weight:400;color:#9ed4bc;margin-left:12px;text-decoration:none;">→ 専用ページで開く</a></div>
@@ -283,8 +283,9 @@
   <div class="card blue"><h2>Amazon</h2>
     <div class="item done">✓ 注文取得（毎朝8時）</div>
     <div class="item done">✓ 売上金額・childAsinフィルター修正</div>
-    <div class="item done">✓ セッション仕様差を許容決定</div>
-    <div class="item now">▶ 週次レポート（amazon-weekly）追加中</div>
+    <div class="item done">✓ バックフィル完了（5月551行・6月129行）</div>
+    <div class="item done">✓ GAS週次データAPI（?type=weekly）追加</div>
+    <div class="item done">✓ 昨日売上：手動入力方式（SC値直接入力）</div>
   </div>
   <div class="card amber"><h2>Yahoo</h2>
     <div class="item done">✓ 週次レポート（CSV運用）</div>
@@ -298,12 +299,41 @@
     <div class="flow-box">Amazon SP-API</div><div class="flow-arrow">→</div>
     <div class="flow-box">EC注文統合GAS（毎朝8時）</div><div class="flow-arrow">→</div>
     <div class="flow-box green">注文統合シート（全モールDB）</div><div class="flow-arrow">→</div>
-    <div class="flow-box green">週次・月次レポート ✓</div>
+    <div class="flow-box green">GAS Web App（?type=weekly）</div><div class="flow-arrow">→</div>
+    <div class="flow-box green">売上トラッカー ✓</div>
+  </div>
+</div>
+<div class="flow"><h2>GAS自動デプロイフロー（2026-06-10〜）</h2>
+  <div class="flow-row">
+    <div class="flow-box">コード編集（Code.gs）</div><div class="flow-arrow">→</div>
+    <div class="flow-box">git push → main</div><div class="flow-arrow">→</div>
+    <div class="flow-box green">GitHub Actions</div><div class="flow-arrow">→</div>
+    <div class="flow-box green">clasp push --force（自動）</div><div class="flow-arrow">→</div>
+    <div class="flow-box green">GAS反映完了 ✓</div>
   </div>
 </div>
 
-<div class="section-title">今週の完了タスク</div>
-<div class="completed-task"><h2>今週の完了タスク</h2><div class="ct-project">楽天自動化（rakuten-automation）</div><div class="ct-item">Automate Rakuten monthly operations reporting</div><div class="ct-item">Rakuten RMS monthly automation system handover</div><div class="ct-item">Automate Rakuten weekly operations workflow</div><div class="ct-item">Update Rakuten weekly reports and RPP keyword analysis</div><div class="ct-item">Build Rakuten marketplace competitive research pipeline</div><div class="ct-item">楽天RPP広告の自動運用システム構築</div><div class="ct-item">Fix keyword bugs and optimize comforter bids</div><div class="ct-project">Yahoo自動化（yahoo-automation）</div><div class="ct-item">Configure Yahoo weekly spreadsheet access</div><div class="ct-item">Build Yahoo Shopping monthly automation system</div><div class="ct-item">Yahoo!ショッピング自動化プロジェクトでKPIダッシュボードシートを作成するNode.jsスクリプト作成</div><div class="ct-item">Yahoo!ショッピングセラー向けAPI調査（全体分析データ等取得可否確認）</div><div class="ct-item">Continue Yahoo monthly report and data consolidation</div><div class="ct-item">Yahoo Shopping API integration with GAS automation</div><div class="ct-item">Update Yahoo product title and optimize Amazon ads</div><div class="ct-project">Amazon自動化（amazon-gas-automation / amazon-monthly）</div><div class="ct-item">Debug SP-API advertising report fetch errors</div><div class="ct-item">Execute Amazon ads improvement and product sync</div><div class="ct-item">Continue Amazon data auto-sync implementation</div><div class="ct-project">ブログ自動化（blog-automation / writing-automation）</div><div class="ct-item">Organize Goosely SNS automation project handover</div><div class="ct-project">音声教育化（writing-concepts）</div><div class="ct-item">Organize Vimeo videos into educational content</div><div class="ct-project">EC受注統合（ec-automation）</div><div class="ct-item">dashboard: 2026-05-29 週次自動更新（gitコミット）</div><div class="ct-project">その他・経営支援・インフラ</div><div class="ct-item">Session handover documentation</div><div class="ct-item">Build AI agent team file structure</div><div class="ct-item">Free up PC storage and identify large folders</div><div class="ct-item">Setup daily report automation handover</div><div class="ct-item">Continue product development operations</div><div class="ct-item">Continue product development operations work</div><div class="ct-item">Search for Anthropic API key on Windows machine</div><div class="ct-item">Remortcontrol implementation</div></div>
+<div class="section-title">6月 完了タスク（6/8〜6/15）</div>
+<div class="completed-task"><h2>6月 完了タスク（6/8〜6/15）</h2>
+  <div class="ct-project">EC受注統合・売上ダッシュボード（ec-automation）</div>
+  <div class="ct-item">売上目標トラッカー新規作成（docs/sales-tracker.html）—ダークテーマ、GAS自動取得対応</div>
+  <div class="ct-item">GAS Web App実装（doGet + getSalesSummary_）—JSONP対応、CORS回避</div>
+  <div class="ct-item">GAS 週次レポートAPI追加（?type=weekly）—直近28日・週次比較・商品ランキング</div>
+  <div class="ct-item">Amazon注文バックフィル実装（5月551行・6月129行を補完）</div>
+  <div class="ct-item">clasp自動デプロイ設定（GitHub Actions + CLASPRC_JSON Secret）</div>
+  <div class="ct-item">売上ダッシュボード改善：万円表示・日付ラベル・Yahoo手動入力・日別棒グラフ</div>
+  <div class="ct-item">Amazon昨日売上を手動入力方式に変更（SC値直接入力・amazon_daily_log保存）</div>
+  <div class="ct-item">Yahoo!カードレイアウトをAmazonと統一（昨日入力を中段に移動）</div>
+  <div class="ct-item">楽天売上：税込み表示に統一、日別グラフのnetPrice参照バグ修正</div>
+  <div class="ct-project">ドキュメント・分析</div>
+  <div class="ct-item">エージェント経営コンテンツ作成（docs/agent-management.html）—8エージェント・フロー図・Phase 1-4ロードマップ</div>
+  <div class="ct-item">楽天CTR改善サムネイルガイド作成（docs/thumbnail-guide.html）—3商品・DO/DON'Tルール・チェックリスト</div>
+  <div class="ct-item">月次経営レポート分析（各部署OGSM進捗報告）</div>
+  <div class="ct-item">OGSM進捗報告作成（5月・6月更新）—経営/プロダクト/マーケ/人材/WEB&AI戦略</div>
+  <div class="ct-project">マーケティング</div>
+  <div class="ct-item">SS後続メルマガ分析：GASデータ（SS期間楽天103万・SS後25万）から本文ドラフト作成</div>
+  <div class="ct-item">Yahoo! OAuth調査・断念確定（GASサーバーIPがpx-04306でブロック）→手動入力方式で確定</div>
+</div>
 
 <div class="section-title">楽天自動化（rakuten-automation）<span class="tag tag-js">Node.js</span><span class="tag tag-auto">週次自動</span></div>
 <div class="card teal" style="margin-bottom:12px"><h2>楽天週次レポート自動集計</h2>
@@ -363,27 +393,30 @@
 <div class="rule-box"><strong>📋 運用ルール（全プロジェクト共通）</strong>各Claude Codeセッション終了前に必ず実行：「今日の作業内容をCLAUDE.mdに追記して」</div>
 
 <div class="todo"><h2>⚡ 次のアクション</h2>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>Google Search Consoleで「確認」ボタンをクリックし所有権確認を完了させる（blog-automation: 2026-05-25未完了タスク）</div>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>Search Console URLインデックス登録リクエスト実施（representative_message / author-list / 5/24・5/21公開記事）</div>
-  <div class="todo-item"><span class="badge b-now">今すぐ</span>楽天RPP広告：週次CSVを手動DL（https://ad.rms.rakuten.co.jp/rpp/reports）し `data/rpp_20260529_20260604.csv` として保存 → `node weekly.js` 実行</div>
-  <div class="todo-item"><span class="badge b-next">次回</span>EC受注統合：自社ショップ・グースリーのCSVメール転送設定を完了し、integration/Code.gs に月次横断レポート関数を追加する</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>GAS Web App 再デプロイ：?type=weekly を有効化（デプロイを管理→鉛筆→新しいバージョン→デプロイ）</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>SS後続メルマガ入稿（R-Mail）：件名「SSは終わりました。でも…」/ クーポン内容・商品リンクを確定して入稿</div>
+  <div class="todo-item"><span class="badge b-now">今すぐ</span>楽天サムネイル改善実施：thumbnail-guide.html のチェックリストに沿って3商品（枕・電位治療掛け布団・そば殻角枕）の画像差し替え</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>EC受注統合：自社ショップ・グースリーのCSVメール転送設定を完了（注文データ完全統合）</div>
+  <div class="todo-item"><span class="badge b-next">次回</span>楽天RPP広告：週次CSVを手動DL → node weekly.js 実行</div>
   <div class="todo-item"><span class="badge b-next">次回</span>音声教育化：Vimeo動画・lessons.jsonを投入し、Whisper文字起こし → Claude API概念抽出パイプラインを初回実行する</div>
   <div class="todo-item"><span class="badge b-wait">承認後</span>楽天RPP広告自動運用システム：DRY_RUN=true での動作確認後、本番適用の承認を得てから DRY_RUN=false に切り替える</div>
 </div>
 
-<div class="progress-wrap"><h2>📊 全体進捗</h2>
-  <div class="prog-row"><div class="prog-label"><span>EC受注統合</span><span class="prog-pct">76%</span></div><div class="bar-bg"><div class="bar-fg" style="width:76%;background:#1D9E75"></div></div></div>
+<div class="progress-wrap"><h2>📊 全体進捗（2026-06-15時点）</h2>
+  <div class="prog-row"><div class="prog-label"><span>EC受注統合（楽天・Amazon）</span><span class="prog-pct">88%</span></div><div class="bar-bg"><div class="bar-fg" style="width:88%;background:#1D9E75"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>売上ダッシュボード（sales-tracker）</span><span class="prog-pct">90%</span></div><div class="bar-bg"><div class="bar-fg" style="width:90%;background:#1D9E75"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>GAS自動デプロイ（clasp + GitHub Actions）</span><span class="prog-pct">100%</span></div><div class="bar-bg"><div class="bar-fg" style="width:100%;background:#1D9E75"></div></div></div>
   <div class="prog-row"><div class="prog-label"><span>楽天RPP広告</span><span class="prog-pct">78%</span></div><div class="bar-bg"><div class="bar-fg" style="width:78%;background:#D85A8C"></div></div></div>
   <div class="prog-row"><div class="prog-label"><span>楽天自動化</span><span class="prog-pct">92%</span></div><div class="bar-bg"><div class="bar-fg" style="width:92%;background:#1D9E75"></div></div></div>
   <div class="prog-row"><div class="prog-label"><span>Amazon月次</span><span class="prog-pct">91%</span></div><div class="bar-bg"><div class="bar-fg" style="width:91%;background:#378ADD"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>Yahoo自動化</span><span class="prog-pct">93%</span></div><div class="bar-bg"><div class="bar-fg" style="width:93%;background:#EF9F27"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>Yahoo自動化（手動CSV運用確定）</span><span class="prog-pct">85%</span></div><div class="bar-bg"><div class="bar-fg" style="width:85%;background:#EF9F27"></div></div></div>
   <div class="prog-row"><div class="prog-label"><span>ブログ自動化</span><span class="prog-pct">81%</span></div><div class="bar-bg"><div class="bar-fg" style="width:81%;background:#7F77DD"></div></div></div>
   <div class="prog-row"><div class="prog-label"><span>音声教育化</span><span class="prog-pct">46%</span></div><div class="bar-bg"><div class="bar-fg" style="width:46%;background:#D85A30"></div></div></div>
-  <div class="prog-row"><div class="prog-label"><span>CLAUDE.md整備</span><span class="prog-pct">92%</span></div><div class="bar-bg"><div class="bar-fg" style="width:92%;background:#378ADD"></div></div></div>
+  <div class="prog-row"><div class="prog-label"><span>CLAUDE.md整備</span><span class="prog-pct">95%</span></div><div class="bar-bg"><div class="bar-fg" style="width:95%;background:#378ADD"></div></div></div>
 </div>
 
 </div><!-- /content -->
-<p class="footer">最終更新: 2026-06-05 09:00 ｜ 全9プロジェクト管理中 ｜ 自動生成 by Claude API</p>
+<p class="footer">最終更新: 2026-06-15 ｜ 全10プロジェクト管理中 ｜ 自動生成 by Claude Code</p>
 <script>
 function fmtYen(n) {
   if (isNaN(n) || n === 0) return '—';
