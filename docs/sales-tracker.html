@@ -560,9 +560,14 @@ function saveYahooYesterday(amount) {
   localStorage.setItem('yahoo_daily_log', JSON.stringify(log));
 }
 
-/* ── Amazon 昨日 手動ログ（localStorage） ── */
+/* ── Amazon 手動ログ（Yahoo!と同方式） ── */
 function getAmazonLog() {
   return JSON.parse(localStorage.getItem('amazon_daily_log') || '{}');
+}
+function getAmazonMonthlyTotal() {
+  var log = getAmazonLog(), total = 0;
+  Object.keys(log).forEach(function(d) { if (d.startsWith(MONTH_PFX)) total += log[d] || 0; });
+  return total;
 }
 function getAmazonYesterdayAmount() {
   return getAmazonLog()[YD_KEY] || 0;
@@ -613,23 +618,21 @@ function setAutoSales(data) {
   SALES.rakuten.monthly   = (data.monthly   || {}).rakuten || 0;
   SALES.rakuten.today     = (data.today     || {}).rakuten || 0;
   SALES.rakuten.yesterday = (ys).rakuten || 0;
-  SALES.amazon.monthly    = (data.monthly   || {}).amazon  || 0;
-  SALES.amazon.today      = (data.today     || {}).amazon  || 0;
-  SALES.amazon.yesterday  = (ys).amazon  || 0;
-  // GASのRakuten+Amazon合計を保存（Yahoo!は含まない）
+  // GAS合計を参考保存（楽天+Amazon）
   SALES.gasBase.monthly   = (data.monthly   || {}).total   || 0;
   SALES.gasBase.today     = (data.today     || {}).total   || 0;
   SALES.gasBase.yesterday = (ys).total   || 0;
-  // Yahoo! は昨日入力の日次ログから月次累計を計算
+  // Amazon: 今月累計も昨日も手動ログ（SC値）優先 — GAS SP-API値は使わない
+  SALES.amazon.monthly    = getAmazonMonthlyTotal();
+  SALES.amazon.yesterday  = getAmazonYesterdayAmount();
+  SALES.amazon.today      = 0;
+  // Yahoo! も同様に手動ログから月次累計を計算
   SALES.yahoo.monthly   = getYahooMonthlyTotal();
   SALES.yahoo.yesterday = getYahooYesterdayAmount();
   SALES.yahoo.today     = 0;
-  // Amazon 昨日は手動入力があればそちらを優先
-  var manualAyd = getAmazonYesterdayAmount();
-  if (manualAyd > 0) SALES.amazon.yesterday = manualAyd;
-  // 合計 = GAS（楽天+Amazon）+ Yahoo!月次ログ合計
-  SALES.total.monthly   = SALES.gasBase.monthly   + SALES.yahoo.monthly;
-  SALES.total.today     = SALES.gasBase.today;
+  // 合計 = 楽天(GAS) + Amazon(手動ログ) + Yahoo!(手動ログ)
+  SALES.total.monthly   = SALES.rakuten.monthly + SALES.amazon.monthly + SALES.yahoo.monthly;
+  SALES.total.today     = SALES.rakuten.today;
   SALES.total.yesterday = SALES.rakuten.yesterday + SALES.amazon.yesterday + SALES.yahoo.yesterday;
   renderSalesDisplay('live');
   recalc();
@@ -639,11 +642,13 @@ function setAutoSales(data) {
 function updateAmazonManual() {
   var ydAmt = gv('in-a-yesterday');
   saveAmazonYesterday(ydAmt);
+  SALES.amazon.monthly   = getAmazonMonthlyTotal();
   SALES.amazon.yesterday = ydAmt;
-  if (SALES.source === 'auto') {
-    SALES.total.yesterday = SALES.rakuten.yesterday + ydAmt + SALES.yahoo.yesterday;
-    sv('av-total-yesterday', fy(SALES.total.yesterday));
-  }
+  SALES.total.monthly    = SALES.rakuten.monthly + SALES.amazon.monthly + SALES.yahoo.monthly;
+  SALES.total.yesterday  = SALES.rakuten.yesterday + ydAmt + SALES.yahoo.yesterday;
+  sv('av-a-monthly',      fy(SALES.amazon.monthly));
+  sv('av-total-monthly',  fy(SALES.total.monthly));
+  sv('av-total-yesterday',fy(SALES.total.yesterday));
   recalc();
 }
 
@@ -654,12 +659,12 @@ function updateYahooManual() {
   SALES.yahoo.yesterday = ydAmt;
   SALES.yahoo.today     = 0;
   if (SALES.source === 'auto') {
-    SALES.total.monthly   = SALES.gasBase.monthly + SALES.yahoo.monthly;
-    SALES.total.today     = SALES.gasBase.today;
-    SALES.total.yesterday = SALES.gasBase.yesterday + SALES.yahoo.yesterday;
-    sv('av-y-monthly',     fy(SALES.yahoo.monthly));
-    sv('av-y-yesterday',   fy(SALES.yahoo.yesterday));
-    sv('av-total-monthly', fy(SALES.total.monthly));
+    SALES.total.monthly   = SALES.rakuten.monthly + SALES.amazon.monthly + SALES.yahoo.monthly;
+    SALES.total.today     = SALES.rakuten.today;
+    SALES.total.yesterday = SALES.rakuten.yesterday + SALES.amazon.yesterday + SALES.yahoo.yesterday;
+    sv('av-y-monthly',       fy(SALES.yahoo.monthly));
+    sv('av-y-yesterday',     fy(SALES.yahoo.yesterday));
+    sv('av-total-monthly',   fy(SALES.total.monthly));
     sv('av-total-yesterday', fy(SALES.total.yesterday));
   }
   recalc();
