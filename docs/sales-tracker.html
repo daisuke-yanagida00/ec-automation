@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>売上目標トラッカー ｜ ネオ・ゲート</title>
+<title>7月 売上目標トラッカー ｜ ネオ・ゲート</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -207,7 +207,7 @@ body {
 
 <div class="header">
   <div>
-    <h1>📊 売上目標トラッカー</h1>
+    <h1>📊 売上目標トラッカー <span style="font-size:12px;font-weight:500;background:#1f3a5e;color:#58a6ff;padding:2px 9px;border-radius:10px;margin-left:4px;vertical-align:middle">7月</span></h1>
     <div style="font-size:11px;color:#8b949e;margin-top:2px">月次・日次の目標 vs 実績をリアルタイム可視化</div>
   </div>
   <div class="header-right">
@@ -235,28 +235,28 @@ body {
     <div class="gas-status" id="gas-status"></div>
   </div>
 
-  <!-- ── 6月目標設定 ── -->
-  <div class="sec">6月 月次売上目標（円）</div>
+  <!-- ── 7月目標設定 ── -->
+  <div class="sec">7月 月次売上目標（円）</div>
   <div class="target-grid">
     <div class="t-card">
       <div class="t-header c-blue">合計（3モール）</div>
       <label>月次目標</label>
-      <input type="number" id="t-total" value="7840000" oninput="recalc();saveTargets()">
+      <input type="number" id="t-total" value="11000000" oninput="recalc();saveTargets()">
     </div>
     <div class="t-card">
       <div class="t-header" style="color:#d29922">楽天市場</div>
       <label>月次目標</label>
-      <input type="number" id="t-rakuten" value="2740000" oninput="recalc();saveTargets()">
+      <input type="number" id="t-rakuten" value="3300000" oninput="recalc();saveTargets()">
     </div>
     <div class="t-card">
       <div class="t-header c-blue">Amazon</div>
       <label>月次目標</label>
-      <input type="number" id="t-amazon" value="4200000" oninput="recalc();saveTargets()">
+      <input type="number" id="t-amazon" value="6200000" oninput="recalc();saveTargets()">
     </div>
     <div class="t-card">
       <div class="t-header c-amber">Yahoo!</div>
       <label>月次目標</label>
-      <input type="number" id="t-yahoo" value="900000" oninput="recalc();saveTargets()">
+      <input type="number" id="t-yahoo" value="1500000" oninput="recalc();saveTargets()">
     </div>
   </div>
 
@@ -960,8 +960,16 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
   var savedUrl = localStorage.getItem('gas_url') || GAS_DEFAULT;
   document.getElementById('gas-url').value = savedUrl;
 
-  /* 目標値の復元 */
+  /* 目標値の復元 — 6月→7月 自動マイグレーション */
+  var JUL_TARGETS = { total: 11000000, rakuten: 3300000, amazon: 6200000, yahoo: 1500000 };
+  var JUN_TOTAL   = 7840000;
   var targets = JSON.parse(localStorage.getItem('tracker_targets') || '{}');
+  var isJune  = targets.total === JUN_TOTAL;
+  if (isJune) {
+    /* 6月の目標が残っている → 7月に自動更新してlocalStorageも書き換え */
+    targets = JUL_TARGETS;
+    localStorage.setItem('tracker_targets', JSON.stringify(JUL_TARGETS));
+  }
   if (targets.total)   document.getElementById('t-total').value   = targets.total;
   if (targets.rakuten) document.getElementById('t-rakuten').value = targets.rakuten;
   if (targets.amazon)  document.getElementById('t-amazon').value  = targets.amazon;
