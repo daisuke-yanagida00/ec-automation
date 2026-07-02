@@ -535,7 +535,9 @@ body {
 var now         = new Date();
 var DOM         = now.getDate();
 var DAYS        = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-var REMAIN_DAYS = DAYS - DOM;
+// ペース評価は「昨日まで」が確定データ（今日分は翌朝GAS取得）
+var ELAPSED     = Math.max(0, DOM - 1);   // 確定済み経過日数（昨日まで）
+var REMAIN_DAYS = DAYS - ELAPSED;         // 残り日数（今日を含む）
 var yd          = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 var TODAY_LABEL = (now.getMonth()+1) + '/' + now.getDate();
 var YD_LABEL    = (yd.getMonth()+1) + '/' + yd.getDate();
@@ -709,10 +711,10 @@ function recalc() {
   var today   = SALES.total.today;
 
   var dailyTarget = monthly > 0 ? monthly / DAYS : 0;
-  var paceTarget  = dailyTarget * DOM;
+  var paceTarget  = dailyTarget * ELAPSED;  // 昨日までの期待値（今日分は翌朝反映）
   var mRatio      = monthly > 0 ? cum / monthly : 0;
   var dRatio      = dailyTarget > 0 ? today / dailyTarget : 0;
-  var paceRatio   = paceTarget > 0 ? cum / paceTarget : 0;
+  var paceRatio   = (paceTarget > 0) ? cum / paceTarget : (ELAPSED === 0 ? 1 : 0);
   var needed      = Math.max(0, monthly - cum);
   var reqDaily    = REMAIN_DAYS > 0 ? needed / REMAIN_DAYS : 0;
 
