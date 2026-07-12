@@ -526,6 +526,46 @@ body {
     </div>
   </div>
 
+  <!-- ── 過去データ修正 ── -->
+  <div class="bar-card" style="margin-top:16px">
+    <h2 style="cursor:pointer;user-select:none" onclick="toggleEditPanel()">
+      過去データ修正
+      <span id="edit-panel-arrow" style="font-size:12px;color:#8b949e;margin-left:6px">▼</span>
+    </h2>
+    <div id="edit-panel" style="display:none;margin-top:12px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:11px;color:#8b949e">日付</label>
+          <input type="date" id="edit-date"
+                 style="background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:12px;padding:5px 8px;font-family:inherit">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:11px;color:#8b949e">モール</label>
+          <select id="edit-store"
+                  style="background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:12px;padding:5px 8px;font-family:inherit">
+            <option value="amazon">Amazon</option>
+            <option value="yahoo">Yahoo!</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:11px;color:#8b949e">売上（円）</label>
+          <input type="number" id="edit-amount" placeholder="0 で削除"
+                 style="background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:12px;padding:5px 8px;font-family:inherit;width:120px">
+        </div>
+        <button onclick="applyEditEntry()"
+                style="padding:5px 16px;background:#238636;color:#fff;border:none;border-radius:5px;font-size:12px;cursor:pointer;font-family:inherit">
+          保存
+        </button>
+        <button onclick="loadEditEntry()"
+                style="padding:5px 12px;background:#21262d;color:#8b949e;border:1px solid #30363d;border-radius:5px;font-size:12px;cursor:pointer;font-family:inherit">
+          現在値を読み込む
+        </button>
+      </div>
+      <div id="edit-msg" style="margin-top:8px;font-size:12px;color:#8b949e"></div>
+      <div id="edit-log-preview" style="margin-top:12px;font-size:11px;color:#8b949e;max-height:120px;overflow-y:auto"></div>
+    </div>
+  </div>
+
 </div><!-- /main -->
 
 <div class="footer">株式会社ネオ・ゲート ｜ 入力値はブラウザに保存されます</div>
@@ -1033,6 +1073,94 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
     recalc(); // 目標だけで初期描画
   }
 })();
+
+/* ── 過去データ修正パネル ── */
+function toggleEditPanel() {
+  var panel = document.getElementById('edit-panel');
+  var arrow = document.getElementById('edit-panel-arrow');
+  if (panel.style.display === 'none') {
+    panel.style.display = 'block';
+    arrow.textContent = '▲';
+    renderEditLogPreview();
+    // 日付をデフォルト昨日にセット
+    if (!document.getElementById('edit-date').value) {
+      document.getElementById('edit-date').value = YD_KEY;
+    }
+  } else {
+    panel.style.display = 'none';
+    arrow.textContent = '▼';
+  }
+}
+
+function loadEditEntry() {
+  var dateVal  = document.getElementById('edit-date').value;
+  var store    = document.getElementById('edit-store').value;
+  if (!dateVal) { document.getElementById('edit-msg').textContent = '日付を選択してください'; return; }
+  var log = store === 'yahoo' ? getYahooLog() : getAmazonLog();
+  var cur = log[dateVal] || 0;
+  document.getElementById('edit-amount').value = cur || '';
+  document.getElementById('edit-msg').textContent = dateVal + ' の現在値: ' + (cur ? fy(cur) : '未入力');
+}
+
+function applyEditEntry() {
+  var dateVal  = document.getElementById('edit-date').value;
+  var store    = document.getElementById('edit-store').value;
+  var amount   = parseInt(document.getElementById('edit-amount').value, 10) || 0;
+  if (!dateVal) { document.getElementById('edit-msg').textContent = '日付を選択してください'; return; }
+
+  var key    = store === 'yahoo' ? 'yahoo_daily_log' : 'amazon_daily_log';
+  var log    = JSON.parse(localStorage.getItem(key) || '{}');
+  var before = log[dateVal] || 0;
+
+  if (amount > 0) {
+    log[dateVal] = amount;
+  } else {
+    delete log[dateVal];
+  }
+  localStorage.setItem(key, JSON.stringify(log));
+
+  var storeName = store === 'yahoo' ? 'Yahoo!' : 'Amazon';
+  var msg = storeName + ' ' + dateVal + ': ' + (before ? fy(before) : '未入力') + ' → ' + (amount > 0 ? fy(amount) : '削除');
+  document.getElementById('edit-msg').style.color = '#3fb950';
+  document.getElementById('edit-msg').textContent = '保存しました: ' + msg;
+  renderEditLogPreview();
+
+  // 昨日のログを復元して入力欄を更新
+  if (dateVal === YD_KEY) {
+    if (store === 'yahoo') {
+      var el = document.getElementById('in-y-yesterday');
+      if (el) el.value = amount || '';
+    } else {
+      var el2 = document.getElementById('in-a-yesterday');
+      if (el2) el2.value = amount || '';
+    }
+  }
+
+  // ページ再計算
+  setAutoSales(null);
+}
+
+function renderEditLogPreview() {
+  var container = document.getElementById('edit-log-preview');
+  var yLog = getYahooLog();
+  var aLog = getAmazonLog();
+  var allDates = Array.from(new Set([].concat(Object.keys(yLog), Object.keys(aLog))))
+    .filter(function(d) { return d.startsWith(MONTH_PFX); })
+    .sort().reverse();
+  if (!allDates.length) { container.textContent = '今月の記録はありません'; return; }
+  var html = '<table style="width:100%;border-collapse:collapse"><tr>' +
+    '<th style="text-align:left;padding:2px 6px">日付</th>' +
+    '<th style="text-align:right;padding:2px 6px;color:#58a6ff">Amazon</th>' +
+    '<th style="text-align:right;padding:2px 6px;color:#a371f7">Yahoo!</th></tr>';
+  allDates.forEach(function(d) {
+    var a = aLog[d] || 0, y = yLog[d] || 0;
+    html += '<tr style="border-top:1px solid #21262d"><td style="padding:2px 6px">' + d + '</td>' +
+      '<td style="text-align:right;padding:2px 6px;color:#58a6ff">' + (a ? fy(a) : '—') + '</td>' +
+      '<td style="text-align:right;padding:2px 6px;color:#a371f7">' + (y ? fy(y) : '—') + '</td></tr>';
+  });
+  html += '</table>';
+  container.innerHTML = html;
+}
 </script>
 </body>
 </html>
