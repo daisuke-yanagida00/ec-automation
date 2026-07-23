@@ -109,11 +109,11 @@ function integrateRakutenOrders() {
 // 楽天 RMS API
 // ================================================================
 
-// searchOrder で直近24時間の注文番号一覧を返す
+// searchOrder で直近48時間の注文番号一覧を返す（24hだと早朝注文が翌日8時実行で取りこぼす）
 function searchRakutenOrders_() {
   var body = JSON.stringify({
-    dateType:          1,
-    startDatetime:     getIsoHoursAgo_(24),
+    dateType:          0,
+    startDatetime:     getIsoHoursAgo_(48),
     endDatetime:       getIsoNow_(),
     orderProgressList: [100, 200, 300, 400, 500]
   });
@@ -1105,4 +1105,56 @@ function backfillAmazonJune() {
   var cnt = integrateAmazonOrdersForMonth_(2026, 6);
   Logger.log('6月完了: ' + cnt + '行追記');
   Logger.log('=== バックフィル完了 ===');
+}
+
+// ================================================================
+// 楽天 バックフィル（指定日の注文を補完）
+// ================================================================
+
+// 楽天の指定日の注文を取得してスプレッドシートに補完する
+function backfillRakutenDate_(dateStr) {
+  // dateStr: 'YYYY-MM-DD' 形式（例: '2026-07-22'）
+  var startDt = dateStr + "T00:00:00+0900";
+  var endDt   = dateStr + "T23:59:59+0900";
+
+  var body = JSON.stringify({
+    dateType:          0,
+    startDatetime:     startDt,
+    endDatetime:       endDt,
+    orderProgressList: [100, 200, 300, 400, 500]
+  });
+
+  var res = rakutenPost_('searchOrder', body);
+  if (!res) { Logger.log('楽天バックフィル: API応答なし'); return 0; }
+
+  var orderNumbers = res.orderNumberList || [];
+  Logger.log('楽天バックフィル ' + dateStr + ': ' + orderNumbers.length + '件の注文番号');
+  if (orderNumbers.length === 0) return 0;
+
+  var sheet     = getOrCreateSheet_();
+  var existsSet = loadExistingOrderIds_(sheet);
+  var newRows   = [];
+  var fetchedAt = new Date();
+
+  chunkArray_(orderNumbers, 100).forEach(function(chunk) {
+    var details = getRakutenOrderDetails_(chunk);
+    details.forEach(function(orderModel) {
+      var rows    = buildRows_(orderModel, fetchedAt);
+      var orderId = rows.length > 0 ? rows[0][COL.ORDER_ID] : '';
+      if (existsSet[orderId]) return;
+      rows.forEach(function(row) { newRows.push(row); });
+      existsSet[orderId] = true;
+    });
+  });
+
+  if (newRows.length > 0) appendRows_(sheet, newRows);
+  Logger.log('楽天バックフィル ' + dateStr + ': ' + newRows.length + '行を追記');
+  return newRows.length;
+}
+
+// 7/22分を補完（GASエディタから手動実行）
+function backfillRakutenJul22() {
+  Logger.log('=== 楽天バックフィル開始（2026/07/22）===');
+  var cnt = backfillRakutenDate_('2026-07-22');
+  Logger.log('=== 楽天バックフィル完了: ' + cnt + '行追記 ===');
 }
