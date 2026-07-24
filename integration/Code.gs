@@ -1199,3 +1199,12 @@ function backfillRakutenJul22() {
   var cnt = backfillRakutenDate_('2026-07-22');
   Logger.log('=== 楽天バックフィル完了: ' + cnt + '行追記 ===');
 }
+
+// 7/22〜7/24の欠損分を一括補完（APIキー失効期間の補完用）
+function backfillRakutenMissing() {
+  Logger.log('=== 楽天バックフィル 7/22〜7/24 ===');
+  var cnt22 = backfillRakutenDate_('2026-07-22');
+  var cnt23 = backfillRakutenDate_('2026-07-23');
+  var cnt24 = backfillRakutenDate_('2026-07-24');
+  Logger.log('完了: 7/22=' + cnt22 + '行, 7/23=' + cnt23 + '行, 7/24=' + cnt24 + '行');
+}
