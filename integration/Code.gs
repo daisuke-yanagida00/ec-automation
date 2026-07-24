@@ -1158,8 +1158,9 @@ function backfillRakutenDate_(dateStr) {
   var startDt = dateStr + "T00:00:00+0900";
   var endDt   = dateStr + "T23:59:59+0900";
 
+  // dateType 1=注文確定日で検索（dateType 0では取得できないケースあり）
   var body = JSON.stringify({
-    dateType:          0,
+    dateType:          1,
     startDatetime:     startDt,
     endDatetime:       endDt,
     orderProgressList: [100, 200, 300, 400, 500, 600, 700, 800]
