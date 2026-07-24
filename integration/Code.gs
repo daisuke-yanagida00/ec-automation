@@ -1162,7 +1162,7 @@ function backfillRakutenDate_(dateStr) {
     dateType:          0,
     startDatetime:     startDt,
     endDatetime:       endDt,
-    orderProgressList: [100, 200, 300, 400, 500]
+    orderProgressList: [100, 200, 300, 400, 500, 600, 700, 800]
   });
 
   var res = rakutenPost_('searchOrder', body);
