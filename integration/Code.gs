@@ -154,10 +154,51 @@ function rakutenPost_(endpoint, jsonBody) {
   var code = res.getResponseCode();
   if (code !== 200) {
     Logger.log('楽天API [' + endpoint + '] エラー ' + code + ': ' + res.getContentText());
+    if (code === 401) {
+      notifyRakutenKeyExpired_();
+    }
     return null;
   }
 
   return JSON.parse(res.getContentText());
+}
+
+// 楽天APIキー失効をメールで通知（1日1回まで）
+function notifyRakutenKeyExpired_() {
+  var props    = PropertiesService.getScriptProperties();
+  var lastSent = props.getProperty('RAKUTEN_401_LAST_NOTIFIED') || '';
+  var today    = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy-MM-dd');
+  if (lastSent === today) return; // 同日は1通のみ
+
+  var email   = Session.getActiveUser().getEmail();
+  var subject = '【要対応】楽天APIキーが失効しました（EC注文統合）';
+  var body    = [
+    '楽天RMS APIへの接続が401エラーで失敗しました。',
+    '',
+    '■ 原因',
+    'ライセンスキーの有効期限が切れた可能性があります。',
+    '楽天RMSのAPIキーは約3ヶ月ごとに自動失効します。',
+    '',
+    '■ 対処手順',
+    '1. 楽天RMS WEB SERVICE (webservice.rms.rakuten.co.jp) にログイン',
+    '2. 利用設定 → 2-1 アプリ一覧 → 対象アプリ',
+    '3. 新しいライセンスキーを確認（「利用中」のもの）',
+    '4. GAS Script Propertiesを更新:',
+    '   - EC注文統合: https://script.google.com/d/1JY-l8MYvPa1d0DEvbVcbJqfKz5gSEQWuDH1mAif-z6I1vq8uQQHNNT3X/edit',
+    '   - 楽天GAS:    https://script.google.com/d/10h7vJgq-3P3PohO6U26xrOpEDL3FnVohZZb6EuborOPlOm5qMA6fRYVg/edit',
+    '   - プロパティ名: RAKUTEN_LICENSE_KEY / RAKUTEN_SERVICE_SECRET',
+    '',
+    '■ 次回期限',
+    '更新後、RMSで表示される有効期限（約3ヶ月後）をご確認ください。',
+  ].join('\n');
+
+  try {
+    GmailApp.sendEmail(email, subject, body);
+    props.setProperty('RAKUTEN_401_LAST_NOTIFIED', today);
+    Logger.log('楽天APIキー失効通知メールを送信しました: ' + email);
+  } catch(e) {
+    Logger.log('メール送信失敗: ' + e);
+  }
 }
 
 // ================================================================
