@@ -110,9 +110,10 @@ function integrateRakutenOrders() {
 // ================================================================
 
 // searchOrder で直近48時間の注文番号一覧を返す（24hだと早朝注文が翌日8時実行で取りこぼす）
+// dateType:1（注文確定日）が実績あり。dateType:0は取得不可のため使用しない
 function searchRakutenOrders_() {
   var body = JSON.stringify({
-    dateType:          0,
+    dateType:          1,
     startDatetime:     getIsoHoursAgo_(48),
     endDatetime:       getIsoNow_(),
     orderProgressList: [100, 200, 300, 400, 500]
