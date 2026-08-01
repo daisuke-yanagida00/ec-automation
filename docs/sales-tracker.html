@@ -498,18 +498,24 @@ body {
   </div>
 
   <!-- ── 日次売上グラフ ── -->
-  <div class="sec" style="margin-top:20px">日次売上グラフ（当月）</div>
+  <div class="sec" style="margin-top:20px">日次売上グラフ</div>
   <div class="chart-card">
     <div class="chart-legend">
       <div class="legend-item"><div class="legend-dot" style="background:#d29922"></div>楽天</div>
       <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div>Amazon</div>
       <div class="legend-item"><div class="legend-dot" style="background:#a371f7"></div>Yahoo!</div>
       <div class="legend-item"><div style="width:18px;height:0;border-top:2px dashed #484f58"></div>日次目標</div>
-      <div class="legend-item" style="margin-left:auto;color:#58a6ff;font-weight:700">■ 今日</div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+        <button id="btn-prev-month" onclick="changeChartMonth(-1)"
+          style="background:#21262d;border:1px solid #30363d;color:#8b949e;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:11px">◀</button>
+        <span id="chart-month-label" style="font-size:12px;color:#e6edf3;min-width:44px;text-align:center"></span>
+        <button id="btn-next-month" onclick="changeChartMonth(1)"
+          style="background:#21262d;border:1px solid #30363d;color:#8b949e;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:11px">▶</button>
+      </div>
     </div>
     <div class="chart-scroll">
       <div class="chart-inner" id="daily-chart">
-        <div class="chart-empty">売上を自動取得すると表示されます</div>
+        <div class="chart-empty">データを取得中...</div>
       </div>
     </div>
   </div>
@@ -857,41 +863,66 @@ function recalcStore(id, target, monthly, today) {
   sv('sfoot-' + id, '目標: ' + fy(target));
 }
 
-/* ── 日次棒グラフ描画（当月1日〜今日の全日程） ── */
+/* ── 月切り替え ── */
+var chartMonthOffset = 0; // 0=今月, -1=先月, -2=先々月
+var gasRakutenCache  = {}; // GASから取得した楽天日別データをキャッシュ
+
+function changeChartMonth(delta) {
+  chartMonthOffset = Math.min(0, chartMonthOffset + delta);
+  renderDailyChart(null); // nullでキャッシュから描画
+}
+
+/* ── 日次棒グラフ描画 ── */
 function renderDailyChart(dailyArr) {
   var container = document.getElementById('daily-chart');
 
-  var dailyTarget = gv('t-total') > 0 ? Math.round(gv('t-total') / DAYS) : 0;
+  // GAS楽天データをキャッシュに保存（今月分のみ）
+  if (dailyArr && dailyArr.length > 0) {
+    var cacheKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    gasRakutenCache[cacheKey] = dailyArr;
+  }
+
+  // 表示対象の年月を計算
+  var viewDate  = new Date(now.getFullYear(), now.getMonth() + chartMonthOffset, 1);
+  var viewYear  = viewDate.getFullYear();
+  var viewMonth = viewDate.getMonth(); // 0始まり
+  var viewDays  = new Date(viewYear, viewMonth + 1, 0).getDate();
+  var viewEnd   = (chartMonthOffset === 0) ? DOM : viewDays; // 今月は今日まで、過去月は月末まで
+
+  // 月ラベル更新
+  var monthLabel = (viewMonth + 1) + '月';
+  sv('chart-month-label', monthLabel);
+  document.getElementById('btn-next-month').disabled = (chartMonthOffset === 0);
+  document.getElementById('btn-next-month').style.opacity = (chartMonthOffset === 0) ? '0.3' : '1';
+
+  var dailyTarget = gv('t-total') > 0 ? Math.round(gv('t-total') / viewDays) : 0;
   var yahooLog    = getYahooLog();
   var amazonLog   = getAmazonLog();
-  var thisYear    = now.getFullYear();
-  var thisMonth   = now.getMonth();
 
-  // GASデータをM/D形式のキーで引けるようにマップ化
-  var gasMap = {};
-  (dailyArr || []).forEach(function(d) { if (d.date) gasMap[d.date] = d; });
+  // GAS楽天データをキャッシュから取得
+  var gasCacheKey = viewYear + '-' + String(viewMonth + 1).padStart(2, '0');
+  var gasSource   = gasRakutenCache[gasCacheKey] || [];
+  var gasMap      = {};
+  gasSource.forEach(function(d) { if (d.date) gasMap[d.date] = d; });
 
-  // 当月1日〜今日の全日程を生成
+  // 表示月の1日〜末日（今月は今日まで）を生成
   var fullArr = [];
-  for (var day = 1; day <= DOM; day++) {
-    var dt      = new Date(thisYear, thisMonth, day);
-    var label   = (thisMonth + 1) + '/' + day;            // 'M/D'
-    var logKey  = thisYear + '-'
-                + String(thisMonth + 1).padStart(2, '0') + '-'
-                + String(day).padStart(2, '0');            // 'YYYY-MM-DD'
-    var gas     = gasMap[label] || { r: 0, a: 0, y: 0 };
-    var aLog    = amazonLog[logKey] || 0;
-    var yLog    = yahooLog[logKey]  || 0;
+  for (var day = 1; day <= viewEnd; day++) {
+    var label  = (viewMonth + 1) + '/' + day;
+    var logKey = viewYear + '-'
+               + String(viewMonth + 1).padStart(2, '0') + '-'
+               + String(day).padStart(2, '0');
+    var gas    = gasMap[label] || { r: 0, a: 0, y: 0 };
     fullArr.push({
-      date:    label,
-      r:       gas.r || 0,
-      a:       aLog  || gas.a || 0,   // 手動ログ優先、なければGAS値
-      y:       yLog  || gas.y || 0
+      date: label,
+      r:    gas.r || 0,
+      a:    amazonLog[logKey] || gas.a || 0,
+      y:    yahooLog[logKey]  || gas.y || 0
     });
   }
 
   if (fullArr.length === 0) {
-    container.innerHTML = '<div class="chart-empty">当月データなし</div>';
+    container.innerHTML = '<div class="chart-empty">データなし</div>';
     return;
   }
 
@@ -913,7 +944,7 @@ function renderDailyChart(dailyArr) {
 
   fullArr.forEach(function(d) {
     var total   = d.r + d.a + d.y;
-    var isToday = (d.date === TODAY_LABEL);
+    var isToday = (chartMonthOffset === 0 && d.date === TODAY_LABEL);
     var rH = maxVal > 0 ? (d.r / maxVal * chartH) : 0;
     var aH = maxVal > 0 ? (d.a / maxVal * chartH) : 0;
     var yH = maxVal > 0 ? (d.y / maxVal * chartH) : 0;
