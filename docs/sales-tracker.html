@@ -532,6 +532,47 @@ body {
     </div>
   </div>
 
+  <!-- ── 先月実績レポート ── -->
+  <div class="bar-card" style="margin-top:16px">
+    <h2 id="prev-report-title">先月実績レポート</h2>
+
+    <!-- 目標入力行 -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end">
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <label style="font-size:10px;color:#8b949e">楽天目標（円）</label>
+        <input type="number" id="prev-t-r" placeholder="3300000"
+               style="background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#d29922;font-size:12px;padding:4px 8px;font-family:inherit;width:110px"
+               oninput="renderPrevReport()">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <label style="font-size:10px;color:#8b949e">Amazon目標（円）</label>
+        <input type="number" id="prev-t-a" placeholder="6200000"
+               style="background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#58a6ff;font-size:12px;padding:4px 8px;font-family:inherit;width:110px"
+               oninput="renderPrevReport()">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <label style="font-size:10px;color:#8b949e">Yahoo!目標（円）</label>
+        <input type="number" id="prev-t-y" placeholder="1500000"
+               style="background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#a371f7;font-size:12px;padding:4px 8px;font-family:inherit;width:110px"
+               oninput="renderPrevReport()">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <label style="font-size:10px;color:#8b949e">楽天実績（円）</label>
+        <input type="number" id="prev-r-actual" placeholder="RMSで確認"
+               style="background:#0d1117;border:1px solid #d29922;border-radius:5px;color:#d29922;font-size:12px;padding:4px 8px;font-family:inherit;width:110px"
+               oninput="savePrevReport();renderPrevReport()">
+      </div>
+      <button onclick="savePrevReport()"
+              style="padding:4px 14px;background:#238636;color:#fff;border:none;border-radius:5px;font-size:12px;cursor:pointer;font-family:inherit;align-self:flex-end">保存</button>
+    </div>
+    <div style="font-size:10px;color:#484f58;margin-bottom:12px">
+      Amazon・Yahoo!は手動ログから自動集計。楽天はRMSの税抜き売上を入力してください。
+    </div>
+
+    <!-- 集計テーブル -->
+    <div id="prev-report-table"></div>
+  </div>
+
   <!-- ── 過去データ修正 ── -->
   <div class="bar-card" style="margin-top:16px">
     <h2 style="cursor:pointer;user-select:none" onclick="toggleEditPanel()">
@@ -1112,7 +1153,93 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
     recalc(); // 目標だけで初期描画
   }
   renderDailyChart([]); // GAS取得前でも手動ログでグラフを即描画
+  loadPrevReport();
 })();
+
+/* ── 先月実績レポート ── */
+var PREV_MONTH_DATE = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+var PREV_MONTH_PFX  = PREV_MONTH_DATE.getFullYear() + '-' + String(PREV_MONTH_DATE.getMonth() + 1).padStart(2, '0');
+var PREV_REPORT_KEY = 'prev_report_' + PREV_MONTH_PFX;
+
+function loadPrevReport() {
+  var saved = JSON.parse(localStorage.getItem(PREV_REPORT_KEY) || '{}');
+  if (saved.t_r)      document.getElementById('prev-t-r').value      = saved.t_r;
+  if (saved.t_a)      document.getElementById('prev-t-a').value      = saved.t_a;
+  if (saved.t_y)      document.getElementById('prev-t-y').value      = saved.t_y;
+  if (saved.r_actual) document.getElementById('prev-r-actual').value = saved.r_actual;
+  var monthNum = PREV_MONTH_DATE.getMonth() + 1;
+  document.getElementById('prev-report-title').textContent = monthNum + '月 実績レポート';
+  renderPrevReport();
+}
+
+function savePrevReport() {
+  var data = {
+    t_r:      gv('prev-t-r'),
+    t_a:      gv('prev-t-a'),
+    t_y:      gv('prev-t-y'),
+    r_actual: gv('prev-r-actual')
+  };
+  localStorage.setItem(PREV_REPORT_KEY, JSON.stringify(data));
+}
+
+function renderPrevReport() {
+  var container = document.getElementById('prev-report-table');
+
+  var tR = gv('prev-t-r') || 3300000;
+  var tA = gv('prev-t-a') || 6200000;
+  var tY = gv('prev-t-y') || 1500000;
+  var tTotal = tR + tA + tY;
+
+  var rActual = gv('prev-r-actual');
+  var aActual = 0, yActual = 0;
+  var aLog = getAmazonLog(), yLog = getYahooLog();
+  Object.keys(aLog).forEach(function(d) { if (d.startsWith(PREV_MONTH_PFX)) aActual += aLog[d] || 0; });
+  Object.keys(yLog).forEach(function(d) { if (d.startsWith(PREV_MONTH_PFX)) yActual += yLog[d] || 0; });
+  var totalActual = rActual + aActual + yActual;
+
+  var rows = [
+    { label: '楽天',   color: '#d29922', actual: rActual,     target: tR,     manual: !rActual },
+    { label: 'Amazon', color: '#58a6ff', actual: aActual,     target: tA,     manual: false },
+    { label: 'Yahoo!', color: '#a371f7', actual: yActual,     target: tY,     manual: false },
+    { label: '合計',   color: '#3fb950', actual: totalActual, target: tTotal, manual: false, isTotal: true }
+  ];
+
+  var html = '<table style="width:100%;border-collapse:collapse">'
+           + '<tr style="border-bottom:1px solid #30363d">'
+           + '<th style="text-align:left;padding:8px 6px;font-size:12px;color:#8b949e">モール</th>'
+           + '<th style="text-align:right;padding:8px 6px;font-size:12px;color:#8b949e">目標</th>'
+           + '<th style="text-align:right;padding:8px 6px;font-size:12px;color:#8b949e">実績</th>'
+           + '<th style="text-align:right;padding:8px 6px;font-size:12px;color:#8b949e">達成率</th>'
+           + '</tr>';
+
+  rows.forEach(function(row) {
+    var ratio     = (row.target > 0 && row.actual > 0) ? (row.actual / row.target) : null;
+    var pctText   = ratio !== null ? (ratio * 100).toFixed(1) + '%' : '—%';
+    var pctColor  = ratio === null ? '#8b949e' : ratio >= 1 ? '#3fb950' : ratio >= 0.8 ? '#d29922' : '#f85149';
+    var rowBorder = row.isTotal ? 'border-top:2px solid #30363d' : 'border-top:1px solid #21262d';
+    var fw        = row.isTotal ? '700' : '400';
+
+    html += '<tr style="' + rowBorder + '">'
+          + '<td style="padding:8px 6px;color:' + row.color + ';font-weight:' + fw + ';font-size:13px">' + row.label + '</td>'
+          + '<td style="text-align:right;padding:8px 6px;font-size:13px;color:#8b949e">' + fy(row.target) + '</td>'
+          + '<td style="text-align:right;padding:8px 6px;font-size:13px;color:' + row.color + ';font-weight:' + fw + '">'
+          + (row.actual > 0 ? fy(row.actual) : (row.manual ? '<span style="color:#484f58;font-size:11px">RMSで確認・入力</span>' : '—'))
+          + '</td>'
+          + '<td style="text-align:right;padding:8px 6px;font-weight:700;font-size:14px;color:' + pctColor + '">' + pctText + '</td>'
+          + '</tr>';
+
+    if (ratio !== null) {
+      var barW = Math.min(100, ratio * 100).toFixed(1);
+      html += '<tr><td colspan="4" style="padding:0 6px 8px 6px">'
+            + '<div style="background:#21262d;border-radius:4px;height:6px;overflow:hidden">'
+            + '<div style="background:' + row.color + ';width:' + barW + '%;height:100%"></div>'
+            + '</div></td></tr>';
+    }
+  });
+
+  html += '</table>';
+  container.innerHTML = html;
+}
 
 /* ── 過去データ修正パネル ── */
 function toggleEditPanel() {
