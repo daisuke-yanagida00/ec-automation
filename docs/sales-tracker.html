@@ -678,7 +678,7 @@ function setAutoSales(data) {
   SALES.total.yesterday = SALES.rakuten.yesterday + SALES.amazon.yesterday + SALES.yahoo.yesterday;
   renderSalesDisplay('live');
   recalc();
-  renderDailyChart(data.daily || [], gv('in-y-monthly'));
+  renderDailyChart(data.daily || []);
 }
 
 function updateAmazonManual() {
@@ -857,60 +857,68 @@ function recalcStore(id, target, monthly, today) {
   sv('sfoot-' + id, '目標: ' + fy(target));
 }
 
-/* ── 日次棒グラフ描画 ── */
-function renderDailyChart(dailyArr, yahooMonthly) {
+/* ── 日次棒グラフ描画（当月1日〜今日の全日程） ── */
+function renderDailyChart(dailyArr) {
   var container = document.getElementById('daily-chart');
-  if (!dailyArr || dailyArr.length === 0) {
+
+  var dailyTarget = gv('t-total') > 0 ? Math.round(gv('t-total') / DAYS) : 0;
+  var yahooLog    = getYahooLog();
+  var amazonLog   = getAmazonLog();
+  var thisYear    = now.getFullYear();
+  var thisMonth   = now.getMonth();
+
+  // GASデータをM/D形式のキーで引けるようにマップ化
+  var gasMap = {};
+  (dailyArr || []).forEach(function(d) { if (d.date) gasMap[d.date] = d; });
+
+  // 当月1日〜今日の全日程を生成
+  var fullArr = [];
+  for (var day = 1; day <= DOM; day++) {
+    var dt      = new Date(thisYear, thisMonth, day);
+    var label   = (thisMonth + 1) + '/' + day;            // 'M/D'
+    var logKey  = thisYear + '-'
+                + String(thisMonth + 1).padStart(2, '0') + '-'
+                + String(day).padStart(2, '0');            // 'YYYY-MM-DD'
+    var gas     = gasMap[label] || { r: 0, a: 0, y: 0 };
+    var aLog    = amazonLog[logKey] || 0;
+    var yLog    = yahooLog[logKey]  || 0;
+    fullArr.push({
+      date:    label,
+      r:       gas.r || 0,
+      a:       aLog  || gas.a || 0,   // 手動ログ優先、なければGAS値
+      y:       yLog  || gas.y || 0
+    });
+  }
+
+  if (fullArr.length === 0) {
     container.innerHTML = '<div class="chart-empty">当月データなし</div>';
     return;
   }
 
-  var dailyTarget = gv('t-total') > 0 ? Math.round(gv('t-total') / DAYS) : 0;
-  var todayStr    = TODAY_LABEL; // 'M/D'
-
-  // Yahoo!: 日次ログの実値を日付で引く（按分ではなく実データ）
-  var yahooLog  = getYahooLog();
-  var amazonLog = getAmazonLog();
-  var thisYear  = new Date().getFullYear();
-
-  // 各日の合計（Yahoo!・AmazonはGASに入っていないため手動ログ実値を加算）
-  var maxVal = dailyTarget * 1.5;
-  dailyArr.forEach(function(d) {
-    var parts   = (d.date || '').split('/');
-    var logKey  = parts.length === 2
-      ? thisYear + '-' + String(+parts[0]).padStart(2,'0') + '-' + String(+parts[1]).padStart(2,'0')
-      : '';
-    d._yActual = yahooLog[logKey]  || 0;
-    d._aLog    = amazonLog[logKey] || 0;
-    var tot = d.r + d._aLog + d._yActual;
+  var maxVal = dailyTarget * 1.5 || 1;
+  fullArr.forEach(function(d) {
+    var tot = d.r + d.a + d.y;
     if (tot > maxVal) maxVal = tot;
   });
-  if (maxVal === 0) maxVal = 1;
 
-  var chartH = 160; // px
-
-  var html = '';
-
-  // 目標ライン（高さ %）
+  var chartH    = 160;
   var targetPct = Math.min(100, (dailyTarget / maxVal) * 100);
+  var html      = '';
 
   if (dailyTarget > 0) {
     html += '<div class="chart-target-line" style="bottom:' + targetPct + '%">'
-          + '<span class="chart-target-label">' + Math.round(dailyTarget/10000) + '万</span>'
+          + '<span class="chart-target-label">' + Math.round(dailyTarget / 10000) + '万</span>'
           + '</div>';
   }
 
-  dailyArr.forEach(function(d) {
-    var aVal  = d._aLog  || d.a; // Amazonは手動ログ優先、なければGAS値
-    var yVal  = d._yActual;
-    var total = d.r + aVal + yVal;
-    var isToday = (d.date === todayStr);
-
-    var rH = maxVal > 0 ? (d.r   / maxVal * chartH) : 0;
-    var aH = maxVal > 0 ? (aVal  / maxVal * chartH) : 0;
-    var yH = maxVal > 0 ? (yVal  / maxVal * chartH) : 0;
-
-    var amtLabel = total >= 10000 ? Math.round(total/10000) + '万' : total > 0 ? Math.round(total/1000) + '千' : '0';
+  fullArr.forEach(function(d) {
+    var total   = d.r + d.a + d.y;
+    var isToday = (d.date === TODAY_LABEL);
+    var rH = maxVal > 0 ? (d.r / maxVal * chartH) : 0;
+    var aH = maxVal > 0 ? (d.a / maxVal * chartH) : 0;
+    var yH = maxVal > 0 ? (d.y / maxVal * chartH) : 0;
+    var amtLabel = total >= 10000 ? Math.round(total / 10000) + '万'
+                 : total > 0      ? Math.round(total / 1000)  + '千' : '';
 
     html += '<div class="day-col' + (isToday ? ' is-today' : '') + '">'
           +   '<div class="day-amt">' + amtLabel + '</div>'
@@ -1072,6 +1080,7 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
   } else {
     recalc(); // 目標だけで初期描画
   }
+  renderDailyChart([]); // GAS取得前でも手動ログでグラフを即描画
 })();
 
 /* ── 過去データ修正パネル ── */
