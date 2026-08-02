@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>7月 売上目標トラッカー ｜ ネオ・ゲート</title>
+<title>売上目標トラッカー ｜ ネオ・ゲート</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -207,7 +207,7 @@ body {
 
 <div class="header">
   <div>
-    <h1>📊 売上目標トラッカー <span style="font-size:12px;font-weight:500;background:#1f3a5e;color:#58a6ff;padding:2px 9px;border-radius:10px;margin-left:4px;vertical-align:middle">7月</span></h1>
+    <h1>📊 売上目標トラッカー <span id="header-month" style="font-size:12px;font-weight:500;background:#1f3a5e;color:#58a6ff;padding:2px 9px;border-radius:10px;margin-left:4px;vertical-align:middle"></span></h1>
     <div style="font-size:11px;color:#8b949e;margin-top:2px">月次・日次の目標 vs 実績をリアルタイム可視化</div>
   </div>
   <div class="header-right">
@@ -235,8 +235,8 @@ body {
     <div class="gas-status" id="gas-status"></div>
   </div>
 
-  <!-- ── 7月目標設定 ── -->
-  <div class="sec">7月 月次売上目標（円）</div>
+  <!-- ── 月次目標設定 ── -->
+  <div class="sec" id="target-section-label">月次売上目標（円）</div>
   <div class="target-grid">
     <div class="t-card">
       <div class="t-header c-blue">合計（3モール）</div>
@@ -629,7 +629,18 @@ var yd          = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 var TODAY_LABEL = (now.getMonth()+1) + '/' + now.getDate();
 var YD_LABEL    = (yd.getMonth()+1) + '/' + yd.getDate();
 var YD_KEY      = yd.getFullYear() + '-' + String(yd.getMonth()+1).padStart(2,'0') + '-' + String(yd.getDate()).padStart(2,'0');
-var MONTH_PFX   = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+var MONTH_PFX        = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+var CURR_MONTH_LABEL = (now.getMonth() + 1) + '月';
+var TARGETS_KEY      = 'tracker_targets_' + MONTH_PFX; // 月別キー（8月 = tracker_targets_2026-08）
+
+// ページタイトル・ラベルを現在月に動的設定
+document.title = CURR_MONTH_LABEL + ' 売上目標トラッカー | ネオ・ゲート';
+(function() {
+  var hm = document.getElementById('header-month');
+  if (hm) hm.textContent = CURR_MONTH_LABEL;
+  var sl = document.getElementById('target-section-label');
+  if (sl) sl.textContent = CURR_MONTH_LABEL + ' 月次売上目標（円）';
+})();
 
 /* ── Yahoo! 日次ログ（localStorage） ── */
 function getYahooLog() {
@@ -1078,7 +1089,7 @@ function saveManual() {
 }
 
 function saveTargets() {
-  localStorage.setItem('tracker_targets', JSON.stringify({
+  localStorage.setItem(TARGETS_KEY, JSON.stringify({
     total: gv('t-total'), rakuten: gv('t-rakuten'),
     amazon: gv('t-amazon'), yahoo: gv('t-yahoo')
   }));
@@ -1092,16 +1103,8 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbznYqQyYEvskbx2fQBVKl
   var savedUrl = localStorage.getItem('gas_url') || GAS_DEFAULT;
   document.getElementById('gas-url').value = savedUrl;
 
-  /* 目標値の復元 — 6月→7月 自動マイグレーション */
-  var JUL_TARGETS = { total: 11000000, rakuten: 3300000, amazon: 6200000, yahoo: 1500000 };
-  var JUN_TOTAL   = 7840000;
-  var targets = JSON.parse(localStorage.getItem('tracker_targets') || '{}');
-  var isJune  = targets.total === JUN_TOTAL;
-  if (isJune) {
-    /* 6月の目標が残っている → 7月に自動更新してlocalStorageも書き換え */
-    targets = JUL_TARGETS;
-    localStorage.setItem('tracker_targets', JSON.stringify(JUL_TARGETS));
-  }
+  /* 目標値の復元（月別キー: tracker_targets_YYYY-MM） */
+  var targets = JSON.parse(localStorage.getItem(TARGETS_KEY) || '{}');
   if (targets.total)   document.getElementById('t-total').value   = targets.total;
   if (targets.rakuten) document.getElementById('t-rakuten').value = targets.rakuten;
   if (targets.amazon)  document.getElementById('t-amazon').value  = targets.amazon;
