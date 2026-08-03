@@ -955,7 +955,13 @@ function renderDailyChart(dailyArr) {
   var gasCacheKey = viewYear + '-' + String(viewMonth + 1).padStart(2, '0');
   var gasSource   = gasRakutenCache[gasCacheKey] || [];
   var gasMap      = {};
-  gasSource.forEach(function(d) { if (d.date) gasMap[d.date] = d; });
+  gasSource.forEach(function(d) {
+    if (!d.date) return;
+    // GASは "MM/DD" or "MM-DD" 形式で返す。チャートラベル "M/D" に正規化
+    var parts = d.date.replace(/-/g, '/').split('/');
+    var key   = parseInt(parts[0], 10) + '/' + parseInt(parts[1], 10);
+    gasMap[key] = d;
+  });
 
   // 表示月の1日〜末日（今月は今日まで）を生成
   var fullArr = [];
