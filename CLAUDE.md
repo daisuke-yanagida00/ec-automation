@@ -200,6 +200,40 @@ ec-automation/
 - `docs/influencer-analysis.html`：インフルエンサー施策履歴・分析レポート（全部署共有）
 - `docs/influencer-collab-plan.html`：コラボ商品開発完全実行計画（Phase 0〜5）
 
+## 2026-08-24 作業記録
+
+### 完了
+- **売上ダッシュボード多数改善**：`docs/sales-tracker.html`
+  - 先月実績レポート追加：7月目標 vs 実績 vs 達成率テーブル（楽天手動・Amazon/Yahoo!はlocalStorageから自動集計）
+  - 8月対応：目標値を月別localStorageキー（`tracker_targets_YYYY-MM`）で管理、「7月」ハードコードを全廃・JS動的生成に変更
+  - 楽天グラフ未表示バグ修正：GASの日付形式 `MM/DD`（ゼロ埋め）→ チャートの `M/D`（非ゼロ埋め）フォーマット不一致を解消
+  - データ永続化アーキテクチャ刷新：Amazon・Yahoo!入力時にGASスプレッドシートにも即保存（localStorage消去後も復元可能）
+  - チャート全月キャッシュ：GASが3ヶ月分を返し、月別に`gasRakutenCache`へ分割保存、◀▶で7月グラフも表示可能
+  - GAS同期ステータス表示追加（保存成功/失敗をリアルタイム表示）
+  - バックアップ/インポートパネル追加：localStorage全体をJSONエクスポート・インポート
+- **GAS `integration/Code.gs` 大規模改修**
+  - 「手動売上ログ」シート追加：Amazon SC値・Yahoo!日次売上をスプレッドシートに永続保存
+  - `saveDailyEntry_()` / `getManualLog_()` / `ensureManualSheet_()` 追加
+  - `doGet()` に `action=save` エンドポイント追加（ブラウザからJSONPで書き込み可能）
+  - `getSalesSummary_()` 拡張：日付形式をISO（YYYY-MM-DD）に統一、集計期間を過去3ヶ月に拡大、手動ログでSP-API値を上書き、dailyMapから全集計値を再計算
+  - `generateRestoreScript()` 追加：localStorage復元用コンソールスクリプトをGASログに出力
+
+### 決定事項
+- **データ永続化の方針確定**：GASスプレッドシート「手動売上ログ」がSingle Source of Truth
+  - 入力 → localStorage（即時反映）+ GASスプレッドシート（永続保存）の二重保存
+  - ページ読込時 → GASから3ヶ月分取得 → localStorageに自動同期 → どのブラウザでも復元
+- **日付形式統一**：GAS内部・daily配列ともにISO形式 `YYYY-MM-DD` に統一
+- **目標値のlocalStorageキー**：`tracker_targets_YYYY-MM`（月別）に変更
+
+### システム構成変更
+- `integration/Code.gs`：手動売上ログ機能・doGet拡張・getSalesSummary_拡張・generateRestoreScript追加
+- `docs/sales-tracker.html`：saveGASEntry追加・save関数改修・renderDailyChart改修・先月実績レポート追加・バックアップパネル追加・月別目標キー対応
+
+### ⚠️ 要対応（ユーザー作業）
+- **GAS Webアプリ再デプロイ**：GASエディタ → 「デプロイを管理」→ 鉛筆アイコン → 「新しいバージョン」→「デプロイ」
+  - これを実行しないと `action=save` エンドポイントが有効にならない（Amazon/Yahoo!入力がGASに保存されない）
+- **楽天APIキー次回失効予定**：2026-10-13（対策：2026-09-29 にカレンダー通知設定推奨）
+
 ## 運用ルール
 **このプロジェクトのセッション終了時は必ずCLAUDE.mdを更新すること。**
 - セッション終了前に「今日の作業内容をCLAUDE.mdに追記してgit pushして」を実行
