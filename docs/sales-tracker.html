@@ -233,6 +233,10 @@ body {
       <button class="btn btn-reset" onclick="clearGAS()">クリア</button>
     </div>
     <div class="gas-status" id="gas-status"></div>
+    <div style="font-size:10px;color:#484f58;margin-top:4px">
+      GAS保存: <span id="gas-sync-status" style="color:#8b949e">—</span>
+      <span style="margin-left:12px">Amazon・Yahoo!入力時にスプレッドシートへ自動保存されます</span>
+    </div>
   </div>
 
   <!-- ── 月次目標設定 ── -->
@@ -677,7 +681,36 @@ document.title = CURR_MONTH_LABEL + ' 売上目標トラッカー | ネオ・ゲ
   if (sl) sl.textContent = CURR_MONTH_LABEL + ' 月次売上目標（円）';
 })();
 
-/* ── Yahoo! 日次ログ（localStorage） ── */
+/* ── GAS への日次売上保存（JSONP経由） ── */
+function saveGASEntry(mall, dateKey, amount) {
+  var url = localStorage.getItem('gas_url') || GAS_DEFAULT;
+  if (!url) return;
+  var cbName = '__gasSave' + Date.now();
+  var timer  = setTimeout(function() { delete window[cbName]; }, 10000);
+  window[cbName] = function(res) {
+    clearTimeout(timer);
+    delete window[cbName];
+    var ind = document.getElementById('gas-sync-status');
+    if (ind) {
+      ind.textContent = res.ok ? ('✓ ' + (res.action === 'deleted' ? '削除' : '保存') + ' ' + dateKey) : ('⚠ GAS保存失敗');
+      ind.style.color = res.ok ? '#3fb950' : '#d29922';
+    }
+  };
+  var sep    = url.indexOf('?') === -1 ? '?' : '&';
+  var script = document.createElement('script');
+  script.src = url + sep + 'action=save'
+             + '&mall='   + encodeURIComponent(mall)
+             + '&date='   + encodeURIComponent(dateKey)
+             + '&amount=' + (amount || 0)
+             + '&callback=' + cbName;
+  script.onerror = function() {
+    clearTimeout(timer); delete window[cbName];
+    document.head.removeChild(script);
+  };
+  document.head.appendChild(script);
+}
+
+/* ── Yahoo! 日次ログ（GAS永続化 + localStorageキャッシュ） ── */
 function getYahooLog() {
   return JSON.parse(localStorage.getItem('yahoo_daily_log') || '{}');
 }
@@ -693,6 +726,7 @@ function saveYahooYesterday(amount) {
   var log = getYahooLog();
   if (amount > 0) { log[YD_KEY] = amount; } else { delete log[YD_KEY]; }
   localStorage.setItem('yahoo_daily_log', JSON.stringify(log));
+  saveGASEntry('Yahoo', YD_KEY, amount); // GASスプレッドシートに永続保存
 }
 
 /* ── Amazon 手動ログ（Yahoo!と同方式） ── */
@@ -711,6 +745,7 @@ function saveAmazonYesterday(amount) {
   var log = getAmazonLog();
   if (amount > 0) { log[YD_KEY] = amount; } else { delete log[YD_KEY]; }
   localStorage.setItem('amazon_daily_log', JSON.stringify(log));
+  saveGASEntry('Amazon', YD_KEY, amount); // GASスプレッドシートに永続保存
 }
 
 document.getElementById('today-label').textContent =
@@ -952,21 +987,44 @@ function recalcStore(id, target, monthly, today) {
 
 /* ── 月切り替え ── */
 var chartMonthOffset = 0; // 0=今月, -1=先月, -2=先々月
-var gasRakutenCache  = {}; // GASから取得した楽天日別データをキャッシュ
+// GASから取得した全日別データを月別にキャッシュ { 'YYYY-MM': [{date:'YYYY-MM-DD', r, a, y}] }
+var gasRakutenCache  = {};
 
 function changeChartMonth(delta) {
   chartMonthOffset = Math.min(0, chartMonthOffset + delta);
-  renderDailyChart(null); // nullでキャッシュから描画
+  renderDailyChart(null);
 }
 
 /* ── 日次棒グラフ描画 ── */
 function renderDailyChart(dailyArr) {
   var container = document.getElementById('daily-chart');
 
-  // GAS楽天データをキャッシュに保存（今月分のみ）
+  // GASから返ってきた全期間データを月別キャッシュに分割保存
+  // GASは YYYY-MM-DD 形式で返す（3ヶ月分）
   if (dailyArr && dailyArr.length > 0) {
-    var cacheKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-    gasRakutenCache[cacheKey] = dailyArr;
+    var monthBuckets = {};
+    dailyArr.forEach(function(d) {
+      if (!d.date) return;
+      var ym = d.date.slice(0, 7); // 'YYYY-MM'
+      if (!monthBuckets[ym]) monthBuckets[ym] = [];
+      monthBuckets[ym].push(d);
+    });
+    Object.keys(monthBuckets).forEach(function(ym) {
+      gasRakutenCache[ym] = monthBuckets[ym];
+    });
+    // GASのAmazon/Yahoo値をlocalStorageに同期（ページリロード後でも参照できるよう）
+    dailyArr.forEach(function(d) {
+      if (!d.date) return;
+      var aLog = JSON.parse(localStorage.getItem('amazon_daily_log') || '{}');
+      var yLog = JSON.parse(localStorage.getItem('yahoo_daily_log')  || '{}');
+      var updated = false;
+      if (d.a && !aLog[d.date]) { aLog[d.date] = d.a; updated = true; }
+      if (d.y && !yLog[d.date]) { yLog[d.date] = d.y; updated = true; }
+      if (updated) {
+        localStorage.setItem('amazon_daily_log', JSON.stringify(aLog));
+        localStorage.setItem('yahoo_daily_log',  JSON.stringify(yLog));
+      }
+    });
   }
 
   // 表示対象の年月を計算
@@ -974,7 +1032,7 @@ function renderDailyChart(dailyArr) {
   var viewYear  = viewDate.getFullYear();
   var viewMonth = viewDate.getMonth(); // 0始まり
   var viewDays  = new Date(viewYear, viewMonth + 1, 0).getDate();
-  var viewEnd   = (chartMonthOffset === 0) ? DOM : viewDays; // 今月は今日まで、過去月は月末まで
+  var viewEnd   = (chartMonthOffset === 0) ? DOM : viewDays;
 
   // 月ラベル更新
   var monthLabel = (viewMonth + 1) + '月';
@@ -986,19 +1044,21 @@ function renderDailyChart(dailyArr) {
   var yahooLog    = getYahooLog();
   var amazonLog   = getAmazonLog();
 
-  // GAS楽天データをキャッシュから取得
+  // GASキャッシュから表示月データを取得（YYYY-MM-DD形式 → M/D形式のmapに変換）
   var gasCacheKey = viewYear + '-' + String(viewMonth + 1).padStart(2, '0');
   var gasSource   = gasRakutenCache[gasCacheKey] || [];
   var gasMap      = {};
   gasSource.forEach(function(d) {
     if (!d.date) return;
-    // GASは "MM/DD" or "MM-DD" 形式で返す。チャートラベル "M/D" に正規化
     var parts = d.date.replace(/-/g, '/').split('/');
-    var key   = parseInt(parts[0], 10) + '/' + parseInt(parts[1], 10);
+    var key   = parts.length === 3
+      ? parseInt(parts[1], 10) + '/' + parseInt(parts[2], 10)  // YYYY/MM/DD
+      : parseInt(parts[0], 10) + '/' + parseInt(parts[1], 10); // MM/DD
     gasMap[key] = d;
   });
 
   // 表示月の1日〜末日（今月は今日まで）を生成
+  // 優先順位: localStorage(手動入力) > GAS(自動集計)
   var fullArr = [];
   for (var day = 1; day <= viewEnd; day++) {
     var label  = (viewMonth + 1) + '/' + day;
@@ -1329,6 +1389,9 @@ function applyEditEntry() {
     delete log[dateVal];
   }
   localStorage.setItem(key, JSON.stringify(log));
+  // GASスプレッドシートにも永続保存
+  var gasMall = store === 'yahoo' ? 'Yahoo' : 'Amazon';
+  saveGASEntry(gasMall, dateVal, amount);
 
   var storeName = store === 'yahoo' ? 'Yahoo!' : 'Amazon';
   var msg = storeName + ' ' + dateVal + ': ' + (before ? fy(before) : '未入力') + ' → ' + (amount > 0 ? fy(amount) : '削除');

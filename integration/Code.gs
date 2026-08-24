@@ -657,15 +657,87 @@ function weeklyRakutenReport() {
 }
 
 // ================================================================
-// Web App：売上サマリーを JSON で返す（sales-tracker.html 用）
-// デプロイ方法: GASエディタ → デプロイ → 新しいデプロイ → ウェブアプリ
+// 手動売上ログ（Amazon SC値・Yahoo!日次 → スプレッドシートに永続保存）
+// シート名: '手動売上ログ'  列: 日付(YYYY-MM-DD) | モール | 売上金額 | 登録日時
+// ================================================================
+var MANUAL_SHEET = '手動売上ログ';
+
+function ensureManualSheet_() {
+  var ss    = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(MANUAL_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(MANUAL_SHEET);
+    sheet.appendRow(['日付', 'モール', '売上金額', '登録日時']);
+    sheet.getRange(1, 1, 1, 4).setFontWeight('bold');
+  }
+  return sheet;
+}
+
+// 手動ログを読み込む → { 'YYYY-MM-DD': { amazon: 0, yahoo: 0 } }
+function getManualLog_() {
+  var ss    = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(MANUAL_SHEET);
+  if (!sheet || sheet.getLastRow() <= 1) return {};
+  var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 3).getValues();
+  var log  = {};
+  data.forEach(function(row) {
+    var date   = String(row[0]).trim();
+    var mall   = String(row[1]).trim();
+    var amount = Number(row[2]) || 0;
+    if (!date || !amount) return;
+    if (!log[date]) log[date] = { amazon: 0, yahoo: 0 };
+    if (mall === 'Amazon') log[date].amazon = amount;
+    if (mall === 'Yahoo')  log[date].yahoo  = amount;
+  });
+  return log;
+}
+
+// 1日分の売上を保存/更新/削除 (amount=0 → 削除)
+function saveDailyEntry_(mall, dateStr, amount) {
+  if (!mall || !dateStr) return { ok: false, error: 'パラメータ不足' };
+  var sheet   = ensureManualSheet_();
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    var rows = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+    for (var i = 0; i < rows.length; i++) {
+      if (String(rows[i][0]) === dateStr && String(rows[i][1]) === mall) {
+        if (amount > 0) {
+          sheet.getRange(i + 2, 3, 1, 2).setValues([[amount, new Date()]]);
+          return { ok: true, action: 'updated', date: dateStr, mall: mall, amount: amount };
+        } else {
+          sheet.deleteRow(i + 2);
+          return { ok: true, action: 'deleted', date: dateStr, mall: mall };
+        }
+      }
+    }
+  }
+  if (amount > 0) {
+    sheet.appendRow([dateStr, mall, amount, new Date()]);
+    return { ok: true, action: 'inserted', date: dateStr, mall: mall, amount: amount };
+  }
+  return { ok: true, action: 'noop' };
+}
+
+// ================================================================
+// Web App：売上サマリーを JSON で返す & 手動ログ保存を受け付ける
+// デプロイ方法: GASエディタ → デプロイを管理 → 鉛筆 → 新しいバージョン → デプロイ
 //   実行ユーザー: 自分、アクセス: 全員
 // ================================================================
 function doGet(e) {
-  var type     = (e && e.parameter && e.parameter.type) ? e.parameter.type : '';
-  var result   = (type === 'weekly') ? getWeeklyReport_() : getSalesSummary_();
-  var json     = JSON.stringify(result);
-  var callback = (e && e.parameter && e.parameter.callback) ? e.parameter.callback : null;
+  var p        = e && e.parameter ? e.parameter : {};
+  var callback = p.callback || null;
+  var result;
+
+  // action=save: Amazon/Yahoo!の日次売上をスプレッドシートに保存
+  if (p.action === 'save') {
+    result = saveDailyEntry_(p.mall || '', p.date || '', Number(p.amount) || 0);
+  } else if (p.type === 'weekly') {
+    result = getWeeklyReport_();
+  } else {
+    result = getSalesSummary_();
+  }
+
+  var json = JSON.stringify(result);
   if (callback) {
     return ContentService
       .createTextOutput(callback + '(' + json + ')')
@@ -777,42 +849,28 @@ function getSalesSummary_() {
   var data = sheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
 
   var now         = new Date();
-  var today       = Utilities.formatDate(now, 'Asia/Tokyo', 'yyyy/MM/dd');
-  var monthPrefix = today.slice(0, 7);
+  // ISO形式 YYYY-MM-DD に統一（手動ログと一致させるため）
+  var today       = Utilities.formatDate(now, 'Asia/Tokyo', 'yyyy-MM-dd');
+  var monthPrefix = today.slice(0, 7); // 'YYYY-MM'
+  var yd          = new Date(now.getTime() - 86400000);
+  var yesterday   = Utilities.formatDate(yd, 'Asia/Tokyo', 'yyyy-MM-dd');
+  // 3ヶ月前の1日（過去データを全部チャートに返す）
+  var pastStart   = Utilities.formatDate(
+    new Date(now.getFullYear(), now.getMonth() - 2, 1), 'Asia/Tokyo', 'yyyy-MM-dd');
 
-  var yd        = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  var yesterday = Utilities.formatDate(yd, 'Asia/Tokyo', 'yyyy/MM/dd');
-
-  var todayM     = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
-  var yesterdayM = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
-  var monthlyM   = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
-
-  var r_today = {}, r_yesterday = {}, r_monthly = {};
   var dailyMap = {}, r_daily = {};
 
   data.forEach(function(row) {
     var orderDate = row[COL.ORDER_DATE];
     if (!orderDate) return;
-
     var d       = new Date(orderDate);
-    var dateStr = Utilities.formatDate(d, 'Asia/Tokyo', 'yyyy/MM/dd');
+    var dateStr = Utilities.formatDate(d, 'Asia/Tokyo', 'yyyy-MM-dd');
     var mall    = String(row[COL.MALL]);
     var orderId = String(row[COL.ORDER_ID]);
     var price   = Number(row[COL.PRICE]) || 0;
 
-    function add(bucket, rakutenSet) {
-      if (mall === '楽天') {
-        if (!rakutenSet[orderId]) { rakutenSet[orderId] = true; bucket.rakuten += price; bucket.total += price; }
-      } else if (mall === 'Amazon') {
-        bucket.amazon += price; bucket.total += price;
-      } else if (mall === 'Yahoo') {
-        bucket.yahoo += price; bucket.total += price;
-      }
-    }
-
-    if (dateStr.slice(0, 7) === monthPrefix) {
-      add(monthlyM, r_monthly);
-      // 日別集計
+    // 過去3ヶ月分を日別集計
+    if (dateStr >= pastStart) {
       if (!dailyMap[dateStr]) dailyMap[dateStr] = { r: 0, a: 0, y: 0 };
       if (mall === '楽天') {
         if (!r_daily[dateStr]) r_daily[dateStr] = {};
@@ -823,13 +881,39 @@ function getSalesSummary_() {
         dailyMap[dateStr].y += price;
       }
     }
-    if (dateStr === today)     add(todayM,     r_today);
-    if (dateStr === yesterday) add(yesterdayM, r_yesterday);
   });
 
+  // 手動ログ（Amazon SC値・Yahoo!手動入力）でSP-API値を上書き
+  var manualLog = getManualLog_();
+  Object.keys(manualLog).forEach(function(date) {
+    if (date < pastStart) return;
+    if (!dailyMap[date]) dailyMap[date] = { r: 0, a: 0, y: 0 };
+    var ml = manualLog[date];
+    if (ml.amazon) dailyMap[date].a = ml.amazon;
+    if (ml.yahoo)  dailyMap[date].y = ml.yahoo;
+  });
+
+  // dailyMap から各集計を再計算（手動ログ反映後の正確な値）
+  var todayM     = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
+  var yesterdayM = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
+  var monthlyM   = { total: 0, rakuten: 0, amazon: 0, yahoo: 0 };
+
+  Object.keys(dailyMap).forEach(function(date) {
+    var v = dailyMap[date];
+    var r = Math.round(v.r), a = Math.round(v.a), y = Math.round(v.y);
+    var t = r + a + y;
+    if (date === today)    { todayM     = { total: t, rakuten: r, amazon: a, yahoo: y }; }
+    if (date === yesterday){ yesterdayM = { total: t, rakuten: r, amazon: a, yahoo: y }; }
+    if (date.slice(0, 7) === monthPrefix) {
+      monthlyM.rakuten += r; monthlyM.amazon += a;
+      monthlyM.yahoo   += y; monthlyM.total  += t;
+    }
+  });
+
+  // daily 配列：YYYY-MM-DD 形式で全期間を返す（チャートが月別にキャッシュ）
   var daily = Object.keys(dailyMap).sort().map(function(d) {
     var v = dailyMap[d];
-    return { date: d.slice(5), r: Math.round(v.r), a: Math.round(v.a), y: Math.round(v.y) };
+    return { date: d, r: Math.round(v.r), a: Math.round(v.a), y: Math.round(v.y) };
   });
 
   return {
