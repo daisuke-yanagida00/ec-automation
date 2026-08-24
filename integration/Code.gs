@@ -728,8 +728,12 @@ function doGet(e) {
   var callback = p.callback || null;
   var result;
 
+  // action=setupTrigger: 日次トリガーを登録（初回セットアップ用）
+  if (p.action === 'setupTrigger') {
+    setupDailyTrigger();
+    result = { ok: true, message: 'Triggers set up successfully' };
   // action=save: Amazon/Yahoo!の日次売上をスプレッドシートに保存
-  if (p.action === 'save') {
+  } else if (p.action === 'save') {
     result = saveDailyEntry_(p.mall || '', p.date || '', Number(p.amount) || 0);
   } else if (p.type === 'weekly') {
     result = getWeeklyReport_();
