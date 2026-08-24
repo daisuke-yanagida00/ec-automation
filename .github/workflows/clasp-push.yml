@@ -38,6 +38,24 @@ jobs:
         if: steps.changes.outputs.integration == 'true'
         run: cd integration && clasp push --force
 
+      - name: Deploy integration Web App
+        if: steps.changes.outputs.integration == 'true'
+        run: |
+          cd integration
+          # 新しいバージョンを作成
+          VERSION_OUTPUT=$(clasp version "Auto-deploy $(date '+%Y-%m-%d %H:%M JST')" 2>&1)
+          echo "Version output: $VERSION_OUTPUT"
+          VERSION_NUM=$(echo "$VERSION_OUTPUT" | grep -oE '[0-9]+' | tail -1)
+          if [ -z "$VERSION_NUM" ]; then
+            echo "⚠ バージョン番号取得失敗。スキップします。"
+            exit 0
+          fi
+          echo "✓ 新バージョン: $VERSION_NUM"
+          # 既存デプロイを更新（URLを維持）
+          DEPLOY_ID="AKfycbznYqQyYEvskbx2fQBVKllfA__C8OsDGrNkwVfp2sh6EQGpZKsKMavEtp9B422kq8XGiw"
+          clasp deploy -i "$DEPLOY_ID" -V "$VERSION_NUM" -d "Auto-deploy $(date '+%Y-%m-%d')" 2>&1
+          echo "✓ デプロイ完了"
+
       - name: Push rakuten
         if: steps.changes.outputs.rakuten == 'true'
         run: cd rakuten && clasp push --force
