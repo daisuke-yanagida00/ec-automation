@@ -613,6 +613,41 @@ body {
     </div>
   </div>
 
+  <!-- ── データバックアップ / 復元 ── -->
+  <div class="bar-card" style="margin-top:16px">
+    <h2 style="cursor:pointer;user-select:none" onclick="toggleBackupPanel()">
+      データバックアップ / 復元
+      <span id="backup-panel-arrow" style="font-size:12px;color:#8b949e;margin-left:6px">▼</span>
+    </h2>
+    <div id="backup-panel" style="display:none;margin-top:12px">
+      <p style="font-size:11px;color:#8b949e;margin-bottom:10px">
+        Amazon・Yahoo!の売上ログをエクスポート/インポートできます。ブラウザを変えたり履歴を消した場合の復元用です。
+      </p>
+      <!-- エクスポート -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <button onclick="exportLocalStorage()"
+                style="padding:5px 14px;background:#1f6feb;color:#fff;border:none;border-radius:5px;font-size:12px;cursor:pointer;font-family:inherit">
+          📤 バックアップをコピー
+        </button>
+        <span id="backup-export-msg" style="font-size:11px;color:#3fb950;align-self:center"></span>
+      </div>
+      <!-- インポート -->
+      <div>
+        <label style="font-size:11px;color:#8b949e;display:block;margin-bottom:4px">バックアップデータを貼り付けて復元:</label>
+        <textarea id="backup-import-text"
+                  style="width:100%;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:11px;padding:7px 9px;font-family:monospace;resize:vertical;min-height:60px"
+                  placeholder='{"amazon_daily_log":{...},"yahoo_daily_log":{...}}'></textarea>
+        <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+          <button onclick="importLocalStorage()"
+                  style="padding:5px 14px;background:#238636;color:#fff;border:none;border-radius:5px;font-size:12px;cursor:pointer;font-family:inherit">
+            📥 データを復元
+          </button>
+          <span id="backup-import-msg" style="font-size:11px;color:#3fb950;align-self:center"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /main -->
 
 <div class="footer">株式会社ネオ・ゲート ｜ 入力値はブラウザに保存されます</div>
@@ -1314,6 +1349,65 @@ function applyEditEntry() {
 
   // ページ再計算
   setAutoSales(null);
+}
+
+/* ── バックアップ / 復元パネル ── */
+function toggleBackupPanel() {
+  var panel = document.getElementById('backup-panel');
+  var arrow = document.getElementById('backup-panel-arrow');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  arrow.textContent   = panel.style.display === 'none' ? '▼' : '▲';
+}
+
+function exportLocalStorage() {
+  var backup = {
+    amazon_daily_log: JSON.parse(localStorage.getItem('amazon_daily_log') || '{}'),
+    yahoo_daily_log:  JSON.parse(localStorage.getItem('yahoo_daily_log')  || '{}'),
+    tracker_targets:  JSON.parse(localStorage.getItem(TARGETS_KEY) || '{}'),
+    prev_report:      JSON.parse(localStorage.getItem(PREV_REPORT_KEY) || '{}'),
+    exported_at:      new Date().toLocaleString('ja-JP')
+  };
+  var json = JSON.stringify(backup, null, 2);
+  // クリップボードへコピー
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(json).then(function() {
+      document.getElementById('backup-export-msg').textContent = '✓ コピーしました（' + new Date().toLocaleTimeString('ja-JP') + '）';
+    });
+  } else {
+    // フォールバック: テキストエリアに表示
+    document.getElementById('backup-import-text').value = json;
+    document.getElementById('backup-panel').style.display = 'block';
+    document.getElementById('backup-export-msg').textContent = '↓ テキストエリアにコピーしてください';
+  }
+}
+
+function importLocalStorage() {
+  var text = document.getElementById('backup-import-text').value.trim();
+  var msgEl = document.getElementById('backup-import-msg');
+  if (!text) { msgEl.textContent = '貼り付けデータがありません'; msgEl.style.color = '#f85149'; return; }
+  try {
+    var data = JSON.parse(text);
+    var count = 0;
+    if (data.amazon_daily_log) {
+      localStorage.setItem('amazon_daily_log', JSON.stringify(data.amazon_daily_log));
+      count += Object.keys(data.amazon_daily_log).length;
+    }
+    if (data.yahoo_daily_log) {
+      localStorage.setItem('yahoo_daily_log',  JSON.stringify(data.yahoo_daily_log));
+      count += Object.keys(data.yahoo_daily_log).length;
+    }
+    if (data.tracker_targets && Object.keys(data.tracker_targets).length) {
+      localStorage.setItem(TARGETS_KEY, JSON.stringify(data.tracker_targets));
+    }
+    if (data.prev_report && Object.keys(data.prev_report).length) {
+      localStorage.setItem(PREV_REPORT_KEY, JSON.stringify(data.prev_report));
+    }
+    msgEl.style.color = '#3fb950';
+    msgEl.textContent = '✓ 復元完了（' + count + '日分）。ページをリロードしてください。';
+  } catch(e) {
+    msgEl.style.color  = '#f85149';
+    msgEl.textContent  = 'JSONが不正です: ' + e.message;
+  }
 }
 
 function renderEditLogPreview() {

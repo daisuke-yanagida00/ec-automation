@@ -1210,3 +1210,59 @@ function backfillRakutenMissing() {
   var cnt24 = backfillRakutenDate_('2026-07-24');
   Logger.log('完了: 7/22=' + cnt22 + '行, 7/23=' + cnt23 + '行, 7/24=' + cnt24 + '行');
 }
+
+// ================================================================
+// ダッシュボード localStorage 復元スクリプト生成
+// 使い方:
+//   GASエディタで generateRestoreScript() を実行 → 実行ログにスクリプトが出力される
+//   コピーして sales-tracker.html ページの F12 コンソールに貼り付けて実行
+// ================================================================
+function generateRestoreScript() {
+  var ss    = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  if (!sheet) { Logger.log('シートが見つかりません'); return; }
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) { Logger.log('データなし'); return; }
+
+  var data     = sheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
+  var amazonLog = {};
+  var r_dup     = {}; // 楽天注文重複排除
+
+  data.forEach(function(row) {
+    var orderDate = row[COL.ORDER_DATE];
+    if (!orderDate) return;
+    var d       = new Date(orderDate);
+    var dateStr = Utilities.formatDate(d, 'Asia/Tokyo', 'yyyy-MM-dd');
+    var mall    = String(row[COL.MALL]);
+    var orderId = String(row[COL.ORDER_ID]);
+    var price   = Number(row[COL.PRICE]) || 0;
+
+    if (mall === 'Amazon') {
+      amazonLog[dateStr] = (amazonLog[dateStr] || 0) + price;
+    }
+    // 楽天は getSalesSummary_ 経由でGASから自動取得するため除外
+    // Yahoo! はスプレッドシートに蓄積されていないため除外
+  });
+
+  var aJson = JSON.stringify(amazonLog);
+
+  var script = [
+    '// ─── ダッシュボード localStorage 復元スクリプト ───',
+    '// 生成日時: ' + Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy-MM-dd HH:mm:ss'),
+    '// ※ Yahoo!売上は手動再入力が必要です',
+    '',
+    'localStorage.setItem("amazon_daily_log", \'' + aJson + '\');',
+    'console.log("✓ Amazon売上ログを復元しました (" + Object.keys(' + aJson + ').length + "日分)");',
+    '',
+    '// 復元後にページをリロードしてください',
+    'console.log("→ ページをリロードして売上を確認してください");'
+  ].join('\n');
+
+  Logger.log('=== 以下をブラウザコンソールに貼り付けて実行してください ===');
+  Logger.log(script);
+  Logger.log('=== ここまでコピー ===');
+
+  return script;
+}
+
