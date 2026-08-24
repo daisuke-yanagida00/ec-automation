@@ -229,9 +229,10 @@ ec-automation/
 - `integration/Code.gs`：手動売上ログ機能・doGet拡張・getSalesSummary_拡張・generateRestoreScript追加
 - `docs/sales-tracker.html`：saveGASEntry追加・save関数改修・renderDailyChart改修・先月実績レポート追加・バックアップパネル追加・月別目標キー対応
 
-### ⚠️ 要対応（ユーザー作業）
-- **GAS Webアプリ再デプロイ**：GASエディタ → 「デプロイを管理」→ 鉛筆アイコン → 「新しいバージョン」→「デプロイ」
-  - これを実行しないと `action=save` エンドポイントが有効にならない（Amazon/Yahoo!入力がGASに保存されない）
+### GAS自動デプロイ確定
+- **GitHub Actions ワークフロー自動デプロイ実装・動作確認済み**（2026-08-24 08:44 JST）
+  - `integration/` 変更 → `clasp push` → `clasp version` → `clasp deploy -i <deploymentId>` がCI上で自動実行
+  - `action=save` エンドポイント有効化済み（手動GASデプロイ不要）
 - **楽天APIキー次回失効予定**：2026-10-13（対策：2026-09-29 にカレンダー通知設定推奨）
 
 ## 運用ルール
