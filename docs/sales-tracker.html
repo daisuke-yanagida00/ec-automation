@@ -1012,7 +1012,13 @@ function renderDailyChart(dailyArr) {
       monthBuckets[ym].push(d);
     });
     Object.keys(monthBuckets).forEach(function(ym) {
-      gasRakutenCache[ym] = monthBuckets[ym];
+      // マージ: 既存キャッシュに r>0 データがあれば GAS の r=0 で上書きしない
+      var prevMap = {};
+      (gasRakutenCache[ym] || []).forEach(function(e) { if (e.date) prevMap[e.date] = e; });
+      gasRakutenCache[ym] = monthBuckets[ym].map(function(d) {
+        var prev = prevMap[d.date] || {};
+        return { date: d.date, r: d.r > 0 ? d.r : (prev.r || 0), a: d.a || 0, y: d.y || 0 };
+      });
     });
     try { localStorage.setItem('gasRakutenCache', JSON.stringify(gasRakutenCache)); } catch(e) {}
     // GASのAmazon/Yahoo値をlocalStorageに同期（ページリロード後でも参照できるよう）
