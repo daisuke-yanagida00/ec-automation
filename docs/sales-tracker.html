@@ -988,7 +988,9 @@ function recalcStore(id, target, monthly, today) {
 /* ── 月切り替え ── */
 var chartMonthOffset = 0; // 0=今月, -1=先月, -2=先々月
 // GASから取得した全日別データを月別にキャッシュ { 'YYYY-MM': [{date:'YYYY-MM-DD', r, a, y}] }
-var gasRakutenCache  = {};
+var gasRakutenCache  = (function() {
+  try { return JSON.parse(localStorage.getItem('gasRakutenCache') || '{}'); } catch(e) { return {}; }
+})();
 
 function changeChartMonth(delta) {
   chartMonthOffset = Math.min(0, chartMonthOffset + delta);
@@ -1012,6 +1014,7 @@ function renderDailyChart(dailyArr) {
     Object.keys(monthBuckets).forEach(function(ym) {
       gasRakutenCache[ym] = monthBuckets[ym];
     });
+    try { localStorage.setItem('gasRakutenCache', JSON.stringify(gasRakutenCache)); } catch(e) {}
     // GASのAmazon/Yahoo値をlocalStorageに同期（ページリロード後でも参照できるよう）
     dailyArr.forEach(function(d) {
       if (!d.date) return;
