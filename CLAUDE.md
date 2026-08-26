@@ -235,6 +235,22 @@ ec-automation/
   - `action=save` エンドポイント有効化済み（手動GASデプロイ不要）
 - **楽天APIキー次回失効予定**：2026-10-13（対策：2026-09-29 にカレンダー通知設定推奨）
 
+## 2026-08-26 作業記録
+
+### 完了
+- **売上ダッシュボード 棒グラフ表示バグ修正**：`docs/sales-tracker.html`
+  - 楽天（金色）バーが表示されない問題を根本修正
+  - `gasRakutenCache` を `var gasRakutenCache = {}` から localStorage読み込みIIFEに変更（ページリロード後も保持）
+  - GASがr=0を返した場合、既存キャッシュの非ゼロ値を保持するマージロジック追加（GASフェッチ後に上書きされる競合状態を解消）
+  - 6〜8月楽天日別データ（`_DEFAULT_RAKUTEN`）をページ内にハードコード埋め込み（localStorage・GAS未取得時の最終フォールバック）
+
+### 決定事項
+- **ダッシュボードのチャート表示方針確定**：GAS → localStorage → _DEFAULT_RAKUTEN の3段階フォールバックで常に表示を保証
+- GASのr=0データはlocalStorage/デフォルトの非ゼロ値で上書き（GASが楽天APIで取得できなかった日はローカル保存値を優先）
+
+### システム構成変更
+- `docs/sales-tracker.html`：gasRakutenCache localStorage永続化・マージロジック・_DEFAULT_RAKUTEN埋め込み（commits: bd05e08, c2adc9f, 9d93285）
+
 ## 運用ルール
 **このプロジェクトのセッション終了時は必ずCLAUDE.mdを更新すること。**
 - セッション終了前に「今日の作業内容をCLAUDE.mdに追記してgit pushして」を実行
