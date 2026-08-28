@@ -728,12 +728,8 @@ function doGet(e) {
   var callback = p.callback || null;
   var result;
 
-  // action=setupTrigger: 日次トリガーを登録（初回セットアップ用）
-  if (p.action === 'setupTrigger') {
-    setupDailyTrigger();
-    result = { ok: true, message: 'Triggers set up successfully' };
   // action=save: Amazon/Yahoo!の日次売上をスプレッドシートに保存
-  } else if (p.action === 'save') {
+  if (p.action === 'save') {
     result = saveDailyEntry_(p.mall || '', p.date || '', Number(p.amount) || 0);
   } else if (p.type === 'weekly') {
     result = getWeeklyReport_();
@@ -1150,31 +1146,6 @@ function getYahooAccessToken_() {
 
 function yahooXml_(el, tag) {
   try { return el.getChild(tag).getText(); } catch(e) { return ''; }
-}
-
-// ================================================================
-// 日次トリガー設定（初回のみ手動実行）
-// ================================================================
-function setupDailyTrigger() {
-  var targets = ['integrateRakutenOrders', 'integrateAmazonOrders', 'integrateYahooOrders'];
-
-  // 対象関数の既存トリガーを削除
-  ScriptApp.getProjectTriggers().forEach(function(t) {
-    if (targets.indexOf(t.getHandlerFunction()) !== -1) {
-      ScriptApp.deleteTrigger(t);
-    }
-  });
-
-  // 各関数を毎朝8時に実行するトリガーを登録
-  targets.forEach(function(funcName) {
-    ScriptApp.newTrigger(funcName)
-      .timeBased()
-      .everyDays(1)
-      .atHour(8)
-      .create();
-  });
-
-  Logger.log('日次トリガーを設定しました（毎朝8時）: ' + targets.join(', '));
 }
 
 // ================================================================
