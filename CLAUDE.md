@@ -251,6 +251,34 @@ ec-automation/
 ### システム構成変更
 - `docs/sales-tracker.html`：gasRakutenCache localStorage永続化・マージロジック・_DEFAULT_RAKUTEN埋め込み（commits: bd05e08, c2adc9f, 9d93285）
 
+## 2026-08-28 / 2026-09-02 作業記録
+
+### 完了
+- **GAS Web App URL修正**：旧URL（AKfycbzn...）がLibraryデプロイを指しており無効だったため新規Webアプリデプロイを作成
+  - 新URL：`https://script.google.com/macros/s/AKfycbxTxVRSWNF8G2vvKKDPBuHPcACnWryorERgVff-xLABBRVWJf64rpvU3a0QYCsMxhH6EA/exec`
+  - `docs/sales-tracker.html` の `GAS_DEFAULT` を新URLに更新
+  - `.github/workflows/clasp-push.yml` の `DEPLOY_ID` も新URLのデプロイIDに更新
+- **GAS `setupDailyTrigger()` 削除**：ScriptAppスコープ要求によりWeb App認証エラーが発生していたため削除
+- **9月売上目標をダッシュボードに反映**：管理スプレッドシート3社分を解析して9月デフォルト目標値を更新
+  - 楽天管理シート（グースリーマットレスS/SD週次計画）：¥378,044/週 × 4週 + ¥78,874/週 × 4週 = ¥1,827,672
+  - Amazon管理シート（グースリーマットレスS/SD + 枕・ボタンテープ等商品）：¥471,440 + ¥523,877 = ¥995,317
+  - Yahoo!実績（週次レポート平均 ¥110,869/週 × 4.3週 ≈ ¥477,000）
+
+### 決定事項
+- **9月目標値**（管理シートより）：
+  - 楽天：¥1,800,000（180万円）
+  - Amazon：¥1,000,000（100万円）
+  - Yahoo!：¥500,000（50万円）
+  - 合計：¥3,300,000（330万円）
+  ※管理シートは特定商品群のみの計画値のため、実際の目標より低めの場合はダッシュボードのUI入力で手動調整可能
+- **GASのprivate関数**：末尾に`_`が付く関数はGASエディタのドロップダウンに表示されない（`getSalesSummary_`等）
+- **GAS Web App運用方針確定**：「デプロイを管理→既存を更新」はLibraryデプロイに当たることがある。Web AppのURLを変えたくない場合は同一デプロイIDで「新しいバージョン」を選択してデプロイ
+
+### システム構成変更
+- `docs/sales-tracker.html`：9月デフォルト目標値更新（楽天180万・Amazon100万・Yahoo50万・合計330万）
+- `.github/workflows/clasp-push.yml`：DEPLOY_IDを新Web AppデプロイIDに更新
+- `integration/Code.gs`：`setupDailyTrigger()`・`action=setupTrigger`を削除
+
 ## 運用ルール
 **このプロジェクトのセッション終了時は必ずCLAUDE.mdを更新すること。**
 - セッション終了前に「今日の作業内容をCLAUDE.mdに追記してgit pushして」を実行
