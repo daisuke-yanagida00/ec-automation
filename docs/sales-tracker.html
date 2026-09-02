@@ -1281,6 +1281,13 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbxTxVRSWNF8G2vvKKDPBu
 
   /* 目標値の復元（月別キー: tracker_targets_YYYY-MM） */
   var targets = JSON.parse(localStorage.getItem(TARGETS_KEY) || '{}');
+  /* 旧デフォルト値（管理シート合計値反映前）が残っている場合はリセット */
+  var OLD_DEFAULTS = { total: 3300000, rakuten: 1800000, amazon: 1000000, yahoo: 500000 };
+  if (targets.total == OLD_DEFAULTS.total && targets.rakuten == OLD_DEFAULTS.rakuten &&
+      targets.amazon == OLD_DEFAULTS.amazon && targets.yahoo == OLD_DEFAULTS.yahoo) {
+    targets = {};
+    localStorage.removeItem(TARGETS_KEY);
+  }
   if (targets.total)   document.getElementById('t-total').value   = targets.total;
   if (targets.rakuten) document.getElementById('t-rakuten').value = targets.rakuten;
   if (targets.amazon)  document.getElementById('t-amazon').value  = targets.amazon;
