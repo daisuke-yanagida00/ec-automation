@@ -681,7 +681,9 @@ function getManualLog_() {
   var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 3).getValues();
   var log  = {};
   data.forEach(function(row) {
-    var date   = String(row[0]).trim();
+    var date = row[0] instanceof Date
+      ? Utilities.formatDate(row[0], 'Asia/Tokyo', 'yyyy-MM-dd')
+      : String(row[0]).trim().slice(0, 10);
     var mall   = String(row[1]).trim();
     var amount = Number(row[2]) || 0;
     if (!date || !amount) return;
@@ -700,7 +702,10 @@ function saveDailyEntry_(mall, dateStr, amount) {
   if (lastRow > 1) {
     var rows = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
     for (var i = 0; i < rows.length; i++) {
-      if (String(rows[i][0]) === dateStr && String(rows[i][1]) === mall) {
+      var rowDate = rows[i][0] instanceof Date
+        ? Utilities.formatDate(rows[i][0], 'Asia/Tokyo', 'yyyy-MM-dd')
+        : String(rows[i][0]).trim().slice(0, 10);
+      if (rowDate === dateStr && String(rows[i][1]).trim() === mall) {
         if (amount > 0) {
           sheet.getRange(i + 2, 3, 1, 2).setValues([[amount, new Date()]]);
           return { ok: true, action: 'updated', date: dateStr, mall: mall, amount: amount };
