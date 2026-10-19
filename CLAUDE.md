@@ -271,6 +271,30 @@ ec-automation/
 - 楽天値の差異（RMS確認値 vs 計算値）：RMS は全ステータス、SP-API は発送済みのみのため最大10〜15%差が生じる
   - 例：9/10 RMS=469,428円 vs SP-API計算=430,281円
 
+## 2026-10-19 作業記録（追記）
+
+### 完了
+- **RMSデータで楽天r:値を全面修正**：`docs/sales-tracker.html`
+  - 10/1〜10/18 全日の `_DEFAULT_RAKUTEN` r: 値を RMS 実績値に置き換え
+    - 主要差異：10/15（97,650→242,305）、10/07（119,122→88,038）、10/12（75,000→128,500）、10/17（197,961→161,658）
+  - 9/11〜9/30 の r: 値を RMS 実績値に置き換え（9/23: 71,168→27,510 など）
+  - 8/25（25,698→32,164）・8/27（3,227→3,550）・8/30（36,362→38,000）修正
+  - `RAKUTEN_CACHE_VER = '20261019-rms'` 追加：既存 gasRakutenCache の r: 値を _DEFAULT_RAKUTEN の RMS 値で強制上書きするIIFE。バージョン変更時のみ実行（1回限り）
+  - `DEFAULTS_VER` を `'20261019-5'` に更新
+- **楽天APIキー確認**：`testRakutenApiKey()` 実行 → HTTP 200・直近24h 1件。SP26/SL26プレフィックスで有効期限は2026-10-13以降に更新済み
+- **楽天バックフィル実行**：`backfillRakutenOct()` で 10/13〜10/19 の SP-API データを注文統合シートに補完
+- **GAS `testRakutenApiKey()` 追加**：`integration/Code.gs` に動作確認用テスト関数を追加
+- **`seedDailyLogs()` バグ修正**：既存 amazon_daily_log エントリを上書きしないよう修正（`!aLog[d.date]` チェック追加）
+
+### 決定事項
+- **楽天データソース方針**：ダッシュボード表示はRMS値（全ステータス）を _DEFAULT_RAKUTEN に直接設定。SP-API（発送済みのみ）との差異（10〜15%）は許容
+- **Amazonは手入力運用継続**：SP-API からの自動取得は行わない。SC値を手動入力
+- **gasRakutenCache 更新方針**：`RAKUTEN_CACHE_VER` を変更することでlocalStorageキャッシュのr:値を強制更新可能
+
+### システム構成変更
+- `docs/sales-tracker.html`：_DEFAULT_RAKUTEN のr:値をRMS値に更新・RAKUTEN_CACHE_VER機構追加・DEFAULTS_VER更新
+- `integration/Code.gs`：testRakutenApiKey()・backfillRakutenOct() 追加
+
 ## 2026-08-28 / 2026-09-02 作業記録
 
 ### 完了
