@@ -1330,4 +1330,57 @@ function generateRestoreScript() {
   return script;
 }
 
+// ================================================================
+// 楽天APIキー動作確認（GASエディタから直接実行可能）
+// ================================================================
+function testRakutenApiKey() {
+  var secret = CONFIG.RAKUTEN.SERVICE_SECRET;
+  var key    = CONFIG.RAKUTEN.LICENSE_KEY;
+
+  if (!secret || !key) {
+    Logger.log('❌ APIキーが設定されていません。Script Propertiesを確認してください。');
+    Logger.log('   RAKUTEN_SERVICE_SECRET: ' + (secret ? '設定済み' : '未設定'));
+    Logger.log('   RAKUTEN_LICENSE_KEY: '    + (key    ? '設定済み' : '未設定'));
+    return;
+  }
+
+  Logger.log('APIキー確認中...');
+  Logger.log('SERVICE_SECRET: ' + secret.substring(0, 4) + '****');
+  Logger.log('LICENSE_KEY: '    + key.substring(0, 4)    + '****');
+
+  // 昨日〜今日の小範囲で searchOrder を実行
+  var body = JSON.stringify({
+    dateType:          1,
+    startDatetime:     getIsoHoursAgo_(24),
+    endDatetime:       getIsoNow_(),
+    orderProgressList: [100, 200, 300, 400, 500]
+  });
+
+  var token = Utilities.base64Encode(secret + ':' + key);
+  var res = UrlFetchApp.fetch(RAKUTEN_API + 'searchOrder/', {
+    method:             'post',
+    contentType:        'application/json; charset=utf-8',
+    headers:            { Authorization: 'ESA ' + token },
+    payload:            body,
+    muteHttpExceptions: true
+  });
+
+  var code = res.getResponseCode();
+  Logger.log('HTTPステータス: ' + code);
+
+  if (code === 200) {
+    var json = JSON.parse(res.getContentText());
+    var count = (json.orderNumberList || []).length;
+    Logger.log('✅ APIキーは有効です！');
+    Logger.log('直近24時間の注文件数: ' + count + '件');
+  } else if (code === 401) {
+    Logger.log('❌ 401 Unauthorized: APIキーが無効または期限切れです');
+    Logger.log('楽天RMS WEB SERVICE でライセンスキーを更新してください:');
+    Logger.log('  https://webservice.rms.rakuten.co.jp/merchant-portal/');
+    Logger.log('  利用設定 → アプリ一覧 → 対象アプリ → ライセンスキー確認');
+  } else {
+    Logger.log('⚠️ エラー: ' + code);
+    Logger.log(res.getContentText().substring(0, 500));
+  }
+}
 
