@@ -1081,8 +1081,8 @@ var DEFAULTS_VER = '20261019-3';
   var yLog = JSON.parse(localStorage.getItem('yahoo_daily_log')  || '{}');
   Object.keys(_DEFAULT_RAKUTEN).forEach(function(ym) {
     _DEFAULT_RAKUTEN[ym].forEach(function(d) {
-      if (d.a > 0) aLog[d.date] = d.a;
-      if (d.y > 0) yLog[d.date] = d.y;
+      if (d.a > 0 && !aLog[d.date]) aLog[d.date] = d.a;
+      if (d.y > 0 && !yLog[d.date]) yLog[d.date] = d.y;
     });
   });
   try {
