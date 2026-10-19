@@ -1061,8 +1061,8 @@ var _DEFAULT_RAKUTEN = {
     {date:"2026-09-29",r:2527,a:190000,y:0},{date:"2026-09-30",r:6435,a:125000,y:0}
   ],
   "2026-10":[
-    {date:"2026-10-01",r:39599,a:27100,y:0},{date:"2026-10-02",r:27799,a:22000,y:0},
-    {date:"2026-10-03",r:3999,a:2700,y:0},{date:"2026-10-04",r:41961,a:230000,y:70000},
+    {date:"2026-10-01",r:39599,a:275000,y:0},{date:"2026-10-02",r:27799,a:250000,y:0},
+    {date:"2026-10-03",r:3999,a:270000,y:0},{date:"2026-10-04",r:41961,a:230000,y:70000},
     {date:"2026-10-05",r:181830,a:175000,y:500},{date:"2026-10-06",r:70015,a:21500,y:0},
     {date:"2026-10-07",r:119122,a:210000,y:38000},{date:"2026-10-08",r:81202,a:195000,y:21000},
     {date:"2026-10-09",r:56288,a:166000,y:1000},{date:"2026-10-10",r:5979,a:150000,y:0},
@@ -1077,11 +1077,25 @@ var _DEFAULT_RAKUTEN = {
 var gasRakutenCache = (function() {
   try {
     var stored = JSON.parse(localStorage.getItem('gasRakutenCache') || '{}');
-    // localStorageにないor空の月はデフォルトデータで初期化
+    // デフォルトデータで初期化・補完
     Object.keys(_DEFAULT_RAKUTEN).forEach(function(ym) {
       var s = stored[ym];
       if (!s || s.length === 0 || s.every(function(d){ return !d.r; })) {
+        // 月ごとデータがない場合はそのまま置き換え
         stored[ym] = _DEFAULT_RAKUTEN[ym];
+      } else {
+        // 既存キャッシュがあっても a:/y: が 0 の日はデフォルト値で補完
+        var defMap = {};
+        _DEFAULT_RAKUTEN[ym].forEach(function(d){ defMap[d.date] = d; });
+        stored[ym] = stored[ym].map(function(d) {
+          var def = defMap[d.date] || {};
+          return {
+            date: d.date,
+            r: d.r || def.r || 0,
+            a: d.a || def.a || 0,
+            y: d.y || def.y || 0
+          };
+        });
       }
     });
     try { localStorage.setItem('gasRakutenCache', JSON.stringify(stored)); } catch(e) {}
