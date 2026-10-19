@@ -233,7 +233,7 @@ ec-automation/
 - **GitHub Actions ワークフロー自動デプロイ実装・動作確認済み**（2026-08-24 08:44 JST）
   - `integration/` 変更 → `clasp push` → `clasp version` → `clasp deploy -i <deploymentId>` がCI上で自動実行
   - `action=save` エンドポイント有効化済み（手動GASデプロイ不要）
-- **楽天APIキー次回失効予定**：2026-10-13（対策：2026-09-29 にカレンダー通知設定推奨）
+- **楽天APIキー次回失効予定**：2027-01-04（対策：2026-12-21 にカレンダー通知設定推奨）
 
 ## 2026-08-26 作業記録
 
