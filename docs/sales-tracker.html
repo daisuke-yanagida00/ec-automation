@@ -1073,6 +1073,25 @@ var _DEFAULT_RAKUTEN = {
   ]
 };
 
+// _DEFAULT_RAKUTEN を更新したら必ずここも変更 → amazon_daily_log / yahoo_daily_log を強制同期
+var DEFAULTS_VER = '20261019-2';
+(function seedDailyLogs() {
+  if (localStorage.getItem('defaults_ver') === DEFAULTS_VER) return;
+  var aLog = JSON.parse(localStorage.getItem('amazon_daily_log') || '{}');
+  var yLog = JSON.parse(localStorage.getItem('yahoo_daily_log')  || '{}');
+  Object.keys(_DEFAULT_RAKUTEN).forEach(function(ym) {
+    _DEFAULT_RAKUTEN[ym].forEach(function(d) {
+      if (d.a > 0) aLog[d.date] = d.a;
+      if (d.y > 0) yLog[d.date] = d.y;
+    });
+  });
+  try {
+    localStorage.setItem('amazon_daily_log', JSON.stringify(aLog));
+    localStorage.setItem('yahoo_daily_log',  JSON.stringify(yLog));
+    localStorage.setItem('defaults_ver', DEFAULTS_VER);
+  } catch(e) {}
+})();
+
 // GASから取得した全日別データを月別にキャッシュ { 'YYYY-MM': [{date:'YYYY-MM-DD', r, a, y}] }
 var gasRakutenCache = (function() {
   try {
