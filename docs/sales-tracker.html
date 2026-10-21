@@ -1093,7 +1093,7 @@ var DEFAULTS_VER = '20261019-5';
 })();
 
 // _DEFAULT_RAKUTEN の楽天r:値を更新したらここも変更 → gasRakutenCacheのr:値を強制上書き
-var RAKUTEN_CACHE_VER = '20261019-rms';
+var RAKUTEN_CACHE_VER = '20261021-rms';
 (function syncRakutenCache() {
   if (localStorage.getItem('rakuten_cache_ver') === RAKUTEN_CACHE_VER) return;
   try {
@@ -1165,13 +1165,24 @@ function renderDailyChart(dailyArr) {
       monthBuckets[ym].push(d);
     });
     Object.keys(monthBuckets).forEach(function(ym) {
-      // マージ: 既存キャッシュに r>0 データがあれば GAS の r=0 で上書きしない
+      // マージ: キャッシュに r>0 があれば GAS(SP-API)値で上書きしない（RMS値を優先）
+      // キャッシュが 0 または存在しない日付のみ GAS 値を採用
       var prevMap = {};
       (gasRakutenCache[ym] || []).forEach(function(e) { if (e.date) prevMap[e.date] = e; });
-      gasRakutenCache[ym] = monthBuckets[ym].map(function(d) {
-        var prev = prevMap[d.date] || {};
-        return { date: d.date, r: d.r > 0 ? d.r : (prev.r || 0), a: d.a || 0, y: d.y || 0 };
+      // GASが返した全日付をマージ（新しい日付はGAS値で追加）
+      var mergedMap = {};
+      (gasRakutenCache[ym] || []).forEach(function(e) { if (e.date) mergedMap[e.date] = e; });
+      monthBuckets[ym].forEach(function(d) {
+        var prev = mergedMap[d.date] || {};
+        mergedMap[d.date] = {
+          date: d.date,
+          r: (prev.r || 0) > 0 ? prev.r : (d.r || 0),  // キャッシュ優先(RMS値保護)、新日付はGAS値
+          a: d.a || prev.a || 0,
+          y: d.y || prev.y || 0
+        };
       });
+      // 日付順にソート
+      gasRakutenCache[ym] = Object.keys(mergedMap).sort().map(function(k) { return mergedMap[k]; });
     });
     try { localStorage.setItem('gasRakutenCache', JSON.stringify(gasRakutenCache)); } catch(e) {}
     // GASのAmazon/Yahoo値をlocalStorageに同期（ページリロード後でも参照できるよう）
