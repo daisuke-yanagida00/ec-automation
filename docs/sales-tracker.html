@@ -1061,18 +1061,19 @@ var _DEFAULT_RAKUTEN = {
     {date:"2026-09-29",r:2527,a:190000,y:0},{date:"2026-09-30",r:6435,a:125000,y:0}
   ],
   "2026-10":[
-    {date:"2026-10-01",r:39599,a:27100,y:0},{date:"2026-10-02",r:27799,a:22000,y:0},
-    {date:"2026-10-03",r:3999,a:2700,y:0},{date:"2026-10-04",r:41961,a:230000,y:70000},
-    {date:"2026-10-05",r:181830,a:175000,y:500},{date:"2026-10-06",r:70015,a:21500,y:0},
-    {date:"2026-10-07",r:119122,a:210000,y:38000},{date:"2026-10-08",r:81202,a:195000,y:21000},
-    {date:"2026-10-09",r:56288,a:166000,y:1000},{date:"2026-10-10",r:5979,a:150000,y:0},
-    {date:"2026-10-11",r:0,a:0,y:0},{date:"2026-10-12",r:116818,a:0,y:0},
-    {date:"2026-10-13",r:0,a:0,y:0},{date:"2026-10-14",r:0,a:0,y:0},
-    {date:"2026-10-15",r:0,a:0,y:0},{date:"2026-10-16",r:0,a:0,y:0},
-    {date:"2026-10-17",r:0,a:0,y:0},{date:"2026-10-18",r:0,a:0,y:0}
+    {date:"2026-10-01",r:43421,a:275000,y:0},{date:"2026-10-02",r:30580,a:250000,y:0},
+    {date:"2026-10-03",r:4400,a:270000,y:0},{date:"2026-10-04",r:41159,a:230000,y:70000},
+    {date:"2026-10-05",r:175818,a:175000,y:500},{date:"2026-10-06",r:70520,a:21500,y:0},
+    {date:"2026-10-07",r:88038,a:210000,y:38000},{date:"2026-10-08",r:83726,a:195000,y:21000},
+    {date:"2026-10-09",r:53701,a:166000,y:1000},{date:"2026-10-10",r:6578,a:150000,y:0},
+    {date:"2026-10-11",r:698,a:76625,y:0},{date:"2026-10-12",r:128500,a:61900,y:0},
+    {date:"2026-10-13",r:24560,a:99684,y:0},{date:"2026-10-14",r:20638,a:58221,y:0},
+    {date:"2026-10-15",r:242305,a:28965,y:0},{date:"2026-10-16",r:5000,a:76718,y:0},
+    {date:"2026-10-17",r:161658,a:178135,y:0},{date:"2026-10-18",r:41560,a:80810,y:0},
+    {date:"2026-10-19",r:0,a:0,y:0},{date:"2026-10-20",r:51254,a:0,y:0},
+    {date:"2026-10-21",r:12270,a:0,y:0}
   ]
 };
-
 // GASから取得した全日別データを月別にキャッシュ { 'YYYY-MM': [{date:'YYYY-MM-DD', r, a, y}] }
 var gasRakutenCache = (function() {
   try {
@@ -1082,6 +1083,26 @@ var gasRakutenCache = (function() {
       var s = stored[ym];
       if (!s || s.length === 0 || s.every(function(d){ return !d.r; })) {
         stored[ym] = _DEFAULT_RAKUTEN[ym];
+      } else {
+        // 既存キャッシュとデフォルトをマージ（新日付も追加）
+        var defMap = {};
+        _DEFAULT_RAKUTEN[ym].forEach(function(d){ defMap[d.date] = d; });
+        var mergeMap = {};
+        stored[ym].forEach(function(d){ mergeMap[d.date] = d; });
+        // _DEFAULT_RAKUTENにある日付でキャッシュにない日はデフォルト値を追加
+        Object.keys(defMap).forEach(function(dt) {
+          if (!mergeMap[dt]) mergeMap[dt] = defMap[dt];
+        });
+        stored[ym] = Object.keys(mergeMap).sort().map(function(dt) {
+          var d   = mergeMap[dt];
+          var def = defMap[dt] || {};
+          return {
+            date: dt,
+            r: d.r || def.r || 0,
+            a: d.a || def.a || 0,
+            y: d.y || def.y || 0
+          };
+        });
       }
     });
     try { localStorage.setItem('gasRakutenCache', JSON.stringify(stored)); } catch(e) {}
@@ -1246,6 +1267,7 @@ function fetchGAS() {
       fy(data.monthly.total) + ' / 昨日:' + fy(ys.total) + ' / 今日:' + fy(data.today.total));
     localStorage.setItem('gas_last', JSON.stringify(data));
     localStorage.setItem('gas_last_time', new Date().toLocaleString('ja-JP'));
+    localStorage.setItem('gas_last_ts', Date.now().toString());
     setAutoSales(data);
   };
 
@@ -1351,8 +1373,10 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbxTxVRSWNF8G2vvKKDPBu
         fy(data.monthly.total) + ' / 昨日:' + fy(ys2.total) + ' / 今日:' + fy(data.today.total) +
         '（「売上を自動取得」で最新に更新）');
       setAutoSales(data);
-      // 今日まだ取得していなければバックグラウンドで自動更新
-      if (lastTime && !lastTime.startsWith(today)) {
+      // 前回取得が今日の9時より前 or 未取得の場合は自動更新（8時GASトリガー後の最新データを取得するため）
+      var lastTs = parseInt(localStorage.getItem('gas_last_ts') || '0', 10);
+      var todayNineAM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0, 0).getTime();
+      if (!lastTs || lastTs < todayNineAM) {
         setStatus('ing', '最新データを自動取得中...');
         fetchGAS();
       }
