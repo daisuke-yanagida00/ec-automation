@@ -346,6 +346,19 @@ ec-automation/
 ### システム構成変更
 - `docs/sales-tracker.html`：_DEFAULT_RAKUTEN 10/19-10/25追加・IIFEマージロジック修正・gas_last_ts導入・バージョン更新
 
+### 追記（同日セッション続き）
+- **GAS Web App URL障害対応・ダッシュボード楽天累計81万→149万修正**
+  - 原因：GAS Webアプリデプロイが「ライブラリ」型になっており `macros/s/.../exec` URLが無効化（Googleドライブエラーページを返す状態）。GASフェッチが全て失敗し、古いlocalStorageキャッシュ（81万）が表示されていた
+  - 対応：GASエディタで新規ウェブアプリデプロイを作成、新URL取得
+  - `docs/sales-tracker.html`：`GAS_DEFAULT` を新URL（AKfycbzsFp1...）に更新
+  - `.github/workflows/clasp-push.yml`：`DEPLOY_ID` を新デプロイIDに更新
+  - ダッシュボードで「売上を自動取得」→ 正常取得確認済み
+
+### 決定事項（追記）
+- **GAS Web App URL（2026-10-26更新）**：`https://script.google.com/macros/s/AKfycbzsFp1bbshqN8fkhVDL93Ogk_MAJXHBmeTyOfWQNJTed3oVFFO7O8G9JLhkwrnH0juGYg/exec`
+  - 旧URL（AKfycbxT...）はLibraryデプロイで無効。新URL（AKfycbzsFp1...）をウェブアプリとして新規発行
+- **ダッシュボード楽天累計の差異根本原因確認**：GASフェッチ失敗時はlocalStorageの古いキャッシュが表示される。GAS URLが壊れていると81万等の過去値が残り続ける
+
 ## 運用ルール
 **このプロジェクトのセッション終了時は必ずCLAUDE.mdを更新すること。**
 - セッション終了前に「今日の作業内容をCLAUDE.mdに追記してgit pushして」を実行
