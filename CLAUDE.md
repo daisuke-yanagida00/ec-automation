@@ -323,6 +323,29 @@ ec-automation/
 - `.github/workflows/clasp-push.yml`：DEPLOY_IDを新Web AppデプロイIDに更新
 - `integration/Code.gs`：`setupDailyTrigger()`・`action=setupTrigger`を削除
 
+## 2026-10-26 作業記録
+
+### 完了
+- **売上ダッシュボード 10/22-10/25 グラフ表示修正**：`docs/sales-tracker.html`
+  - `_DEFAULT_RAKUTEN['2026-10']` に 10/19-10/25 の楽天SP-API売上データを追加
+    - 10/19: 0, 10/20: 51,254, 10/21: 12,270, 10/22: 1,396
+    - 10/23: 5,750, 10/24: 53,340, 10/25: 146,332円（マットレス2件含む）
+  - `syncRakutenCache` IIFE 修正：既存キャッシュにない新日付を_DEFAULT_RAKUTENから追加するマージロジックへ変更（旧コードは `.map()` で既存行のみ更新し新日付は無視していた）
+  - `gasRakutenCache` 初期化 IIFE 同様に修正
+  - 自動再取得条件の根本修正：`gas_last_ts`（エポックミリ秒）を新規導入
+    - 旧条件：`lastTime.startsWith(today)` → 当日中2度目以降の開封でGAS再取得をスキップ
+    - 新条件：前回取得が今日9時より前なら再取得（8時GASトリガー後データを確実に反映）
+  - `RAKUTEN_CACHE_VER` / `DEFAULTS_VER` を `'20261026-1'` に更新
+
+### 決定事項
+- **ダッシュボードのグラフ未表示の根本原因**：ユーザーが8時GASトリガー実行前にページを開くと `gas_last_time` が当日日付になり、8時以降に開いても「今日既に取得済み」と判断され楽天APIデータが再取得されない。`gas_last_ts`（エポック秒）+9時閾値で恒久修正。
+- **10/19の楽天注文**: 0件（祝日等の影響）
+- **10/25の楽天注文**: 10件合計146,332円（goosely-mattress-sd 48,000 + goosely-mattress-s 38,000 含む）
+- **注文統合シート総行数**: 8,051行（2026-10-26 現在）
+
+### システム構成変更
+- `docs/sales-tracker.html`：_DEFAULT_RAKUTEN 10/19-10/25追加・IIFEマージロジック修正・gas_last_ts導入・バージョン更新
+
 ## 運用ルール
 **このプロジェクトのセッション終了時は必ずCLAUDE.mdを更新すること。**
 - セッション終了前に「今日の作業内容をCLAUDE.mdに追記してgit pushして」を実行
