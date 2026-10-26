@@ -1069,12 +1069,16 @@ var _DEFAULT_RAKUTEN = {
     {date:"2026-10-11",r:698,a:76625,y:0},{date:"2026-10-12",r:128500,a:61900,y:0},
     {date:"2026-10-13",r:24560,a:99684,y:0},{date:"2026-10-14",r:20638,a:58221,y:0},
     {date:"2026-10-15",r:242305,a:28965,y:0},{date:"2026-10-16",r:5000,a:76718,y:0},
-    {date:"2026-10-17",r:161658,a:178135,y:0},{date:"2026-10-18",r:41560,a:80810,y:0}
+    {date:"2026-10-17",r:161658,a:178135,y:0},{date:"2026-10-18",r:41560,a:80810,y:0},
+    {date:"2026-10-19",r:0,a:0,y:0},{date:"2026-10-20",r:51254,a:0,y:0},
+    {date:"2026-10-21",r:12270,a:0,y:0},{date:"2026-10-22",r:1396,a:0,y:0},
+    {date:"2026-10-23",r:5750,a:0,y:0},{date:"2026-10-24",r:53340,a:0,y:0},
+    {date:"2026-10-25",r:146332,a:0,y:0}
   ]
 };
 
 // _DEFAULT_RAKUTEN を更新したら必ずここも変更 → amazon_daily_log / yahoo_daily_log を強制同期
-var DEFAULTS_VER = '20261019-5';
+var DEFAULTS_VER = '20261026-1';
 (function seedDailyLogs() {
   if (localStorage.getItem('defaults_ver') === DEFAULTS_VER) return;
   var aLog = JSON.parse(localStorage.getItem('amazon_daily_log') || '{}');
@@ -1093,7 +1097,7 @@ var DEFAULTS_VER = '20261019-5';
 })();
 
 // _DEFAULT_RAKUTEN の楽天r:値を更新したらここも変更 → gasRakutenCacheのr:値を強制上書き
-var RAKUTEN_CACHE_VER = '20261021-rms';
+var RAKUTEN_CACHE_VER = '20261026-1';
 (function syncRakutenCache() {
   if (localStorage.getItem('rakuten_cache_ver') === RAKUTEN_CACHE_VER) return;
   try {
@@ -1102,9 +1106,14 @@ var RAKUTEN_CACHE_VER = '20261021-rms';
       var defMap = {};
       _DEFAULT_RAKUTEN[ym].forEach(function(d){ defMap[d.date] = d; });
       if (stored[ym]) {
-        stored[ym] = stored[ym].map(function(d) {
-          var def = defMap[d.date] || {};
-          return { date: d.date, r: def.r || d.r || 0, a: d.a || def.a || 0, y: d.y || def.y || 0 };
+        var mergeMap = {};
+        stored[ym].forEach(function(d){ mergeMap[d.date] = d; });
+        Object.keys(defMap).forEach(function(dt) {
+          if (!mergeMap[dt]) mergeMap[dt] = defMap[dt];
+        });
+        stored[ym] = Object.keys(mergeMap).sort().map(function(dt) {
+          var d = mergeMap[dt]; var def = defMap[dt] || {};
+          return { date: dt, r: def.r || d.r || 0, a: d.a || def.a || 0, y: d.y || def.y || 0 };
         });
       } else {
         stored[ym] = _DEFAULT_RAKUTEN[ym];
@@ -1123,20 +1132,18 @@ var gasRakutenCache = (function() {
     Object.keys(_DEFAULT_RAKUTEN).forEach(function(ym) {
       var s = stored[ym];
       if (!s || s.length === 0 || s.every(function(d){ return !d.r; })) {
-        // 月ごとデータがない場合はそのまま置き換え
         stored[ym] = _DEFAULT_RAKUTEN[ym];
       } else {
-        // 既存キャッシュがあっても a:/y: が 0 の日はデフォルト値で補完
         var defMap = {};
         _DEFAULT_RAKUTEN[ym].forEach(function(d){ defMap[d.date] = d; });
-        stored[ym] = stored[ym].map(function(d) {
-          var def = defMap[d.date] || {};
-          return {
-            date: d.date,
-            r: d.r || def.r || 0,
-            a: d.a || def.a || 0,
-            y: d.y || def.y || 0
-          };
+        var mergeMap = {};
+        stored[ym].forEach(function(d){ mergeMap[d.date] = d; });
+        Object.keys(defMap).forEach(function(dt) {
+          if (!mergeMap[dt]) mergeMap[dt] = defMap[dt];
+        });
+        stored[ym] = Object.keys(mergeMap).sort().map(function(dt) {
+          var d = mergeMap[dt]; var def = defMap[dt] || {};
+          return { date: dt, r: d.r || def.r || 0, a: d.a || def.a || 0, y: d.y || def.y || 0 };
         });
       }
     });
@@ -1313,6 +1320,7 @@ function fetchGAS() {
       fy(data.monthly.total) + ' / 昨日:' + fy(ys.total) + ' / 今日:' + fy(data.today.total));
     localStorage.setItem('gas_last', JSON.stringify(data));
     localStorage.setItem('gas_last_time', new Date().toLocaleString('ja-JP'));
+    localStorage.setItem('gas_last_ts', Date.now().toString());
     setAutoSales(data);
   };
 
@@ -1394,7 +1402,9 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbxTxVRSWNF8G2vvKKDPBu
   /* GAS キャッシュを復元（最終取得データ） */
   var last     = localStorage.getItem('gas_last');
   var lastTime = localStorage.getItem('gas_last_time');
+  var lastTs   = parseInt(localStorage.getItem('gas_last_ts') || '0', 10);
   var today    = new Date().toLocaleDateString('ja-JP');
+  var todayNineAM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0, 0).getTime();
 
   /* 手動入力を先に復元（setAutoSales が gv('in-y-monthly') を読むため必ず先に実行） */
   var ms = JSON.parse(localStorage.getItem('manual_sales') || '{}');
@@ -1418,8 +1428,8 @@ var GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbxTxVRSWNF8G2vvKKDPBu
         fy(data.monthly.total) + ' / 昨日:' + fy(ys2.total) + ' / 今日:' + fy(data.today.total) +
         '（「売上を自動取得」で最新に更新）');
       setAutoSales(data);
-      // 今日まだ取得していなければバックグラウンドで自動更新
-      if (lastTime && !lastTime.startsWith(today)) {
+      // 前回取得が今日9時より前なら再取得（8時GASトリガー後のデータを確実に反映）
+      if (!lastTs || lastTs < todayNineAM) {
         setStatus('ing', '最新データを自動取得中...');
         fetchGAS();
       }
