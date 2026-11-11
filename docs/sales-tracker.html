@@ -1076,12 +1076,16 @@ var _DEFAULT_RAKUTEN = {
     {date:"2026-10-25",r:146332,a:0,y:0}
   ],
   "2026-11": [
-    {date:"2026-11-01",r:80896,a:0,y:0}
+    {date:"2026-11-01",r:80896,a:0,y:0},{date:"2026-11-02",r:55776,a:0,y:0},
+    {date:"2026-11-03",r:10460,a:0,y:0},{date:"2026-11-04",r:49094,a:0,y:0},
+    {date:"2026-11-05",r:226472,a:0,y:0},{date:"2026-11-06",r:54158,a:0,y:0},
+    {date:"2026-11-07",r:2094,a:0,y:0},{date:"2026-11-08",r:125840,a:0,y:0},
+    {date:"2026-11-09",r:23072,a:0,y:0},{date:"2026-11-10",r:315406,a:0,y:0}
   ]
 };
 
 // _DEFAULT_RAKUTEN を更新したら必ずここも変更 → amazon_daily_log / yahoo_daily_log を強制同期
-var DEFAULTS_VER = '20261102-1';
+var DEFAULTS_VER = '20261111-1';
 (function seedDailyLogs() {
   if (localStorage.getItem('defaults_ver') === DEFAULTS_VER) return;
   var aLog = JSON.parse(localStorage.getItem('amazon_daily_log') || '{}');
@@ -1100,7 +1104,7 @@ var DEFAULTS_VER = '20261102-1';
 })();
 
 // _DEFAULT_RAKUTEN の楽天r:値を更新したらここも変更 → gasRakutenCacheのr:値を強制上書き
-var RAKUTEN_CACHE_VER = '20261102-1';
+var RAKUTEN_CACHE_VER = '20261111-1';
 (function syncRakutenCache() {
   if (localStorage.getItem('rakuten_cache_ver') === RAKUTEN_CACHE_VER) return;
   try {
